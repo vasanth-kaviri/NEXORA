@@ -4,6 +4,8 @@
  * Supports Users, Sessions, Notifications, Roadmaps, and Tasks.
  */
 
+import realtimeDb from './realtimeDb';
+
 const DB_KEYS = {
   USERS: 'nexora_db_users',
   SESSION: 'nexora_user',
@@ -321,6 +323,16 @@ class DatabaseService {
       return n;
     });
     this.saveNotifications(notifs);
+
+    // Sync to Firebase Realtime Database
+    const currentUser = this.getCurrentUser();
+    if (currentUser?.id) {
+      realtimeDb.appendNotificationChat(currentUser.id, id, replyText, sender);
+    }
+  }
+
+  addChatToNotification(id, replyText, sender = 'user') {
+    return this.addNotificationReply(id, replyText, sender);
   }
 }
 

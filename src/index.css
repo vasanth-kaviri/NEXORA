@@ -2,35 +2,33 @@
 
 
 :root {
-  /* LIGHT MODE (Default) */
-  --bg-main: #f8fafc;
-  /* Slate 50 */
+  /* LIGHT MODE (Gallery Minimalist Paper & Titanium) */
+  --bg-main: #fafafa;
   --bg-card: #ffffff;
-  /* White */
-  --bg-card-glass: rgba(255, 255, 255, 0.7);
+  --bg-card-glass: rgba(255, 255, 255, 0.85);
 
-  --primary: #6366f1;
-  /* Indigo 500 */
-  --primary-rgb: 99, 102, 241;
-  --primary-glow: rgba(99, 102, 241, 0.35);
-  --secondary: #f43f5e;
-  /* Rose 500 */
-  --secondary-rgb: 244, 63, 94;
-  --accent: #14b8a6;
-  /* Teal 500 */
-  --accent-rgb: 20, 184, 166;
+  --primary: #18181b;
+  /* Sleek Titanium Black */
+  --primary-rgb: 24, 24, 27;
+  --primary-glow: rgba(0, 0, 0, 0.12);
+  --secondary: #71717a;
+  /* Muted Zinc */
+  --secondary-rgb: 113, 113, 122;
+  --accent: #2563eb;
+  /* Minimalist Cobalt */
+  --accent-rgb: 37, 99, 235;
 
-  --text-main: #0f172a;
-  /* Slate 900 */
-  --text-muted: #64748b;
-  /* Slate 500 */
-  --border-color: rgba(0, 0, 0, 0.1);
-  --input-bg: rgba(0, 0, 0, 0.05);
+  --text-main: #09090b;
+  /* Carbon Black */
+  --text-muted: #71717a;
+  /* Neutral Graphite */
+  --border-color: rgba(0, 0, 0, 0.08);
+  --input-bg: rgba(0, 0, 0, 0.03);
 
   --success: #10b981;
   --warning: #f59e0b;
 
-  /* Spacing - Optimized to reduce blank wasted space */
+  /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.4rem;
   --space-md: 0.85rem;
@@ -50,50 +48,61 @@
 
   /* SKEUOMORPHIC LIGHT TOKENS */
   --skeuo-highlight: rgba(255, 255, 255, 0.95);
-  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.6);
-  --skeuo-shadow-rim: rgba(15, 23, 42, 0.08);
-  --skeuo-shadow-deep: rgba(15, 23, 42, 0.12);
-  --skeuo-surface-grad: linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
-  --skeuo-surface-card: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.85) 100%);
-  --skeuo-recessed-bg: #eef2f6;
-  --skeuo-recessed-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1), inset 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 0 rgba(255, 255, 255, 0.9);
-  --skeuo-btn-lip: #4338ca;
-  --skeuo-btn-sec-lip: rgba(148, 163, 184, 0.7);
-  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-  --skeuo-bevel-dark: 0 -1px 0 rgba(15, 23, 42, 0.08) inset;
+  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.7);
+  --skeuo-shadow-rim: rgba(0, 0, 0, 0.06);
+  --skeuo-shadow-deep: rgba(0, 0, 0, 0.08);
+  --skeuo-surface-grad: linear-gradient(180deg, #ffffff 0%, #fafafa 50%, #f4f4f5 100%);
+  --skeuo-surface-card: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  --skeuo-recessed-bg: #f4f4f5;
+  --skeuo-recessed-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.9);
+  --skeuo-btn-lip: #09090b;
+  --skeuo-btn-sec-lip: rgba(113, 113, 122, 0.3);
+  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  --skeuo-bevel-dark: 0 -1px 0 rgba(0, 0, 0, 0.05) inset;
 }
 
 html.dark {
-  /* DARK MODE */
-  --bg-main: #020617;
-  /* Slate 950 - darker for better contrast */
-  --bg-card: #0f172a;
-  /* Slate 900 */
-  --bg-card-glass: rgba(15, 23, 42, 0.85);
-  /* More opaque */
+  /* DARK MODE (Luxury Minimalist Deep Obsidian & Titanium) */
+  --bg-main: #09090b;
+  /* Pure Obsidian Zinc */
+  --bg-card: #121215;
+  /* Elevated Matte Surface */
+  --bg-card-glass: rgba(18, 18, 21, 0.85);
 
-  --text-main: #f8fafc;
-  /* Slate 50 */
-  --text-muted: #cbd5e1;
-  /* Slate 300 - lighter for better visibility */
-  --border-color: rgba(255, 255, 255, 0.15);
-  /* Slightly brighter border */
-  --input-bg: rgba(255, 255, 255, 0.1);
-  /* Brighter input bg */
-  --primary-glow: rgba(99, 102, 241, 0.6);
+  --primary: #4f46e5;
+  /* Precision Electric Cobalt */
+  --primary-rgb: 79, 70, 229;
+  --primary-glow: rgba(79, 70, 229, 0.25);
+  --secondary: #71717a;
+  /* Muted Titanium Zinc */
+  --secondary-rgb: 113, 113, 122;
+  --accent: #38bdf8;
+  /* Minimalist Ice Blue */
+  --accent-rgb: 56, 189, 248;
 
-  /* SKEUOMORPHIC DARK TOKENS */
-  --skeuo-highlight: rgba(255, 255, 255, 0.22);
-  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.1);
-  --skeuo-shadow-rim: rgba(0, 0, 0, 0.6);
-  --skeuo-shadow-deep: rgba(0, 0, 0, 0.7);
-  --skeuo-surface-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
-  --skeuo-surface-card: linear-gradient(180deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
-  --skeuo-recessed-bg: rgba(2, 6, 23, 0.7);
-  --skeuo-recessed-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.08);
+  --text-main: #f4f4f5;
+  /* Crisp Optical White */
+  --text-muted: #a1a1aa;
+  /* Neutral Calm Silver */
+  --border-color: rgba(255, 255, 255, 0.08);
+  /* Razor-thin 1px line */
+  --input-bg: rgba(255, 255, 255, 0.04);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+
+  /* SKEUOMORPHIC DARK TOKENS (Matte Anodized Titanium) */
+  --skeuo-highlight: rgba(255, 255, 255, 0.12);
+  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.05);
+  --skeuo-shadow-rim: rgba(0, 0, 0, 0.5);
+  --skeuo-shadow-deep: rgba(0, 0, 0, 0.65);
+  --skeuo-surface-grad: linear-gradient(180deg, #18181b 0%, #121215 100%);
+  --skeuo-surface-card: linear-gradient(180deg, #18181b 0%, #0e0e11 100%);
+  --skeuo-recessed-bg: #141417;
+  --skeuo-recessed-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.06);
   --skeuo-btn-lip: #312e81;
-  --skeuo-btn-sec-lip: rgba(0, 0, 0, 0.65);
-  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  --skeuo-btn-sec-lip: rgba(0, 0, 0, 0.5);
+  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
   --skeuo-bevel-dark: 0 -1px 0 rgba(0, 0, 0, 0.5) inset;
 }
 
@@ -273,26 +282,29 @@ html.dark .blob {
 .blob-1 {
   top: -10%;
   left: -10%;
-  width: 50vw;
-  height: 50vw;
+  width: 45vw;
+  height: 45vw;
   background: var(--primary);
+  opacity: 0.12;
 }
 
 .blob-2 {
   bottom: -10%;
   right: -10%;
-  width: 60vw;
-  height: 60vw;
+  width: 50vw;
+  height: 50vw;
   background: var(--secondary);
+  opacity: 0.08;
   animation-delay: -5s;
 }
 
 .blob-3 {
   top: 40%;
   left: 60%;
-  width: 40vw;
-  height: 40vw;
+  width: 35vw;
+  height: 35vw;
   background: var(--accent);
+  opacity: 0.06;
   animation-delay: -10s;
 }
 
@@ -302,24 +314,24 @@ html.dark .blob {
   }
 
   50% {
-    transform: translate(30px, 50px) scale(1.1);
+    transform: translate(25px, 35px) scale(1.05);
   }
 
   100% {
-    transform: translate(-20px, 30px) scale(0.9);
+    transform: translate(-15px, 20px) scale(0.95);
   }
 }
 
-/* Typography Utilities */
+/* Typography Utilities - Luxury Platinum Sheen */
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--text-main) 20%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-alt {
-  background: linear-gradient(135deg, var(--accent), var(--primary));
+  background: linear-gradient(135deg, var(--text-main) 30%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -436,29 +448,38 @@ select.input-field option {
   will-change: transform, box-shadow;
 }
 
-/* ── Primary Tactile Push Button ── */
+/* ── Primary Tactile Push Button (Luxury Minimalist) ── */
 .btn-primary {
-  background: linear-gradient(180deg, #818cf8 0%, #6366f1 45%, #4f46e5 100%);
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.4);
   /* 3D Physical Ledge Base */
   box-shadow: 
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-    0 4px 0 var(--skeuo-btn-lip),
-    0 8px 18px rgba(99, 102, 241, 0.38);
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 3.5px 0 var(--skeuo-btn-lip),
+    0 6px 16px var(--primary-glow);
+}
+
+html:not(.dark) .btn-primary {
+  background: linear-gradient(180deg, #27272a 0%, #18181b 50%, #09090b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 3.5px 0 #000000,
+    0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
   transform: translateY(-2px);
   box-shadow: 
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-    0 6px 0 var(--skeuo-btn-lip),
-    0 12px 24px rgba(99, 102, 241, 0.48);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 5px 0 var(--skeuo-btn-lip),
+    0 10px 20px var(--primary-glow);
 }
 
 /* Tactile Mechanical Depression on Active / Click */
