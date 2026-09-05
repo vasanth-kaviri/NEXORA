@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Compass, User, Bell, ArrowLeft, Rocket, 
   FolderKanban, Trophy, BookOpen, Bot, Settings, 
-  Sun, Moon, ChevronRight, Sparkles, Menu, X, Search
+  Sun, Moon, ChevronRight, Sparkles, Menu, X, Search, Info
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -67,6 +67,7 @@ export default function Layout() {
     { label: 'Hackathons', path: '/hackathons', icon: Trophy },
     { label: 'Resources', path: '/resources', icon: BookOpen },
     { label: 'AI Mentor', path: '/chatbot', icon: Bot },
+    { label: 'About NEXORA', path: '/about', icon: Info },
   ];
 
   // Route breadcrumbs generator

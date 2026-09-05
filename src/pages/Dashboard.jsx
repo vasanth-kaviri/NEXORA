@@ -33,12 +33,6 @@ export default function Dashboard() {
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-  const scrollToAbout = () => {
-    const el = document.getElementById('about-nexora-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   const handleFeedbackSubmit = (e) => {
     e.preventDefault();
@@ -193,20 +187,9 @@ export default function Dashboard() {
   return (
     <div className="workstation-container animate-fade-in flex flex-col gap-md">
       
-      {/* ── Global Search & Quick About Jump Bar ── */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-sm">
-        <div className="flex-1">
-          <GlobalSearch />
-        </div>
-        <button
-          onClick={scrollToAbout}
-          className="btn btn-secondary flex items-center justify-center gap-xs"
-          style={{ padding: '9px 18px', fontSize: '0.8rem', borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap' }}
-          title="Jump down to About NEXORA & Platform Overview"
-        >
-          <Info size={15} className="text-primary" />
-          <span>About NEXORA ↓</span>
-        </button>
+      {/* ── Global Search Command Bar ── */}
+      <div className="w-full">
+        <GlobalSearch />
       </div>
 
       {/* ── Compact Top Ribbon (Stats) ── */}
