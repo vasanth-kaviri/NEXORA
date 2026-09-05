@@ -1,0 +1,194 @@
+/* ==========================================================================
+   NEXORA CONTINUOUS FLOATING SOCIAL MEDIA TICKER (INFINITE SCROLLING)
+   ========================================================================== */
+
+@keyframes socialTickerScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes socialFloatingWave1 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes socialFloatingWave2 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+.social-ticker-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 0;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 7%,
+    black 93%,
+    transparent 100%
+  );
+}
+
+.social-ticker-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 16px;
+  will-change: transform;
+  animation: socialTickerScroll 34s linear infinite;
+}
+
+/* PAUSE ON HOVER:
+   Scrolling pauses instantly when user hovers over the ticker wrapper or any logo */
+.social-ticker-wrapper:hover .social-ticker-track,
+.social-ticker-wrapper:focus-within .social-ticker-track {
+  animation-play-state: paused !important;
+}
+
+/* Individual Floating Social Media Pill / Card */
+.social-ticker-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              background 0.25s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+}
+
+/* Subtle alternate wave floating animation */
+.social-ticker-card:nth-child(odd) {
+  animation: socialFloatingWave1 4.5s ease-in-out infinite;
+}
+
+.social-ticker-card:nth-child(even) {
+  animation: socialFloatingWave2 5.2s ease-in-out infinite 0.8s;
+}
+
+/* On Card Hover: pause floating, elevate with brand colored glow and outline */
+.social-ticker-card:hover,
+.social-ticker-card:focus {
+  animation-play-state: paused !important;
+  transform: translateY(-5px) scale(1.05) !important;
+  border-color: var(--brand-color, var(--primary)) !important;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.2),
+              0 0 18px -2px var(--brand-glow, var(--primary-glow)) !important;
+  background: var(--bg-card) !important;
+  z-index: 10;
+}
+
+.social-ticker-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--brand-color, var(--text-main));
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.social-ticker-card:hover .social-ticker-icon-wrap,
+.social-ticker-card:focus .social-ticker-icon-wrap {
+  transform: scale(1.12) rotate(6deg);
+  background: var(--brand-color);
+  color: #ffffff !important;
+  border-color: transparent;
+}
+
+.social-ticker-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.social-ticker-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.social-ticker-handle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.social-ticker-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Mobile and Small Tablet Responsiveness */
+@media (max-width: 768px) {
+  .social-ticker-wrapper {
+    padding: 10px 0;
+  }
+  .social-ticker-track {
+    gap: 12px;
+    animation-duration: 28s;
+  }
+  .social-ticker-card {
+    padding: 6px 12px;
+    gap: 9px;
+  }
+  .social-ticker-icon-wrap {
+    width: 30px;
+    height: 30px;
+  }
+  .social-ticker-name {
+    font-size: 0.8rem;
+  }
+  .social-ticker-handle {
+    font-size: 0.68rem;
+  }
+  .social-ticker-badge {
+    display: none;
+  }
+}

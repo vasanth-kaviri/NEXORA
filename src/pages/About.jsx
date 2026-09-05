@@ -3,6 +3,7 @@ import {
   Cpu, Lock, Globe, ArrowRight, Bot, CheckCircle2, Heart 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SocialTicker from '../components/SocialTicker';
 
 export default function About() {
   const navigate = useNavigate();
@@ -306,6 +307,14 @@ export default function About() {
           </button>
         </div>
       </section>
+
+      {/* ── CONTINUOUS FLOATING SOCIAL MEDIA TICKER ── */}
+      <div className="glass-panel p-md rounded-2xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+        <SocialTicker 
+          title="JOIN THE GLOBAL NEXORA DEVELOPER NETWORK" 
+          subtitle="Collaborate with over 120,000+ software engineers across open source, mock interview labs, and community channels."
+        />
+      </div>
 
       {/* ── FOOTER & POLICIES ── */}
       <footer className="text-center pt-md" style={{ borderTop: '1px solid var(--border-color)' }}>

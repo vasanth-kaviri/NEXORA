@@ -7,6 +7,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalSearch from '../components/GlobalSearch';
+import SocialTicker from '../components/SocialTicker';
 import db from '../services/db';
 import { useToast } from '../contexts/ToastContext';
 import { getRoadmapForJob } from '../utils/roadmapData';
@@ -863,6 +864,14 @@ style = {{
         </form>
       )}
     </div>
+  </div>
+
+  {/* ── CONTINUOUS FLOATING SOCIAL MEDIA TICKER ── */}
+  <div className="pt-md" style={{ borderTop: '1px solid var(--border-color)' }}>
+    <SocialTicker 
+      title="LIVE SOCIAL ECOSYSTEM & COMMUNITY" 
+      subtitle="Follow live codebase commits, system design discussions, tutorials, and community events."
+    />
   </div>
 
 {/* Footer Copyright */ }
