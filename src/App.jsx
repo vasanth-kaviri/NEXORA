@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
 import './index.css';
 
 // Layouts
@@ -64,12 +65,13 @@ import Hackathons from './pages/Hackathons';
 function App() {
   return (
     <ThemeProvider>
-      <div className="bg-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
-      </div>
-      <BrowserRouter>
+      <ToastProvider>
+        <div className="bg-blobs">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+          <div className="blob blob-3"></div>
+        </div>
+        <BrowserRouter>
         <Routes>
           {/* Student & Public Portal */}
           <Route element={<Layout />}>
@@ -131,6 +133,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

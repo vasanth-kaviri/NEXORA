@@ -1,16 +1,29 @@
-import { Bell, Award, Calendar, Compass, FileText, CheckCircle2, MessageSquare, Sparkles } from 'lucide-react';
+import { 
+  Bell, Award, Calendar, Compass, FileText, CheckCircle2, 
+  MessageSquare, Sparkles, Search, Check, ExternalLink, ArrowRight,
+  Filter, Trash2, Clock, Send, ChevronRight
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import db from '../services/db';
+import { useToast } from '../contexts/ToastContext';
 
 export default function Notifications() {
   const navigate = useNavigate();
+  const toast = useToast();
+
   const [notifications, setNotifications] = useState([]);
-  const [filter, setFilter] = useState('all'); // 'all' | 'unread' | 'alerts'
+  const [filter, setFilter] = useState('all'); // 'all' | 'unread' | 'resume' | 'interview'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedNotif, setSelectedNotif] = useState(null);
+  const [replyText, setReplyText] = useState('');
 
   const loadNotifications = () => {
     const list = db.getNotifications();
     setNotifications(list);
+    if (list.length > 0 && !selectedNotif) {
+      setSelectedNotif(list[0]);
+    }
   };
 
   useEffect(() => {
@@ -34,145 +47,300 @@ export default function Notifications() {
     }
   };
 
+  const handleSelect = (notif) => {
+    setSelectedNotif(notif);
+    if (notif.unread) {
+      db.markNotificationAsRead(notif.id);
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, unread: false } : n));
+    }
+  };
+
+  const handleMarkAllRead = () => {
+    notifications.forEach(n => {
+      if (n.unread) db.markNotificationAsRead(n.id);
+    });
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    toast.success('All alerts marked as read');
+  };
+
+  const handleSendReply = (e) => {
+    e.preventDefault();
+    if (!replyText.trim() || !selectedNotif) return;
+    
+    db.addChatToNotification(selectedNotif.id, replyText);
+    setReplyText('');
+    toast.success('Reply submitted to AI Mentor');
+    
+    // Simulate instant AI reply
+    setTimeout(() => {
+      db.addChatToNotification(selectedNotif.id, 'I have noted your update and adjusted your career trajectory accordingly! Keep up the great work.', 'system');
+      loadNotifications();
+    }, 800);
+  };
+
   const filtered = notifications.filter(n => {
+    const matchesSearch = n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          n.message.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
     if (filter === 'unread') return n.unread;
-    if (filter === 'alerts') return n.type === 'resume' || n.type === 'reminder';
+    if (filter === 'resume') return n.type === 'resume';
+    if (filter === 'interview') return n.type === 'reminder';
     return true;
   });
 
+  const unreadTotal = notifications.filter(n => n.unread).length;
+
   return (
-    <div className="animate-fade-in flex flex-col gap-md" style={{ maxWidth: '850px', margin: '0 auto' }}>
+    <div className="workstation-container animate-fade-in flex flex-col gap-md">
       
-      {/* ── Header ── */}
-      <header className="flex justify-between items-center flex-wrap gap-xs">
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '800', margin: 0 }}>Notification Inbox</h1>
-          <p className="text-muted" style={{ fontSize: '0.85rem', marginTop: '2px' }}>
-            Click any alert to launch its interactive chat & action room.
-          </p>
+      {/* ── Inbox Header ── */}
+      <header className="glass-panel skeuo-convex" style={{ padding: '18px 24px', borderRadius: 'var(--radius-lg)' }}>
+        <div className="flex justify-between items-center flex-wrap gap-sm">
+          <div>
+            <div className="flex items-center gap-xs mb-xs">
+              <Bell size={18} className="text-primary" />
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--primary)' }}>
+                ENTERPRISE INBOX & ACTION HUB
+              </span>
+            </div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '2px 0', letterSpacing: '-0.3px' }}>
+              Notification Workstation
+            </h1>
+            <p className="text-muted" style={{ fontSize: '0.86rem', margin: 0 }}>
+              {unreadTotal} unread action items requiring your attention
+            </p>
+          </div>
+
+          <div className="flex items-center gap-xs">
+            <button
+              onClick={handleMarkAllRead}
+              className="btn btn-secondary flex items-center gap-xs"
+              style={{ fontSize: '0.82rem', padding: '7px 14px' }}
+            >
+              <Check size={15} />
+              <span>Mark All as Read</span>
+            </button>
+          </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex gap-xs">
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'unread', label: 'Unread' },
-            { key: 'alerts', label: 'Action Items' }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-full)',
-                border: filter === tab.key ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-                background: filter === tab.key ? 'rgba(99, 102, 241, 0.12)' : 'var(--input-bg)',
-                color: filter === tab.key ? 'var(--primary)' : 'var(--text-muted)',
-                cursor: 'pointer'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Filter Pills & Search */}
+        <div className="flex justify-between items-center flex-wrap gap-sm mt-md pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+          <div className="flex gap-xs flex-wrap">
+            {[
+              { key: 'all', label: `All (${notifications.length})` },
+              { key: 'unread', label: `Unread (${unreadTotal})` },
+              { key: 'resume', label: 'ATS Audits' },
+              { key: 'interview', label: 'Mock Interviews' }
+            ].map(f => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`tab-pill ${filter === f.key ? 'active' : ''}`}
+                style={{ fontSize: '0.78rem', padding: '5px 12px' }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick Search */}
+          <div className="flex items-center gap-xs skeuo-well" style={{ padding: '5px 12px', borderRadius: 'var(--radius-full)', width: '220px' }}>
+            <Search size={14} className="text-muted" />
+            <input 
+              type="text" 
+              placeholder="Search notifications..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.8rem', width: '100%' }}
+            />
+          </div>
         </div>
       </header>
 
-      {/* ── Notification List ── */}
-      <div className="flex flex-col gap-xs">
-        {filtered.length === 0 ? (
-          <div className="glass-panel text-center" style={{ padding: 'var(--space-xl)', borderRadius: 'var(--radius-md)' }}>
-            <p className="text-muted" style={{ margin: 0 }}>No notifications found for this filter.</p>
-          </div>
-        ) : (
-          filtered.map((notif, i) => (
-            <div 
-              key={notif.id || i} 
-              className={`glass-panel interactive delay-${Math.min((i + 1) * 100, 400)} flex gap-md items-start`} 
-              style={{ 
-                padding: '12px 16px', 
-                cursor: 'pointer',
-                borderRadius: 'var(--radius-md)',
-                borderLeft: notif.unread ? '3px solid var(--primary)' : '1px solid var(--border-color)'
-              }}
-              onClick={() => navigate(`/notification/${notif.id}`)}
-            >
-              <div 
-                style={{ 
-                  padding: '9px', 
-                  background: 'var(--input-bg)', 
-                  borderRadius: '50%',
-                  position: 'relative',
-                  flexShrink: 0
-                }}
-              >
-                {getIcon(notif.type)}
-                {notif.unread && (
-                  <div 
-                    style={{ 
-                      position: 'absolute', 
-                      top: 0, 
-                      right: 0, 
-                      width: '8px', 
-                      height: '8px', 
-                      borderRadius: '50%', 
-                      background: 'var(--primary)',
-                      boxShadow: '0 0 6px var(--primary-glow)' 
-                    }} 
-                  />
+      {/* ── Split Inbox Workstation (Left: Feed, Right: Live Resolution Canvas) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-md" style={{ alignItems: 'start' }}>
+        
+        {/* ── LEFT PANE: Notification List (5 Columns on Desktop) ── */}
+        <div className="lg:col-span-5 flex flex-col gap-xs">
+          {filtered.length === 0 ? (
+            <div className="glass-panel p-lg text-center" style={{ borderRadius: 'var(--radius-md)' }}>
+              <p className="text-muted" style={{ margin: 0, fontSize: '0.88rem' }}>No notifications match the filter.</p>
+            </div>
+          ) : (
+            filtered.map((notif) => {
+              const isSelected = selectedNotif?.id === notif.id;
+              return (
+                <div
+                  key={notif.id}
+                  onClick={() => handleSelect(notif)}
+                  className={`skeuo-convex interactive transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                  style={{
+                    padding: '14px',
+                    borderRadius: 'var(--radius-md)',
+                    background: isSelected ? 'var(--bg-card)' : 'var(--skeuo-surface-grad)',
+                    border: '1px solid var(--border-color)',
+                    cursor: 'pointer',
+                    boxShadow: isSelected ? '0 0 16px var(--primary-glow)' : 'var(--skeuo-bevel-light)'
+                  }}
+                >
+                  <div className="flex items-start gap-sm">
+                    <div className="skeuo-well" style={{ padding: '8px', borderRadius: '50%', flexShrink: 0 }}>
+                      {getIcon(notif.type)}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center mb-xs">
+                        <span className="badge" style={{ fontSize: '0.66rem', fontWeight: 700, background: 'var(--input-bg)' }}>
+                          {notif.type.toUpperCase()}
+                        </span>
+                        <span className="text-muted" style={{ fontSize: '0.72rem' }}>
+                          {notif.time}
+                        </span>
+                      </div>
+
+                      <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', fontWeight: notif.unread ? 800 : 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {notif.title}
+                      </h4>
+                      <p className="text-muted" style={{ margin: 0, fontSize: '0.78rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {notif.message}
+                      </p>
+                    </div>
+
+                    {notif.unread && (
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--primary)', flexShrink: 0, marginTop: '6px', boxShadow: '0 0 6px var(--primary)' }} />
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* ── RIGHT PANE: Live Resolution Canvas (7 Columns on Desktop) ── */}
+        <div className="lg:col-span-7 flex flex-col gap-md">
+          {selectedNotif ? (
+            <div className="glass-panel skeuo-convex flex flex-col gap-md" style={{ padding: '24px', borderRadius: 'var(--radius-lg)' }}>
+              
+              {/* Header */}
+              <div className="flex justify-between items-start flex-wrap gap-sm">
+                <div>
+                  <div className="flex items-center gap-xs mb-xs">
+                    <span className="badge" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700 }}>
+                      ACTIVE RESOLUTION CANVAS
+                    </span>
+                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>•</span>
+                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>{selectedNotif.time}</span>
+                  </div>
+                  <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '2px 0 6px 0', letterSpacing: '-0.3px' }}>
+                    {selectedNotif.title}
+                  </h2>
+                </div>
+
+                {selectedNotif.actionPath && (
+                  <button
+                    onClick={() => navigate(selectedNotif.actionPath)}
+                    className="btn btn-primary flex items-center gap-xs"
+                    style={{ fontSize: '0.82rem', padding: '8px 16px' }}
+                  >
+                    <span>{selectedNotif.actionLabel || 'Launch Tool'}</span>
+                    <ArrowRight size={15} />
+                  </button>
                 )}
               </div>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="flex justify-between items-center gap-xs mb-xs">
-                  <h3 style={{ fontSize: '0.94rem', fontWeight: notif.unread ? '700' : '600', margin: 0, color: 'var(--text-main)' }}>
-                    {notif.title}
-                  </h3>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-                    {notif.time}
-                  </span>
+              {/* Message Body */}
+              <p className="text-main" style={{ fontSize: '0.92rem', lineHeight: 1.6, margin: 0 }}>
+                {selectedNotif.message}
+              </p>
+
+              {/* Specific Widget based on alert type */}
+              {selectedNotif.type === 'resume' && (
+                <div className="skeuo-well" style={{ padding: '18px', borderRadius: 'var(--radius-md)' }}>
+                  <div className="flex justify-between items-center mb-sm">
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--primary)' }}>
+                      AI ATS AUDIT TELEMETRY
+                    </span>
+                    <span className="tabular-numbers text-success font-bold" style={{ fontSize: '1.1rem' }}>
+                      78 / 100
+                    </span>
+                  </div>
+                  <div style={{ height: '8px', background: 'rgba(0,0,0,0.2)', borderRadius: '9999px', overflow: 'hidden', marginBottom: '12px' }}>
+                    <div style={{ width: '78%', height: '100%', background: 'linear-gradient(90deg, #10b981, var(--primary))', borderRadius: '9999px' }} />
+                  </div>
+                  <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>
+                    Detected 3 high-leverage technical keyword opportunities: <strong>PyTorch Quantization</strong>, <strong>FastAPI Async Inference</strong>, and <strong>Docker Containerization</strong>.
+                  </p>
+                </div>
+              )}
+
+              {selectedNotif.type === 'reminder' && (
+                <div className="skeuo-well" style={{ padding: '18px', borderRadius: 'var(--radius-md)' }}>
+                  <div className="flex items-center gap-xs mb-xs">
+                    <Clock size={16} className="text-accent" />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>AI Mock Interview Chamber Ready</span>
+                  </div>
+                  <p className="text-muted" style={{ fontSize: '0.82rem', margin: 0 }}>
+                    Topics: Machine Learning System Design, Algorithm Latency, and Python Concurrency. Ensure camera & microphone permissions are enabled.
+                  </p>
+                </div>
+              )}
+
+              {/* Interactive AI Chat History & In-place Reply */}
+              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+                <div className="flex items-center gap-xs mb-sm">
+                  <Sparkles size={16} className="text-primary" />
+                  <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>In-Place AI Copilot Thread</h4>
                 </div>
 
-                <p 
-                  className="text-muted" 
-                  style={{ 
-                    fontSize: '0.83rem', 
-                    margin: '0 0 6px 0', 
-                    lineHeight: 1.45,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {notif.message}
-                </p>
-
-                <div className="flex justify-between items-center gap-xs flex-wrap">
-                  <span style={{ 
-                    fontSize: '0.7rem', 
-                    padding: '2px 8px', 
-                    borderRadius: '999px', 
-                    background: 'rgba(99, 102, 241, 0.08)', 
-                    color: 'var(--primary)', 
-                    fontWeight: 600,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <MessageSquare size={12} />
-                    Open Chat Thread
-                  </span>
-
-                  <span className="text-primary interactive" style={{ fontSize: '0.74rem', fontWeight: 600 }}>
-                    {notif.actionLabel || 'View Details'} →
-                  </span>
+                <div className="flex flex-col gap-xs mb-sm custom-scroll" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  {(selectedNotif.chatHistory || []).map((chat, idx) => (
+                    <div 
+                      key={idx}
+                      className={`p-sm rounded-md ${chat.sender === 'user' ? 'self-end bg-primary text-white' : 'self-start skeuo-well text-main'}`}
+                      style={{ maxWidth: '80%', padding: '8px 12px', fontSize: '0.82rem', borderRadius: 'var(--radius-md)' }}
+                    >
+                      <p style={{ margin: 0 }}>{chat.text}</p>
+                      <span style={{ fontSize: '0.66rem', opacity: 0.7, display: 'block', marginTop: '3px' }}>{chat.time}</span>
+                    </div>
+                  ))}
                 </div>
+
+                {/* Quick Reply Form */}
+                <form onSubmit={handleSendReply} className="flex gap-xs">
+                  <input 
+                    type="text"
+                    placeholder="Ask AI Mentor for clarification or action..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="skeuo-well flex-1"
+                    style={{ 
+                      padding: '8px 14px', 
+                      borderRadius: 'var(--radius-full)', 
+                      border: '1px solid var(--border-color)', 
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem',
+                      outline: 'none'
+                    }}
+                  />
+                  <button 
+                    type="submit"
+                    className="btn btn-primary flex items-center justify-center"
+                    style={{ width: '38px', height: '38px', borderRadius: '50%', padding: 0 }}
+                  >
+                    <Send size={15} />
+                  </button>
+                </form>
               </div>
+
             </div>
-          ))
-        )}
+          ) : (
+            <div className="glass-panel flex items-center justify-center p-xl text-center" style={{ minHeight: '380px', borderRadius: 'var(--radius-lg)' }}>
+              <p className="text-muted">Select an alert from the left feed to resolve it in-place.</p>
+            </div>
+          )}
+        </div>
+
       </div>
 
     </div>

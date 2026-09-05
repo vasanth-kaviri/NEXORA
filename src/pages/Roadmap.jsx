@@ -1,18 +1,25 @@
 import { 
   Check, Clock, Lock, Sparkles, Layers, BookOpen, 
-  ArrowRight, Compass, CheckCircle2, ChevronRight, Filter
+  ArrowRight, Compass, CheckCircle2, ChevronRight, Filter,
+  Terminal, ExternalLink, Code2, Award, Zap, RefreshCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getRoadmapForJob, ROADMAP_DOMAINS } from '../utils/roadmapData';
+import { getResourcesForStep } from '../utils/resourceData';
+import { useToast } from '../contexts/ToastContext';
 import db from '../services/db';
 
 export default function Roadmap() {
   const navigate = useNavigate();
+  const toast = useToast();
+
   const [currentUser, setCurrentUser] = useState({ firstName: 'Alex', dreamJob: 'Machine Learning Engineer' });
   const [activeTab, setActiveTab] = useState('core'); // 'core' | 'subset'
   const [roadmapData, setRoadmapData] = useState(null);
   const [stepStates, setStepStates] = useState({});
+  const [selectedStep, setSelectedStep] = useState(null);
+  const [stepResources, setStepResources] = useState([]);
 
   useEffect(() => {
     const user = db.getCurrentUser();
@@ -27,6 +34,12 @@ export default function Roadmap() {
     } catch {
       setStepStates({});
     }
+
+    // Default select first step
+    if (domain.coreSteps && domain.coreSteps.length > 0) {
+      setSelectedStep(domain.coreSteps[0]);
+      setStepResources(getResourcesForStep(domain.coreSteps[0]));
+    }
   }, []);
 
   const handleJobChange = (domainKey) => {
@@ -39,16 +52,39 @@ export default function Roadmap() {
       } catch {
         setStepStates({});
       }
+      const firstStep = domain.coreSteps?.[0] || null;
+      setSelectedStep(firstStep);
+      setStepResources(getResourcesForStep(firstStep));
+      toast.info(`Switched trajectory to ${domain.title}`);
     }
   };
 
+  const handleSelectStep = (step) => {
+    setSelectedStep(step);
+    setStepResources(getResourcesForStep(step));
+  };
+
+  const getStepStatus = (stepId) => {
+    if (stepStates[stepId]) return stepStates[stepId];
+    // Default: first step in-progress, rest locked
+    if (roadmapData?.coreSteps?.[0]?.id === stepId) return 'in-progress';
+    return 'locked';
+  };
+
   const toggleStepStatus = (stepId, e) => {
-    e.stopPropagation();
-    const currentStatus = stepStates[stepId] || getInitialStatus(stepId);
+    if (e) e.stopPropagation();
+    const currentStatus = getStepStatus(stepId);
     let nextStatus = 'in-progress';
-    if (currentStatus === 'in-progress') nextStatus = 'completed';
-    else if (currentStatus === 'completed') nextStatus = 'locked';
-    else if (currentStatus === 'locked') nextStatus = 'in-progress';
+    if (currentStatus === 'in-progress') {
+      nextStatus = 'completed';
+      toast.success('Milestone completed! +50 XP awarded');
+    } else if (currentStatus === 'completed') {
+      nextStatus = 'locked';
+      toast.info('Milestone reset');
+    } else if (currentStatus === 'locked') {
+      nextStatus = 'in-progress';
+      toast.info('Milestone marked in progress');
+    }
 
     const newStates = { ...stepStates, [stepId]: nextStatus };
     setStepStates(newStates);
@@ -57,263 +93,342 @@ export default function Roadmap() {
     }
   };
 
-  const getInitialStatus = (stepId) => {
-    if (!roadmapData) return 'locked';
-    const allSteps = [...roadmapData.coreSteps, ...(roadmapData.subset?.steps || [])];
-    const found = allSteps.find(s => s.id === stepId);
-    return found ? found.status : 'locked';
-  };
+  if (!roadmapData) return null;
 
-  const getEffectiveStatus = (stepId) => {
-    return stepStates[stepId] !== undefined ? stepStates[stepId] : getInitialStatus(stepId);
-  };
+  const activeSteps = activeTab === 'core' 
+    ? (roadmapData.coreSteps || []) 
+    : (roadmapData.subsets || []);
 
-  if (!roadmapData) {
-    return (
-      <div className="flex items-center justify-center" style={{ minHeight: '50vh' }}>
-        <p className="text-muted">Loading your personalized roadmap...</p>
-      </div>
-    );
-  }
-
-  const currentList = activeTab === 'core' ? roadmapData.coreSteps : (roadmapData.subset?.steps || []);
-  const completedCount = currentList.filter(s => getEffectiveStatus(s.id) === 'completed').length;
-  const progressPercent = Math.round((completedCount / Math.max(currentList.length, 1)) * 100);
+  // Compute completion percent
+  const completedStepsCount = activeSteps.filter(s => getStepStatus(s.id) === 'completed').length;
+  const trackPercent = Math.round((completedStepsCount / Math.max(activeSteps.length, 1)) * 100);
 
   return (
-    <div className="animate-fade-in flex flex-col gap-md" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="workstation-container animate-fade-in flex flex-col gap-md">
       
-      {/* ── Roadmap Header ── */}
-      <header className="glass-panel" style={{ padding: 'var(--space-md) var(--space-lg)', borderRadius: 'var(--radius-lg)' }}>
-        <div className="flex justify-between items-start flex-wrap gap-sm">
+      {/* ── Top Header & Domain Switcher ── */}
+      <header className="glass-panel skeuo-convex" style={{ padding: '18px 24px', borderRadius: 'var(--radius-lg)' }}>
+        <div className="flex justify-between items-center flex-wrap gap-md">
           <div>
             <div className="flex items-center gap-xs mb-xs">
-              <Compass className="text-primary" size={18} />
+              <Compass size={18} className="text-primary" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--primary)' }}>
-                Personalized Career Path · {roadmapData.category}
+                DYNAMIC CAREER WORKSTATION
               </span>
             </div>
-            <h1 className="text-gradient" style={{ fontSize: '1.6rem', fontWeight: '800', margin: '2px 0 6px 0' }}>
-              {roadmapData.title}
+            <h1 style={{ fontSize: '1.55rem', fontWeight: 800, margin: '2px 0', letterSpacing: '-0.4px' }}>
+              {roadmapData.title} Track
             </h1>
-            <p className="text-muted" style={{ fontSize: '0.88rem', maxWidth: '680px', lineHeight: 1.45, margin: 0 }}>
+            <p className="text-muted" style={{ fontSize: '0.86rem', margin: 0 }}>
               {roadmapData.description}
             </p>
           </div>
 
-          {/* Quick Domain Selector Dropdown */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignSelf: 'center' }}>
-            <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>Explore Other Tracks</label>
-            <select
-              value={roadmapData.id}
-              onChange={(e) => handleJobChange(e.target.value)}
-              className="input-field"
-              style={{ padding: '6px 12px', fontSize: '0.82rem', borderRadius: 'var(--radius-full)', background: 'var(--input-bg)' }}
-            >
-              {Object.entries(ROADMAP_DOMAINS).map(([key, domain]) => (
-                <option key={key} value={key}>
-                  {domain.category || domain.title}
-                </option>
-              ))}
-            </select>
+          <div className="flex items-center gap-sm flex-wrap">
+            {/* Domain Selector */}
+            <div className="flex items-center gap-xs">
+              <span className="text-muted hidden sm:inline" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Switch Track:</span>
+              <select 
+                value={roadmapData.id} 
+                onChange={(e) => handleJobChange(e.target.value)}
+                className="skeuo-convex"
+                style={{ 
+                  background: 'var(--bg-card)', 
+                  color: 'var(--text-main)', 
+                  border: '1px solid var(--border-color)', 
+                  padding: '7px 12px', 
+                  borderRadius: 'var(--radius-md)', 
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              >
+                {Object.keys(ROADMAP_DOMAINS).map((key) => (
+                  <option key={key} value={key}>
+                    {ROADMAP_DOMAINS[key].title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Core vs Subset Toggle */}
+            <div className="flex skeuo-well p-xs rounded-full">
+              <button 
+                onClick={() => {
+                  setActiveTab('core');
+                  const firstStep = roadmapData.coreSteps?.[0];
+                  setSelectedStep(firstStep);
+                  setStepResources(getResourcesForStep(firstStep));
+                }}
+                className={`btn-tactile ${activeTab === 'core' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '5px 14px', fontSize: '0.78rem', borderRadius: 'var(--radius-full)' }}
+              >
+                Core Steps ({roadmapData.coreSteps?.length || 0})
+              </button>
+              <button 
+                onClick={() => {
+                  setActiveTab('subset');
+                  const firstSubset = roadmapData.subsets?.[0];
+                  setSelectedStep(firstSubset);
+                  setStepResources(getResourcesForStep(firstSubset));
+                }}
+                className={`btn-tactile ${activeTab === 'subset' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '5px 14px', fontSize: '0.78rem', borderRadius: 'var(--radius-full)' }}
+              >
+                Electives ({roadmapData.subsets?.length || 0})
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Overall Track Progress Bar */}
-        <div style={{ marginTop: 'var(--space-md)', paddingTop: 'var(--space-sm)', borderTop: '1px solid var(--border-color)' }}>
-          <div className="flex justify-between items-center mb-xs">
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              {activeTab === 'core' ? 'Core Milestones Completed' : 'Specialization Subset Progress'}
-            </span>
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)' }}>
-              {completedCount} of {currentList.length} Modules ({progressPercent}%)
-            </span>
-          </div>
-          <div className="skeuo-progress-track" style={{ height: '9px' }}>
+        {/* Track Completion Bar */}
+        <div className="flex items-center gap-sm mt-md pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+          <div className="flex-1 skeuo-well" style={{ height: '8px', borderRadius: '9999px', overflow: 'hidden' }}>
             <div 
-              className="skeuo-progress-bar"
-              style={{ width: `${progressPercent}%` }} 
+              style={{ 
+                width: `${trackPercent}%`, 
+                height: '100%', 
+                background: 'linear-gradient(90deg, var(--primary), var(--secondary))',
+                borderRadius: '9999px',
+                transition: 'width 0.3s ease'
+              }} 
             />
           </div>
+          <span className="tabular-numbers text-primary font-bold" style={{ fontSize: '0.85rem' }}>
+            {completedStepsCount}/{activeSteps.length} Milestones ({trackPercent}%)
+          </span>
         </div>
       </header>
 
-      {/* ── Subsets & Track Switcher Tabs (Skeuomorphic Sunken Track + Rocker) ── */}
-      <div className="skeuo-tab-track flex-wrap" style={{ marginTop: '2px', alignSelf: 'flex-start' }}>
-        <button
-          onClick={() => setActiveTab('core')}
-          className={`skeuo-tab-btn flex items-center gap-xs ${activeTab === 'core' ? 'active' : ''}`}
-        >
-          <Layers size={16} />
-          <span>Core Career Track ({roadmapData.coreSteps.length} Milestones)</span>
-        </button>
-
-        {roadmapData.subset && (
-          <button
-            onClick={() => setActiveTab('subset')}
-            className={`skeuo-tab-btn flex items-center gap-xs ${activeTab === 'subset' ? 'active' : ''}`}
-          >
-            <Sparkles size={16} />
-            <span>{roadmapData.subset.title}</span>
-            <span style={{ fontSize: '0.68rem', background: 'var(--secondary)', color: 'white', padding: '1px 6px', borderRadius: '999px', fontWeight: 700 }}>
-              Subset
+      {/* ── Dual-Pane Responsive Workstation (Eliminates All Wasted Gutter Space) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-md" style={{ alignItems: 'start' }}>
+        
+        {/* ── LEFT PANE: Milestone Journey Tree (5 Columns on Desktop) ── */}
+        <div className="lg:col-span-5 flex flex-col gap-sm">
+          <div className="flex justify-between items-center px-xs">
+            <span className="text-muted" style={{ fontSize: '0.76rem', fontWeight: 700, letterSpacing: '0.5px' }}>
+              CURRICULUM MILESTONES
             </span>
-          </button>
-        )}
-      </div>
+            <span className="text-muted" style={{ fontSize: '0.74rem' }}>
+              Click node to inspect deep dive
+            </span>
+          </div>
 
-      {/* Subset Overview Banner (if subset active) */}
-      {activeTab === 'subset' && roadmapData.subset && (
-        <div 
-          className="glass-panel animate-fade-in"
-          style={{ 
-            padding: '12px 16px', 
-            borderRadius: 'var(--radius-md)', 
-            background: 'rgba(244, 63, 94, 0.06)', 
-            border: '1px solid rgba(244, 63, 94, 0.2)' 
-          }}
-        >
-          <p style={{ fontSize: '0.84rem', margin: 0, color: 'var(--text-main)', lineHeight: 1.45 }}>
-            <strong className="text-secondary">Specialization Track:</strong> {roadmapData.subset.description}
-          </p>
+          <div className="flex flex-col gap-sm">
+            {activeSteps.map((step, index) => {
+              const status = getStepStatus(step.id);
+              const isSelected = selectedStep?.id === step.id;
+
+              return (
+                <div 
+                  key={step.id}
+                  onClick={() => handleSelectStep(step)}
+                  className={`skeuo-convex interactive transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                  style={{ 
+                    padding: '14px 16px', 
+                    borderRadius: 'var(--radius-md)', 
+                    background: isSelected ? 'var(--bg-card)' : 'var(--skeuo-surface-grad)',
+                    border: '1px solid var(--border-color)',
+                    cursor: 'pointer',
+                    boxShadow: isSelected ? '0 0 16px var(--primary-glow)' : 'var(--skeuo-bevel-light)'
+                  }}
+                >
+                  <div className="flex items-start gap-sm">
+                    {/* Node status toggle icon */}
+                    <button
+                      onClick={(e) => toggleStepStatus(step.id, e)}
+                      className="skeuo-well"
+                      style={{ 
+                        width: 32, 
+                        height: 32, 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        border: 'none',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        color: status === 'completed' ? 'var(--success)' : status === 'in-progress' ? 'var(--primary)' : 'var(--text-muted)'
+                      }}
+                      title={`Status: ${status} (click to toggle)`}
+                    >
+                      {status === 'completed' && <Check size={16} />}
+                      {status === 'in-progress' && <Clock size={16} />}
+                      {status === 'locked' && <Lock size={15} />}
+                    </button>
+
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
+                          Step 0{index + 1}
+                        </span>
+                        <span className="text-muted" style={{ fontSize: '0.72rem' }}>
+                          {step.duration || '2-3 weeks'}
+                        </span>
+                      </div>
+                      <h4 style={{ margin: '2px 0', fontSize: '0.94rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                        {step.title}
+                      </h4>
+                      <p className="text-muted" style={{ margin: 0, fontSize: '0.78rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {step.description}
+                      </p>
+                    </div>
+
+                    <ChevronRight size={16} className={`text-muted ${isSelected ? 'text-primary' : ''}`} style={{ alignSelf: 'center' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      )}
 
-      {/* ── Interactive Timeline ── */}
-      <div className="roadmap-timeline flex flex-col relative" style={{ marginTop: '4px' }}>
-        <div style={{ 
-          position: 'absolute', 
-          left: '23px', 
-          top: '25px', 
-          bottom: '25px', 
-          width: '2px', 
-          background: 'var(--border-color)',
-          zIndex: 0
-        }} />
-
-        {currentList.map((step, index) => {
-          const status = getEffectiveStatus(step.id);
-          return (
-            <div 
-              key={step.id} 
-              className="flex gap-md relative animate-fade-in" 
-              style={{ marginBottom: 'var(--space-md)', zIndex: 1, animationDelay: `${index * 80}ms` }}
-            >
-              {/* Timeline status indicator node */}
-              <div 
-                className="flex-shrink-0 flex items-center justify-center cursor-pointer" 
-                style={{ width: 48 }}
-                onClick={(e) => toggleStepStatus(step.id, e)}
-                title="Click to change status (Locked -> In Progress -> Completed)"
-              >
-                {status === 'completed' && (
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)' }}>
-                    <Check size={17} color="white" strokeWidth={3} />
-                  </div>
-                )}
-                {status === 'in-progress' && (
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 16px var(--primary-glow)' }}>
-                    <Clock size={17} color="white" />
-                  </div>
-                )}
-                {status === 'locked' && (
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--input-bg)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Lock size={16} className="text-muted" />
-                  </div>
-                )}
-              </div>
-
-              {/* Step Card */}
-              <div 
-                className={`glass-panel interactive flex-1 ${status === 'locked' ? 'opacity-70' : ''}`} 
-                style={{ 
-                  padding: 'var(--space-md)', 
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer',
-                  border: status === 'in-progress' ? '1px solid var(--primary)' : '1px solid var(--border-color)'
-                }}
-                onClick={() => {
-                  navigate('/resources', { state: { topic: step } });
-                }}
-              >
-                <div className="flex justify-between items-start flex-wrap gap-xs mb-xs">
-                  <div className="flex items-center gap-sm">
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-                      STEP {index + 1}
+        {/* ── RIGHT PANE: Milestone Deep-Dive Workstation (7 Columns on Desktop) ── */}
+        <div className="lg:col-span-7 flex flex-col gap-md">
+          {selectedStep ? (
+            <div className="glass-panel skeuo-convex flex flex-col gap-md" style={{ padding: '24px', borderRadius: 'var(--radius-lg)' }}>
+              
+              {/* Header */}
+              <div className="flex justify-between items-start flex-wrap gap-sm">
+                <div>
+                  <div className="flex items-center gap-xs mb-xs">
+                    <span className="badge" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700 }}>
+                      INSPECTION WORKSTATION
                     </span>
-                    <span style={{ fontSize: '0.72rem', padding: '1px 8px', borderRadius: '999px', background: 'var(--input-bg)', color: 'var(--text-muted)' }}>
-                      ⏱️ {step.estimatedTime}
-                    </span>
-                    {status === 'completed' && (
-                      <span style={{ fontSize: '0.68rem', padding: '1px 7px', borderRadius: '999px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', fontWeight: 700 }}>
-                        Completed
-                      </span>
-                    )}
-                    {status === 'in-progress' && (
-                      <span style={{ fontSize: '0.68rem', padding: '1px 7px', borderRadius: '999px', background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)', fontWeight: 700 }}>
-                        Active
-                      </span>
-                    )}
+                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>•</span>
+                    <span className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 600 }}>Estimated: {selectedStep.duration || '2-3 weeks'}</span>
                   </div>
-
-                  <button
-                    onClick={(e) => toggleStepStatus(step.id, e)}
-                    className="skeuo-pill"
-                    style={{
-                      fontSize: '0.72rem',
-                      padding: '3px 10px',
-                    }}
-                    title="Toggle completion status"
-                  >
-                    Mark {status === 'completed' ? 'Incomplete' : 'Complete'}
-                  </button>
+                  <h2 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '2px 0 6px 0', letterSpacing: '-0.3px' }}>
+                    {selectedStep.title}
+                  </h2>
+                  <p className="text-muted" style={{ fontSize: '0.88rem', margin: 0, lineHeight: 1.5 }}>
+                    {selectedStep.description}
+                  </p>
                 </div>
 
-                <h3 style={{ 
-                  fontSize: '1.02rem', 
-                  fontWeight: '700', 
-                  margin: '2px 0 4px 0', 
-                  color: status === 'in-progress' ? 'var(--primary)' : 'inherit' 
-                }}>
-                  {step.title}
-                </h3>
-                
-                <p className="text-muted" style={{ fontSize: '0.84rem', margin: '0 0 8px 0', lineHeight: 1.45 }}>
-                  {step.description}
-                </p>
+                {/* State Toggle Button */}
+                <button
+                  onClick={() => toggleStepStatus(selectedStep.id)}
+                  className={`btn ${getStepStatus(selectedStep.id) === 'completed' ? 'btn-secondary' : 'btn-primary'} flex items-center gap-xs`}
+                  style={{ padding: '8px 16px', fontSize: '0.82rem' }}
+                >
+                  <CheckCircle2 size={16} className={getStepStatus(selectedStep.id) === 'completed' ? 'text-success' : ''} />
+                  <span>
+                    {getStepStatus(selectedStep.id) === 'completed' ? 'Completed (+50 XP)' : 'Mark as Completed'}
+                  </span>
+                </button>
+              </div>
 
-                {/* Skills tags & Resource action */}
-                <div className="flex justify-between items-center flex-wrap gap-xs">
-                  <div className="flex gap-xs flex-wrap">
-                    {step.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="skeuo-well"
-                        style={{
-                          fontSize: '0.7rem',
-                          padding: '3px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          color: 'var(--text-main)',
-                          fontWeight: 500
-                        }}
+              {/* Skills / Key Deliverables Pill Row */}
+              {selectedStep.skills && (
+                <div>
+                  <h5 style={{ margin: '0 0 8px 0', fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Required Technical Competencies
+                  </h5>
+                  <div className="flex flex-wrap gap-xs">
+                    {selectedStep.skills.map((skill, i) => (
+                      <span 
+                        key={i} 
+                        className="badge font-bold" 
+                        style={{ padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.74rem', background: 'var(--input-bg)' }}
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
 
-                  <div 
-                    className="flex items-center gap-xs btn-icon-tactile text-primary" 
-                    style={{ fontSize: '0.78rem', fontWeight: 700, padding: '5px 12px', borderRadius: 'var(--radius-full)' }}
-                  >
-                    <span>Explore Learning Materials</span>
-                    <ChevronRight size={14} />
+              {/* Real-Time Learning Resources for Selected Milestone */}
+              <div>
+                <div className="flex justify-between items-center mb-sm">
+                  <div className="flex items-center gap-xs">
+                    <BookOpen size={16} className="text-primary" />
+                    <h4 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 800 }}>
+                      Real-Time Verified Learning Resources ({stepResources.length})
+                    </h4>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                  {stepResources.map((res) => (
+                    <div 
+                      key={res.id}
+                      onClick={() => navigate(`/resource/${res.id}`, { state: { resource: res } })}
+                      className="skeuo-convex interactive flex flex-col justify-between"
+                      style={{ 
+                        padding: '14px', 
+                        borderRadius: 'var(--radius-md)', 
+                        background: 'var(--bg-card)', 
+                        border: '1px solid var(--border-color)',
+                        cursor: 'pointer' 
+                      }}
+                    >
+                      <div>
+                        <div className="flex justify-between items-center mb-xs">
+                          <span className="badge" style={{ fontSize: '0.66rem', fontWeight: 700, background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                            {res.type}
+                          </span>
+                          <span className="text-muted" style={{ fontSize: '0.72rem' }}>
+                            {res.duration}
+                          </span>
+                        </div>
+                        <h5 style={{ margin: '0 0 4px 0', fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.3 }}>
+                          {res.title}
+                        </h5>
+                        <p className="text-muted" style={{ margin: 0, fontSize: '0.75rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {res.description}
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-xs mt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                        <span className="text-muted" style={{ fontSize: '0.72rem', fontWeight: 600 }}>{res.source}</span>
+                        <span className="text-primary flex items-center gap-xs" style={{ fontSize: '0.74rem', fontWeight: 700 }}>
+                          Launch <ExternalLink size={12} />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
+
+              {/* Interactive Quick Practice / Terminal Prompt */}
+              <div className="skeuo-well" style={{ padding: '16px', borderRadius: 'var(--radius-md)' }}>
+                <div className="flex justify-between items-center mb-xs">
+                  <div className="flex items-center gap-xs">
+                    <Terminal size={15} className="text-primary" />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>Quick Practice CLI Prompt</span>
+                  </div>
+                  <span className="text-muted" style={{ fontSize: '0.72rem' }}>Interactive Sandbox</span>
+                </div>
+                <pre style={{ margin: 0, padding: '8px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', fontSize: '0.78rem', color: '#10b981', overflowX: 'auto', fontFamily: 'monospace' }}>
+                  $ nexora test --milestone="{selectedStep.id}" --strict-eval
+                </pre>
+              </div>
+
+              {/* Quick AI Mentor Assist Button */}
+              <div className="flex justify-between items-center pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                <span className="text-muted" style={{ fontSize: '0.82rem' }}>
+                  Stuck on this milestone?
+                </span>
+                <button 
+                  onClick={() => navigate('/chatbot')}
+                  className="btn btn-secondary flex items-center gap-xs"
+                  style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                >
+                  <Sparkles size={14} className="text-primary" />
+                  <span>Ask AI Mentor About {selectedStep.title.split(' ')[0]}</span>
+                </button>
+              </div>
+
             </div>
-          );
-        })}
+          ) : (
+            <div className="glass-panel flex items-center justify-center p-xl text-center" style={{ minHeight: '380px', borderRadius: 'var(--radius-lg)' }}>
+              <p className="text-muted">Select any milestone from the left tree to inspect learning resources.</p>
+            </div>
+          )}
+        </div>
+
       </div>
 
     </div>
