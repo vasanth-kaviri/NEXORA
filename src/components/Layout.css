@@ -1,0 +1,77 @@
+.bottom-nav {
+  position: absolute;
+  bottom: var(--space-md);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  max-width: 600px;
+  width: calc(100% - (var(--space-md) * 2));
+  height: 65px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: var(--radius-full);
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  width: 60px;
+}
+
+.nav-item span {
+  font-size: 0.65rem;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.3s ease;
+}
+
+.nav-item.active {
+  color: var(--primary);
+  transform: translateY(-5px);
+}
+
+.nav-item.active span {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Desktop Sidebar Styles */
+@media (min-width: 1024px) {
+  .bottom-nav {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin: var(--space-lg) 0 var(--space-lg) var(--space-lg);
+    width: 100px;
+    height: calc(100vh - (var(--space-lg) * 2));
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-xl);
+    border-radius: var(--radius-lg);
+    order: -1; /* Move to the left of page-content */
+  }
+
+  .nav-item {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .nav-item span {
+    font-size: 0.75rem;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav-item.active {
+    transform: translateX(5px);
+  }
+}
