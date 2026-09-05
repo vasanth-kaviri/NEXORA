@@ -1,27 +1,47 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Sparkles, Paperclip, ArrowUp, Copy, Check, 
   ChevronRight, FileCode2, X, RotateCcw,
   FileText, ArrowLeft, MessageSquare, Plus, Trash2,
-  Cpu, Compass, ShieldCheck, ChevronDown, Bot, Terminal
+  ChevronDown, Bot, Terminal, Play, Download,
+  RefreshCw, CornerDownLeft, Compass, Video, Users
 } from 'lucide-react';
 import db from '../services/db';
 
 export default function Chatbot() {
   const navigate = useNavigate();
-  const currentUser = db.getCurrentUser() || {};
+  const location = useLocation();
+  const currentUser = db.getCurrentUser() || { firstName: 'Alex', dreamJob: 'Full Stack Engineer' };
 
-  // Claude Model Selector
+  // Claude Model Families
   const models = [
-    { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', tag: 'Most Intelligent • Frontier' },
-    { id: 'claude-3-opus', name: 'Claude 3 Opus', tag: 'Deep Analysis & Reasoning' },
-    { id: 'claude-3-5-haiku', name: 'Claude 3.5 Haiku', tag: 'Lightning Fast' }
+    { 
+      id: 'claude-3-5-sonnet', 
+      name: 'Claude 3.5 Sonnet', 
+      tag: 'Most Intelligent • Frontier Coding', 
+      speed: 'High', 
+      tokens: '200K Context' 
+    },
+    { 
+      id: 'claude-3-opus', 
+      name: 'Claude 3 Opus', 
+      tag: 'Deep Contextual Reasoning & System Design', 
+      speed: 'Moderate', 
+      tokens: '200K Context' 
+    },
+    { 
+      id: 'claude-3-5-haiku', 
+      name: 'Claude 3.5 Haiku', 
+      tag: 'Lightning Fast Technical Answers', 
+      speed: 'Fastest', 
+      tokens: '200K Context' 
+    }
   ];
   const [selectedModel, setSelectedModel] = useState(models[0]);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
 
-  // Sidebar & Sessions
+  // Sidebar & Chat Sessions
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sessions, setSessions] = useState(() => {
     try {
@@ -40,6 +60,12 @@ export default function Chatbot() {
         title: 'Distributed Rate Limiting Architecture',
         date: 'Yesterday',
         preview: 'Token bucket and sliding window log in Redis...'
+      },
+      {
+        id: 'session_3',
+        title: 'Amazon Leadership STAR Mock Scenario',
+        date: 'Previous 7 Days',
+        preview: 'Customer Obsession & Disagree and Commit...'
       }
     ];
   });
@@ -51,10 +77,19 @@ export default function Chatbot() {
       id: 'm1',
       sender: 'claude',
       time: 'Just now',
-      thought: `Target role identified as ${currentUser.dreamJob || 'Software Professional'}. Calibrating response with Fortune 500 production standards, ATS keyword density, and practical code implementations.`,
-      text: `Hello ${currentUser.firstName || 'Alex'}! I am your **NEXORA AI Mentor**, powered by Claude's architectural and career intelligence.\n\nI can help you audit your resume against MNC benchmarks, conduct mock technical interviews, architect distributed systems, or explain complex algorithmic concepts. What would you like to build or prepare for today?`,
+      thought: `Candidate profile initialized:
+- Target Role: ${currentUser.dreamJob || 'Software Professional'}
+- Current Level: ${currentUser.level || 5}
+- Memory Context: Calibrating responses for high-velocity software engineering interviews, ATS scanning benchmarks, and production distributed system architecture.`,
+      text: `Hello ${currentUser.firstName || 'Alex'}! I am your **NEXORA AI Mentor**, architected with Claude 3.5 Sonnet's technical reasoning engine.\n\nI can assist you in auditing resume bullets against live ATS parsers, conducting real-time mock behavioral & system design interviews, optimizing algorithmic complexity, or architecting distributed cloud systems. What would you like to explore or build today?`,
       code: null,
-      codeTitle: null
+      codeTitle: null,
+      codeLang: null,
+      followUps: [
+        'Audit my resume for high-leverage ATS keywords',
+        'Architect a distributed rate limiter in Redis',
+        'Simulate an Amazon Leadership STAR interview'
+      ]
     }
   ]);
 
@@ -62,10 +97,12 @@ export default function Chatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const [expandedThoughtIds, setExpandedThoughtIds] = useState(['m1']);
   const [copiedCodeId, setCopiedCodeId] = useState(null);
+  const [copiedMsgId, setCopiedMsgId] = useState(null);
   const [attachedFiles, setAttachedFiles] = useState([]);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   useEffect(() => { scrollToBottom(); }, [messages, isTyping]);
@@ -78,6 +115,20 @@ export default function Chatbot() {
       console.warn('Failed to persist Claude chats:', e);
     }
   }, [sessions]);
+
+  // Handle Initial Prompt passed from Dashboard navigation
+  useEffect(() => {
+    if (location.state?.initialPrompt) {
+      const initialText = location.state.initialPrompt;
+      setInput(initialText);
+      // Clean location state to avoid re-triggering
+      window.history.replaceState({}, document.title);
+      // Trigger execution automatically after short delay
+      setTimeout(() => {
+        executePrompt(initialText);
+      }, 300);
+    }
+  }, [location.state]);
 
   const handleInput = (e) => {
     setInput(e.target.value);
@@ -92,7 +143,7 @@ export default function Chatbot() {
       id: `session_${Date.now()}`,
       title: 'New Conversation',
       date: 'Just now',
-      preview: 'Started a new career session...'
+      preview: 'Fresh engineering dialogue...'
     };
     setSessions([newSession, ...sessions]);
     setActiveSessionId(newSession.id);
@@ -101,10 +152,16 @@ export default function Chatbot() {
         id: `m_${Date.now()}`,
         sender: 'claude',
         time: 'Just now',
-        thought: 'Fresh conversation initiated. Memory state primed for technical questions.',
-        text: `Starting a new workspace. How can I assist your ${currentUser.dreamJob || 'engineering'} journey right now?`,
+        thought: `Conversation reset. Model: ${selectedModel.name}. Context cleared. Ready for new technical queries or architecture reviews.`,
+        text: `Starting a fresh workspace with **${selectedModel.name}**. How can I assist your ${currentUser.dreamJob || 'engineering'} goals right now?`,
         code: null,
-        codeTitle: null
+        codeTitle: null,
+        codeLang: null,
+        followUps: [
+          'Explain React 19 compiler optimizations',
+          'Review database indexing for PostgreSQL',
+          'Design an idempotent payment webhook service'
+        ]
       }
     ]);
     setAttachedFiles([]);
@@ -120,10 +177,18 @@ export default function Chatbot() {
   };
 
   const handleAttachMock = () => {
-    const options = ['Resume_2026_ATS.pdf', 'SystemArchitecture.drawio', 'LeetCode_Solution.py'];
+    const options = ['Resume_2026_ATS.pdf', 'DistributedGateway.go', 'SystemArchitecture.drawio', 'BenchmarkResults.csv'];
     const chosen = options[Math.floor(Math.random() * options.length)];
     if (!attachedFiles.includes(chosen)) {
       setAttachedFiles([...attachedFiles, chosen]);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const fileNames = Array.from(files).map(f => f.name);
+      setAttachedFiles(prev => [...prev, ...fileNames]);
     }
   };
 
@@ -135,6 +200,14 @@ export default function Chatbot() {
     }
   };
 
+  const handleCopyMessage = (text, id) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedMsgId(id);
+      setTimeout(() => setCopiedMsgId(null), 2000);
+    }
+  };
+
   const toggleThought = (id) => {
     if (expandedThoughtIds.includes(id)) {
       setExpandedThoughtIds(expandedThoughtIds.filter(i => i !== id));
@@ -143,47 +216,174 @@ export default function Chatbot() {
     }
   };
 
-  // Dynamic Prompt Response Generator
+  // Dynamic Claude Response Synthesis Engine
   const generateClaudeReply = (userPrompt) => {
     const prompt = userPrompt.toLowerCase();
     const dreamJob = currentUser.dreamJob || 'Software Professional';
 
-    if (prompt.includes('resume') || prompt.includes('ats') || prompt.includes('cv')) {
+    if (prompt.includes('resume') || prompt.includes('ats') || prompt.includes('cv') || prompt.includes('keyword')) {
       return {
-        text: `I've analyzed your resume requirements against 2026 MNC hiring bars for **${dreamJob}**.\n\n### Critical Observations:\n1. **Metrics Over Tasks**: Recruiters scan for quantifiable delta (e.g. *reduced latency by 38%* or *handled 250k daily active users*) rather than generic responsibilities.\n2. **High-Density Tech Keywords**: Ensure modern toolchains such as Docker, Kubernetes, Redis, and TypeScript are contextualized inside your accomplishments.\n3. **Active Verbs**: Open bullet points with words like *Spearheaded*, *Architected*, *Optimized*, and *Deconstructed*.`,
-        thought: `Evaluating candidate query on ATS resume optimization:\n- Matching target role ${dreamJob} against Fortune 500 keyword distributions.\n- Structuring recommendations using the Google XYZ resume framework: Accomplished [X] as measured by [Y], by doing [Z].\n- Generating ready-to-copy bullet point templates.`,
-        codeTitle: 'OptimizedResumeBullets.md',
-        code: `# Production Experience Bullets (${dreamJob})\n\n* Spearheaded the decomposition of legacy monolithic services into containerized microservices,\n  reducing 95th-percentile API response latency from 320ms to 48ms across 2M daily queries.\n\n* Engineered an automated regression and end-to-end testing pipeline with GitHub Actions & Docker,\n  accelerating weekly sprint deployment frequency by 35% with zero regressions.\n\n* Implemented distributed Redis caching and optimized PostgreSQL index strategies,\n  preventing database connection starvation during peak traffic spikes.`
+        thought: `Evaluating candidate query on ATS resume optimization:
+1. Target role: ${dreamJob} across Tier-1 Tech (FAANG / Fortune 500).
+2. Deconstructing resume parsing heuristics:
+   - High ATS parsing failures stem from non-standard fonts, 2-column tables, and lack of quantifiable outcomes.
+   - Formulating recommendations around the Google XYZ framework: Accomplished [X] as measured by [Y], by doing [Z].
+3. Injecting high-impact keywords: Kubernetes, Distributed Tracing, Redis, TypeScript, CI/CD pipelines.`,
+        text: `I've performed a comprehensive ATS audit against 2026 technical recruitment benchmarks for **${dreamJob}** positions.\n\n### 3 High-Leverage Adjustments:\n\n1. **Adopt Google's XYZ Formula**: Replace passive duties (*"Responsible for backend APIs"*) with hard operational results (*"Architected 14 RESTful microservices in Node/Go, reducing p99 latency from 480ms to 42ms for 3.4M daily requests"*).\n\n2. **Pass Strict AST Table Parsers**: Applicant Tracking Systems like Greenhouse and Workday frequently scramble multi-column layouts. Use a clean, single-column markdown/PDF structure with standard section headers (*Experience*, *Projects*, *Technical Skills*, *Education*).\n\n3. **Keyword Density Matrix**: Embed specific tools in the context of business impact rather than an unverified list at the bottom.`,
+        codeTitle: 'High_Impact_Experience_Bullets.md',
+        codeLang: 'markdown',
+        code: `# Production Experience Bullets (${dreamJob})
+
+* Spearheaded the migration of 8 monolithic services into Kubernetes-orchestrated microservices,
+  slashing cloud compute expenditure by $42,000/yr while maintaining 99.98% service uptime.
+
+* Engineered an automated regression and end-to-end testing pipeline with GitHub Actions & Docker,
+  accelerating bi-weekly deployment frequency by 35% with zero production regressions.
+
+* Implemented distributed Redis caching and optimized PostgreSQL composite indexes,
+  eliminating query timeouts and absorbing 4.2x Black Friday traffic surge without degradation.`,
+        followUps: [
+          'How do I tailor this for Staff / Lead Engineer roles?',
+          'Audit my project descriptions for technical depth',
+          'What are the top 10 ATS red flags to avoid?'
+        ]
       };
     }
 
-    if (prompt.includes('system design') || prompt.includes('rate limit') || prompt.includes('architect')) {
+    if (prompt.includes('rate limit') || prompt.includes('system design') || prompt.includes('architect') || prompt.includes('distributed')) {
       return {
-        text: `Here is the production architecture blueprint for a **Distributed Rate Limiting Gateway**:\n\n- **Algorithm**: Sliding Window Log using Redis Sorted Sets (ZSET).\n- **Concurrency**: Leverages atomic Redis Lua scripts to evaluate timestamps without race conditions.\n- **Fail-Open Strategy**: If the caching cluster is unreachable, fall back to localized in-memory token buckets to ensure service availability.`,
-        thought: `Synthesizing distributed system design response:\n1. Comparing Leaky Bucket, Token Bucket, and Sliding Window algorithms.\n2. Selecting Sliding Window with Redis for exact boundary precision.\n3. Formulating an atomic Lua script implementation.`,
-        codeTitle: 'rateLimiter.lua',
-        code: `-- Atomic Redis Sliding Window Rate Limiter\nlocal key = KEYS[1]\nlocal now = tonumber(ARGV[1])\nlocal window = tonumber(ARGV[2])\nlocal limit = tonumber(ARGV[3])\n\nlocal clearBefore = now - window\nredis.call('ZREMRANGEBYSCORE', key, 0, clearBefore)\nlocal currentRequests = redis.call('ZCARD', key)\n\nif currentRequests < limit then\n  redis.call('ZADD', key, now, now)\n  redis.call('EXPIRE', key, math.ceil(window / 1000))\n  return 1 -- Allowed\nelse\n  return 0 -- Rate Limited\nend`
+        thought: `Synthesizing distributed rate limiting gateway design:
+1. Requirements: High throughput (100k+ RPS), multi-region active-active, millisecond precision, atomic execution.
+2. Trade-off Analysis:
+   - Fixed Window Counter: Susceptible to 2x burst at boundary limits.
+   - Leaky Bucket: Smooths traffic, but delays requests instead of immediate feedback.
+   - Sliding Window Log: Highest precision, higher memory footprint.
+   - Redis Sliding Window with ZSET + atomic Lua script is the industry gold standard.
+3. Formulating runnable production-grade Lua script for Redis cluster.`,
+        text: `Here is the architectural blueprint for an enterprise **Distributed Sliding-Window Rate Limiter**:\n\n### Architectural Guarantees:\n- **Atomic Guarantee**: Executes directly in Redis via Lua scripts to eliminate race conditions between reading and updating keys.\n- **Precision**: Uses Unix millisecond timestamps stored inside Redis Sorted Sets (\`ZSET\`).\n- **Memory Self-Pruning**: Automatically evicts expired requests older than the sliding window before checking the quota.\n- **Fail-Open Policy**: If the Redis cluster experiences network partitions, local in-memory token buckets take over to protect gateway throughput.`,
+        codeTitle: 'sliding_window_rate_limiter.lua',
+        codeLang: 'lua',
+        code: `-- Atomic Redis Sliding Window Rate Limiter
+local key = KEYS[1]
+local now = tonumber(ARGV[1])        -- Current timestamp in milliseconds
+local window = tonumber(ARGV[2])     -- Window size in milliseconds (e.g. 60000)
+local limit = tonumber(ARGV[3])      -- Max requests allowed per window
+
+local clearBefore = now - window
+
+-- 1. Remove expired entries older than the current window
+redis.call('ZREMRANGEBYSCORE', key, 0, clearBefore)
+
+-- 2. Fetch current active count within the window
+local currentCount = redis.call('ZCARD', key)
+
+if currentCount < limit then
+  -- 3. Quota available: Record request with current timestamp as both score and value
+  redis.call('ZADD', key, now, now)
+  redis.call('EXPIRE', key, math.ceil(window / 1000) + 1)
+  return { 1, limit - currentCount - 1 } -- 1 = ALLOWED, remaining quota
+else
+  -- 4. Quota exceeded: Reject request
+  return { 0, 0 } -- 0 = RATE_LIMITED
+end`,
+        followUps: [
+          'How do we handle multi-region Redis replication lag?',
+          'Write a Node.js/Express middleware using this script',
+          'Compare Sliding Window Log vs Token Bucket algorithms'
+        ]
       };
     }
 
+    if (prompt.includes('interview') || prompt.includes('star') || prompt.includes('behavioral') || prompt.includes('amazon')) {
+      return {
+        thought: `Preparing Amazon Leadership Principle STAR behavioral framework:
+1. Targeted Principle: Customer Obsession & Ownership.
+2. Context: Technical disagreement with product scope vs technical debt.
+3. Structuring STAR response:
+   - Situation: Critical database bottleneck impacting user checkout.
+   - Task: Resolve incident while balancing upcoming marketing launch.
+   - Action: Profiling slow queries, deploying interim connection pooling, negotiating timeline with data.
+   - Result: 0 downtime, 350ms checkout latency, launched 2 days early.`,
+        text: `Let's practice an **Amazon Leadership Principles (LP)** behavioral scenario. A favorite MNC question is:\n\n> *"Tell me about a time you had to make a technical decision with incomplete information or under intense time pressure."*\n\n### The STAR Execution Framework:\n\n- **Situation (15%)**: Frame the context succinctly. Set the business stakes and constraints without getting bogged down in trivial backstories.\n- **Task (10%)**: Clarify your exact responsibility (e.g. *"I was the primary on-call engineer responsible for preventing checkout failure during peak traffic"*).\n- **Action (60%)**: This is the heart of the answer. Emphasize *your* technical intuition, data gathering, risk mitigation, and cross-functional leadership.\n- **Result (15%)**: Conclude with quantifiable metrics and lasting organizational learning.`,
+        codeTitle: 'STAR_Response_Blueprint.md',
+        codeLang: 'markdown',
+        code: `### Model Answer: Amazon "Customer Obsession & Bias for Action"
+
+* **Situation**: During a flash sale event handling 85,000 concurrent checkouts, our payment gateway began throwing 504 Gateway Timeouts on 4.2% of transactions.
+* **Task**: As the lead infrastructure on-call, I needed to restore transaction health within 10 minutes without dropping in-flight payments.
+* **Action**:
+  1. Isolated the bottleneck to database connection pool exhaustion via Datadog metrics.
+  2. Implemented dynamic query rate-limiting on non-essential search filters to prioritize checkout transactions.
+  3. Deployed an ephemeral Redis queue to asynchronously buffer payment confirmations with idempotency keys.
+* **Result**: Restored 100% checkout completion in 6 minutes, salvaging an estimated $180,000 in revenue, and subsequently codified the queuing pattern across 6 partner services.`,
+        followUps: [
+          'Give me a mock question on "Disagree and Commit"',
+          'How do I quantify impact if exact revenue numbers are confidential?',
+          'Roleplay an interviewer and ask me a follow-up question'
+        ]
+      };
+    }
+
+    if (prompt.includes('react') || prompt.includes('compiler') || prompt.includes('reconciliation')) {
+      return {
+        thought: `Analyzing React 19 architecture:
+1. React Compiler (formerly React Forget): Automatic memoization via AST transformation.
+2. Eradication of manual useMemo, useCallback, and React.memo overhead.
+3. Server Actions and useActionState integration.
+4. Synthesizing concise technical explanation with side-by-side compilation snippet.`,
+        text: `The **React 19 Compiler** introduces an automatic compile-time memoization pipeline that fundamentally simplifies component performance tuning:\n\n### Key Architectural Shifts:\n\n1. **Automated Memoization**: The compiler analyzes JavaScript semantics and dependency graphs at build time, inserting fine-grained memoization instructions automatically without requiring manual \`useMemo\` or \`useCallback\` hooks.\n\n2. **Fine-Grained Value Tracking**: Unlike previous React reconciliation which invalidated entire functional components on state change, the compiler caches intermediate sub-expressions.\n\n3. **Preservation of React Rules**: The compiler relies on Strict Mode invariants (pure rendering functions, immutable state updates).`,
+        codeTitle: 'React19CompilerOutput.jsx',
+        codeLang: 'javascript',
+        code: `// Developer Source Code (React 19)
+export function CandidateAnalytics({ metrics, onSelectMetric }) {
+  const sortedMetrics = metrics.filter(m => m.score > 80).sort((a, b) => b.score - a.score);
+  
+  return (
+    <div className="metrics-dashboard">
+      <h3>High-Performance Milestones</h3>
+      {sortedMetrics.map(m => (
+        <MetricCard key={m.id} data={m} onClick={() => onSelectMetric(m.id)} />
+      ))}
+    </div>
+  );
+}
+
+// Conceptual Compiler Optimization (Automated Cache Slots)
+// The compiler automatically wraps 'sortedMetrics' and the mapped JSX in internal cache checks [$]
+// eliminating re-renders when 'metrics' hasn't changed.`,
+        followUps: [
+          'How does the React 19 Compiler handle closures?',
+          'What are React Server Actions and useOptimistic?',
+          'Benchmark comparison of React 18 vs React 19 rendering latency'
+        ]
+      };
+    }
+
+    // Default intelligent response tailored to user's dream job
     return {
-      text: `That is an excellent topic in **${dreamJob}** engineering.\n\nTo master this, break down the core components into fundamental execution primitives, identify common trade-offs (e.g. latency vs consistency, memory vs CPU), and validate with automated test cases.\n\nWould you like me to walk through a code implementation, design a mock interview question around this, or audit relevant documentation?`,
-      thought: `Parsing prompt: "${userPrompt}". Formulating clear, concise explanation with actionable follow-up options suited for ${dreamJob}.`,
+      thought: `Parsing prompt: "${userPrompt}".
+Context: ${dreamJob} engineering trajectory.
+Formulating structured, actionable breakdown with engineering principles, industry best practices, and next steps.`,
+      text: `That is an essential topic in modern **${dreamJob}** engineering.\n\n### Technical Breakdown & Strategy:\n\n1. **Core Execution Model**: Always isolate the underlying primitives (concurrency models, memory allocations, network overhead) before choosing high-level abstractions.\n\n2. **Production Reliability**: Ensure observability is built in from day one using structured logging, OpenTelemetry tracing, and canary deployment pipelines.\n\n3. **MNC Interview Framing**: When answering this in an MNC technical interview, first clarify requirements, state edge cases, discuss algorithmic space/time complexity, and validate with test cases.\n\nWould you like me to walk through a complete code implementation, design a mock interview question around this, or audit your system architecture diagram?`,
       codeTitle: null,
-      code: null
+      codeLang: null,
+      code: null,
+      followUps: [
+        `Write a production code example for ${dreamJob}`,
+        'What are common edge cases and failure modes?',
+        'Give me a 3-question quiz on this topic'
+      ]
     };
   };
 
-  const handleSendMessage = (e) => {
-    e?.preventDefault();
-    if (!input.trim()) return;
+  const executePrompt = (textToSend) => {
+    if (!textToSend.trim()) return;
 
-    const userText = input.trim();
     const userMsg = {
       id: `u_${Date.now()}`,
       sender: 'user',
       time: 'Just now',
-      text: userText,
+      text: textToSend.trim(),
       files: [...attachedFiles]
     };
 
@@ -196,9 +396,9 @@ export default function Chatbot() {
       textareaRef.current.style.height = 'auto';
     }
 
-    // Simulate Claude thoughtful streaming response
+    // Simulate Claude's realistic reasoning + streaming response time
     setTimeout(() => {
-      const reply = generateClaudeReply(userText);
+      const reply = generateClaudeReply(textToSend);
       const claudeMsg = {
         id: `c_${Date.now()}`,
         sender: 'claude',
@@ -206,7 +406,9 @@ export default function Chatbot() {
         thought: reply.thought,
         text: reply.text,
         code: reply.code,
-        codeTitle: reply.codeTitle
+        codeTitle: reply.codeTitle,
+        codeLang: reply.codeLang,
+        followUps: reply.followUps
       };
 
       setMessages(prev => [...prev, claudeMsg]);
@@ -215,25 +417,82 @@ export default function Chatbot() {
     }, 1100);
   };
 
+  const handleSendMessage = (e) => {
+    e?.preventDefault();
+    executePrompt(input);
+  };
+
+  const handleRegenerate = (msgIndex) => {
+    // Find last user message
+    const previousUserMsg = [...messages].slice(0, msgIndex).reverse().find(m => m.sender === 'user');
+    if (previousUserMsg) {
+      setIsTyping(true);
+      setTimeout(() => {
+        const reply = generateClaudeReply(previousUserMsg.text);
+        const updated = [...messages];
+        updated[msgIndex] = {
+          ...updated[msgIndex],
+          time: 'Just now (Regenerated)',
+          thought: reply.thought,
+          text: reply.text,
+          code: reply.code,
+          codeTitle: reply.codeTitle,
+          codeLang: reply.codeLang,
+          followUps: reply.followUps
+        };
+        setMessages(updated);
+        setIsTyping(false);
+      }, 900);
+    }
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: '#09090b', color: '#e4e4e7', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div 
+      className="flex w-full overflow-hidden animate-fade-in" 
+      style={{ 
+        height: 'calc(100vh - 65px)', 
+        background: 'var(--bg-main)', 
+        color: 'var(--text-main)',
+        position: 'relative'
+      }}
+    >
       
-      {/* ── LEFT SIDEBAR (Claude-Style Collapsible Navigation) ── */}
+      {/* ── LEFT CLAUDE SESSIONS SIDEBAR ── */}
       <aside 
-        className={`flex flex-col justify-between transition-all duration-200 shrink-0 border-r border-zinc-800 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}
-        style={{ background: '#0d0d10' }}
+        className={`flex flex-col justify-between transition-all duration-200 shrink-0 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}
+        style={{ 
+          background: 'var(--bg-card)', 
+          borderRight: '1px solid var(--border-color)',
+          zIndex: 10
+        }}
       >
-        <div className="flex flex-col p-md gap-md overflow-hidden">
-          {/* Top Brand & New Chat */}
+        <div className="flex flex-col p-md gap-md overflow-hidden flex-1">
+          {/* Top Brand & Hide Sidebar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-xs">
-              <span style={{ fontSize: '1.2rem', color: 'var(--primary)' }}>✦</span>
-              <span className="font-bold text-sm tracking-tight text-white">Claude AI Mentor</span>
+              <div 
+                style={{ 
+                  width: 28, height: 28, borderRadius: 8, 
+                  background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'white', fontWeight: 800, fontSize: '0.85rem'
+                }}
+              >
+                ✦
+              </div>
+              <span className="font-bold text-sm tracking-tight text-main">Claude AI Mentor</span>
             </div>
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="btn-icon-tactile text-zinc-400 hover:text-white p-1"
-              title="Close Sidebar"
+              className="btn-icon-tactile p-1 text-muted hover:text-main"
+              title="Close Sessions Drawer"
             >
               <X size={16} />
             </button>
@@ -242,23 +501,29 @@ export default function Chatbot() {
           {/* New Chat Button */}
           <button
             onClick={handleNewChat}
-            className="flex items-center justify-between p-sm rounded-lg glass-panel hover:bg-zinc-800/60 transition-colors text-white font-semibold text-sm"
-            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+            className="flex items-center justify-between p-sm rounded-lg skeuo-convex interactive transition-all font-semibold text-xs"
+            style={{ 
+              background: 'var(--input-bg)', 
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-main)'
+            }}
           >
             <span className="flex items-center gap-xs">
-              <Plus size={16} className="text-primary" /> Start New Chat
+              <Plus size={15} className="text-primary" /> Start New Chat
             </span>
-            <span className="text-xs text-zinc-500 font-mono">⌘N</span>
+            <span className="text-[10px] text-muted font-mono bg-[var(--bg-card)] px-1.5 py-0.5 rounded border border-[var(--border-color)]">
+              +N
+            </span>
           </button>
 
-          {/* Prompt Starter Chips */}
+          {/* Quick Prompts Drawer List */}
           <div className="flex flex-col gap-xs mt-xs">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-1">Quick Prompts</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-wider px-1">Curated Prompts</span>
             {[
-              { label: '📄 Audit My Resume for ATS', prompt: 'Audit my resume for high-leverage ATS keywords and metrics.' },
+              { label: '📄 Audit Resume for ATS', prompt: 'Audit my resume for high-leverage ATS keywords and metrics.' },
               { label: '🏗️ Distributed Rate Limiter', prompt: 'Architect a distributed sliding-window rate limiter in Redis.' },
-              { label: '💡 Explain React Reconciliation', prompt: 'Explain the React 19 reconciliation algorithm and how to minimize re-renders.' },
-              { label: '💼 Amazon Leadership STAR Prep', prompt: 'Give me a mock interview scenario on Amazon Customer Obsession and Ownership.' },
+              { label: '💼 Amazon Leadership STAR', prompt: 'Give me a mock interview scenario on Amazon Customer Obsession and Ownership.' },
+              { label: '⚡ React 19 Compiler Internals', prompt: 'Explain the React 19 compiler optimizations and automatic memoization.' },
             ].map((p, i) => (
               <button
                 key={i}
@@ -266,29 +531,33 @@ export default function Chatbot() {
                   setInput(p.prompt);
                   if (textareaRef.current) textareaRef.current.focus();
                 }}
-                className="text-left text-xs p-2 rounded-md hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200 transition-colors truncate"
+                className="text-left text-xs p-2 rounded-md hover:bg-[var(--input-bg)] text-muted hover:text-main transition-colors truncate"
               >
                 {p.label}
               </button>
             ))}
           </div>
 
-          {/* Recent Chat History */}
+          {/* Recent Sessions List */}
           <div className="flex flex-col gap-xs mt-sm flex-1 overflow-y-auto custom-scroll">
-            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-1">Recent Sessions</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-wider px-1">Recent Sessions</span>
             {sessions.map((s) => (
               <div
                 key={s.id}
                 onClick={() => setActiveSessionId(s.id)}
-                className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors group ${activeSessionId === s.id ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200'}`}
+                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors group ${
+                  activeSessionId === s.id 
+                    ? 'bg-[var(--input-bg)] font-semibold text-primary border border-[var(--border-color)]' 
+                    : 'text-muted hover:bg-[var(--input-bg)] hover:text-main'
+                }`}
               >
                 <div className="flex items-center gap-xs min-w-0">
-                  <MessageSquare size={13} className="shrink-0 text-zinc-500" />
+                  <MessageSquare size={13} className="shrink-0 text-muted" />
                   <span className="text-xs truncate">{s.title}</span>
                 </div>
                 <button
                   onClick={(e) => handleDeleteSession(s.id, e)}
-                  className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 p-1 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 text-muted hover:text-error p-1 transition-opacity"
                   title="Delete Chat"
                 >
                   <Trash2 size={12} />
@@ -298,50 +567,74 @@ export default function Chatbot() {
           </div>
         </div>
 
-        {/* Bottom Model Selector in Sidebar */}
-        <div className="p-md border-t border-zinc-800">
-          <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-900/60 border border-zinc-800">
+        {/* Bottom Model Indicator in Sidebar */}
+        <div className="p-md" style={{ borderTop: '1px solid var(--border-color)' }}>
+          <div 
+            className="flex items-center justify-between p-2 rounded-lg"
+            style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}
+          >
             <div className="flex items-center gap-xs">
               <span className="text-primary text-xs">✦</span>
-              <span className="text-xs font-semibold text-zinc-300">{selectedModel.name}</span>
+              <span className="text-xs font-semibold text-main">{selectedModel.name}</span>
             </div>
-            <span className="badge text-[10px] text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">Active</span>
+            <span 
+              className="badge text-[10px]"
+              style={{ background: 'rgba(99, 102, 241, 0.12)', color: 'var(--primary)', padding: '2px 6px', borderRadius: 4 }}
+            >
+              {selectedModel.tokens}
+            </span>
           </div>
         </div>
       </aside>
 
-      {/* ── MAIN CHAT CANVAS ── */}
+      {/* ── MAIN CLAUDE WORKSPACE CANVAS ── */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        {/* Top Navbar */}
-        <header className="h-14 flex items-center justify-between px-md border-b border-zinc-800 shrink-0 bg-zinc-950/60 backdrop-blur-md z-10">
+        {/* Top Claude Sub-Toolbar */}
+        <header 
+          className="h-14 flex items-center justify-between px-md shrink-0 backdrop-blur-md z-10"
+          style={{ 
+            background: 'var(--bg-card)', 
+            borderBottom: '1px solid var(--border-color)' 
+          }}
+        >
           <div className="flex items-center gap-sm">
             {!isSidebarOpen && (
               <button
                 onClick={() => setIsSidebarOpen(true)}
-                className="btn-icon-tactile p-1.5 text-zinc-400 hover:text-white"
-                title="Open Sidebar"
+                className="btn-icon-tactile p-1.5 text-muted hover:text-main"
+                title="Open Sessions Drawer"
               >
-                <Compass size={18} />
+                <MessageSquare size={18} />
               </button>
             )}
 
-            {/* Model Selector Pill */}
+            {/* Model Selector Pill Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-xs px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-700/60 text-xs font-semibold text-zinc-200 hover:border-zinc-500 transition-colors"
+                className="flex items-center gap-xs px-3 py-1.5 rounded-full skeuo-convex interactive text-xs font-semibold text-main transition-all"
+                style={{ 
+                  background: 'var(--input-bg)', 
+                  border: '1px solid var(--border-color)' 
+                }}
               >
-                <span className="text-primary">✦</span>
+                <span className="text-primary font-bold">✦</span>
                 <span>{selectedModel.name}</span>
-                <ChevronDown size={13} className="text-zinc-400" />
+                <ChevronDown size={13} className="text-muted" />
               </button>
 
               {showModelDropdown && (
                 <div 
-                  className="absolute top-9 left-0 w-64 glass-panel p-1 rounded-xl shadow-2xl z-50 animate-scale-up"
-                  style={{ background: '#18181b', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="absolute top-10 left-0 w-72 glass-panel p-2 rounded-xl shadow-2xl z-50 animate-scale-up"
+                  style={{ 
+                    background: 'var(--bg-card)', 
+                    border: '1px solid var(--border-color)' 
+                  }}
                 >
+                  <div className="text-[10px] font-bold text-muted uppercase tracking-wider px-2 py-1">
+                    Select Claude Model
+                  </div>
                   {models.map(m => (
                     <div
                       key={m.id}
@@ -349,13 +642,17 @@ export default function Chatbot() {
                         setSelectedModel(m);
                         setShowModelDropdown(false);
                       }}
-                      className={`p-2 rounded-lg cursor-pointer transition-colors ${selectedModel.id === m.id ? 'bg-zinc-800 text-white' : 'hover:bg-zinc-800/60 text-zinc-300'}`}
+                      className={`p-2.5 rounded-lg cursor-pointer transition-colors ${
+                        selectedModel.id === m.id 
+                          ? 'bg-[var(--input-bg)] text-main font-medium border border-[var(--border-color)]' 
+                          : 'hover:bg-[var(--input-bg)] text-muted hover:text-main'
+                      }`}
                     >
                       <div className="flex items-center justify-between text-xs font-bold">
-                        <span>{m.name}</span>
-                        {selectedModel.id === m.id && <Check size={12} className="text-primary" />}
+                        <span className="text-main">{m.name}</span>
+                        {selectedModel.id === m.id && <Check size={13} className="text-primary" />}
                       </div>
-                      <p className="text-[11px] text-zinc-400 m-0 mt-0.5">{m.tag}</p>
+                      <p className="text-[11px] text-muted m-0 mt-0.5">{m.tag}</p>
                     </div>
                   ))}
                 </div>
@@ -363,27 +660,120 @@ export default function Chatbot() {
             </div>
           </div>
 
-          {/* Right Action */}
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="btn btn-secondary flex items-center gap-xs"
-            style={{ padding: '6px 14px', fontSize: '0.78rem', width: 'auto' }}
-          >
-            <ArrowLeft size={14} /> Back to Dashboard
-          </button>
+          {/* Right Sub-Actions */}
+          <div className="flex items-center gap-xs">
+            <button
+              onClick={handleNewChat}
+              className="btn btn-secondary flex items-center gap-xs"
+              style={{ padding: '6px 12px', fontSize: '0.76rem', width: 'auto' }}
+              title="Reset Conversation"
+            >
+              <Plus size={13} /> New Chat
+            </button>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn btn-secondary flex items-center gap-xs"
+              style={{ padding: '6px 12px', fontSize: '0.76rem', width: 'auto' }}
+            >
+              <ArrowLeft size={13} /> Home
+            </button>
+          </div>
         </header>
 
-        {/* Conversation Stream */}
+        {/* Conversation Stream & Claude Welcoming State */}
         <div className="flex-1 overflow-y-auto custom-scroll p-md md:p-lg flex flex-col items-center">
           <div className="w-full max-w-3xl flex flex-col gap-lg py-sm">
-            {messages.map((msg) => (
+            
+            {/* Claude Welcoming Hero (Shown when conversation is short or fresh) */}
+            {messages.length <= 1 && (
+              <div className="flex flex-col items-center text-center gap-sm my-md animate-fade-in">
+                <div 
+                  style={{ 
+                    width: 56, height: 56, borderRadius: 18, 
+                    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', fontSize: '1.75rem', fontWeight: 800,
+                    boxShadow: '0 8px 24px var(--primary-glow)'
+                  }}
+                >
+                  ✦
+                </div>
+                <h2 style={{ fontSize: '1.65rem', fontWeight: 800, margin: '6px 0 2px 0' }}>
+                  {getGreeting()}, {currentUser.firstName || 'Alex'}.
+                </h2>
+                <p className="text-muted text-sm max-w-lg" style={{ margin: 0, lineHeight: 1.6 }}>
+                  How can Claude assist your {currentUser.dreamJob || 'engineering'} preparation today? Select a technical topic below or type your inquiry.
+                </p>
+
+                {/* 4 Prompt Starter Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm w-full mt-md">
+                  <div 
+                    onClick={() => executePrompt('Architect a distributed sliding-window rate limiter with Redis and Lua scripts')}
+                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                  >
+                    <div className="flex items-center gap-xs font-bold text-xs text-main">
+                      <span style={{ fontSize: '1.1rem' }}>🏗️</span> System Architecture
+                    </div>
+                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                      Design a low-latency sliding window rate limiter with atomic Redis Lua scripts.
+                    </p>
+                  </div>
+
+                  <div 
+                    onClick={() => executePrompt('Audit my resume for high-leverage ATS keywords and metrics')}
+                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                  >
+                    <div className="flex items-center gap-xs font-bold text-xs text-main">
+                      <span style={{ fontSize: '1.1rem' }}>📄</span> ATS Resume Audit
+                    </div>
+                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                      Review experience bullet points using Google's XYZ formula and high-density keywords.
+                    </p>
+                  </div>
+
+                  <div 
+                    onClick={() => executePrompt('Simulate an Amazon Leadership STAR interview on Customer Obsession')}
+                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                  >
+                    <div className="flex items-center gap-xs font-bold text-xs text-main">
+                      <span style={{ fontSize: '1.1rem' }}>💼</span> STAR Behavioral Prep
+                    </div>
+                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                      Simulate MNC behavioral questions on Customer Obsession and Ownership.
+                    </p>
+                  </div>
+
+                  <div 
+                    onClick={() => executePrompt('Explain the React 19 compiler optimizations and automatic memoization')}
+                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                  >
+                    <div className="flex items-center gap-xs font-bold text-xs text-main">
+                      <span style={{ fontSize: '1.1rem' }}>⚡</span> React 19 Compiler
+                    </div>
+                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                      Deep-dive into compiler-driven memoization and elimination of manual hooks.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Render Messages */}
+            {messages.map((msg, idx) => (
               <div key={msg.id} className="flex flex-col gap-xs animate-fade-in">
                 {msg.sender === 'user' ? (
                   /* User Message Card */
                   <div className="self-end max-w-xl flex flex-col items-end">
                     <div 
-                      className="p-3 px-4 rounded-2xl text-white text-sm"
-                      style={{ background: 'var(--primary)', lineHeight: 1.55 }}
+                      className="p-3 px-4 rounded-2xl text-white text-sm shadow-sm"
+                      style={{ 
+                        background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
+                        lineHeight: 1.6 
+                      }}
                     >
                       <p className="m-0 whitespace-pre-wrap">{msg.text}</p>
                       {msg.files?.length > 0 && (
@@ -396,32 +786,42 @@ export default function Chatbot() {
                         </div>
                       )}
                     </div>
-                    <span className="text-[10px] text-zinc-500 mt-1 mr-1">{currentUser.firstName || 'You'} • {msg.time}</span>
+                    <span className="text-[10px] text-muted mt-1 mr-1">{currentUser.firstName || 'You'} • {msg.time}</span>
                   </div>
                 ) : (
                   /* Claude AI Response Card */
                   <div className="flex flex-col gap-sm">
                     {/* Claude Avatar Header */}
                     <div className="flex items-center gap-xs">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-primary bg-indigo-500/10 border border-indigo-500/20">
+                      <div 
+                        style={{ 
+                          width: 24, height: 24, borderRadius: 6, 
+                          background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'white', fontWeight: 800, fontSize: '0.78rem'
+                        }}
+                      >
                         ✦
                       </div>
-                      <span className="text-xs font-bold text-zinc-300">Claude 3.5 Sonnet</span>
-                      <span className="text-[10px] text-zinc-500">• {msg.time}</span>
+                      <span className="text-xs font-bold text-main">{selectedModel.name}</span>
+                      <span className="text-[10px] text-muted">• {msg.time}</span>
                     </div>
 
-                    {/* Reasoning / Thought Accordion ("Thought for 3 seconds") */}
+                    {/* Reasoning Accordion ("Thought for 3 seconds") */}
                     {msg.thought && (
                       <div 
-                        className="rounded-lg border border-zinc-800/80 overflow-hidden"
-                        style={{ background: 'rgba(255,255,255,0.02)' }}
+                        className="rounded-lg overflow-hidden transition-all"
+                        style={{ 
+                          background: 'var(--input-bg)', 
+                          border: '1px solid var(--border-color)' 
+                        }}
                       >
                         <button
                           onClick={() => toggleThought(msg.id)}
-                          className="w-full flex items-center justify-between p-2 px-3 text-left text-xs font-medium text-zinc-400 hover:text-zinc-200 transition-colors"
+                          className="w-full flex items-center justify-between p-2 px-3 text-left text-xs font-medium text-muted hover:text-main transition-colors"
                         >
                           <span className="flex items-center gap-1.5">
-                            <Sparkles size={12} className="text-amber-400" />
+                            <Sparkles size={12} className="text-warning" />
                             Thought for 3 seconds
                           </span>
                           <ChevronRight 
@@ -430,28 +830,55 @@ export default function Chatbot() {
                           />
                         </button>
                         {expandedThoughtIds.includes(msg.id) && (
-                          <div className="p-3 px-4 pt-1 text-xs text-zinc-400 font-mono whitespace-pre-wrap leading-relaxed border-t border-zinc-800/60 bg-zinc-950/40">
+                          <div 
+                            className="p-3 px-4 pt-1 text-xs font-mono whitespace-pre-wrap leading-relaxed"
+                            style={{ 
+                              borderTop: '1px solid var(--border-color)', 
+                              color: 'var(--text-muted)' 
+                            }}
+                          >
                             {msg.thought}
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* Message Body with clean typography */}
-                    <div className="text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap pl-1">
+                    {/* Claude Message Body */}
+                    <div 
+                      className="text-sm leading-relaxed whitespace-pre-wrap pl-1"
+                      style={{ color: 'var(--text-main)', lineHeight: 1.7 }}
+                    >
                       {msg.text}
                     </div>
 
                     {/* Formatted Copyable Code Block Artifact */}
                     {msg.code && (
-                      <div className="rounded-xl overflow-hidden border border-zinc-800 my-2" style={{ background: '#000' }}>
-                        <div className="flex items-center justify-between px-3 py-2 bg-zinc-900 border-b border-zinc-800">
-                          <span className="text-xs font-mono text-zinc-400 flex items-center gap-1.5">
-                            <FileCode2 size={13} className="text-primary" /> {msg.codeTitle || 'script.js'}
+                      <div 
+                        className="rounded-xl overflow-hidden my-2" 
+                        style={{ 
+                          background: '#090d16', 
+                          border: '1px solid var(--border-color)',
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.25)' 
+                        }}
+                      >
+                        <div 
+                          className="flex items-center justify-between px-3 py-2"
+                          style={{ 
+                            background: '#111827', 
+                            borderBottom: '1px solid rgba(255,255,255,0.08)' 
+                          }}
+                        >
+                          <span className="text-xs font-mono text-zinc-300 flex items-center gap-1.5">
+                            <FileCode2 size={13} className="text-primary" /> {msg.codeTitle || 'artifact.code'}
+                            {msg.codeLang && (
+                              <span className="badge text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">
+                                {msg.codeLang}
+                              </span>
+                            )}
                           </span>
                           <button
                             onClick={() => handleCopyCode(msg.code, msg.id)}
-                            className="flex items-center gap-1 text-xs text-zinc-400 hover:text-white px-2 py-1 rounded bg-zinc-800/80 hover:bg-zinc-800 transition-colors"
+                            className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors"
                           >
                             {copiedCodeId === msg.id ? (
                               <><Check size={12} className="text-success" /> Copied</>
@@ -460,53 +887,130 @@ export default function Chatbot() {
                             )}
                           </button>
                         </div>
-                        <pre className="p-4 text-xs font-mono text-zinc-300 overflow-x-auto leading-relaxed m-0">
+                        <pre className="p-4 text-xs font-mono text-zinc-200 overflow-x-auto leading-relaxed m-0 custom-scroll">
                           <code>{msg.code}</code>
                         </pre>
                       </div>
                     )}
+
+                    {/* Response Action Pills & Follow-up Chips */}
+                    <div className="flex flex-col gap-xs mt-1 pl-1">
+                      {/* Interactive Follow-up Prompt Chips */}
+                      {msg.followUps && msg.followUps.length > 0 && (
+                        <div className="flex flex-wrap gap-xs mb-xs">
+                          {msg.followUps.map((chip, i) => (
+                            <button
+                              key={i}
+                              onClick={() => executePrompt(chip)}
+                              className="text-left text-xs px-3 py-1.5 rounded-full skeuo-convex interactive transition-all"
+                              style={{ 
+                                background: 'var(--input-bg)', 
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-muted)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}
+                            >
+                              <span className="text-primary font-bold">✦</span> {chip}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Tool Actions */}
+                      <div className="flex items-center gap-sm">
+                        <button
+                          onClick={() => handleCopyMessage(msg.text, msg.id)}
+                          className="text-xs text-muted hover:text-main flex items-center gap-1 transition-colors"
+                          title="Copy Full Response"
+                        >
+                          {copiedMsgId === msg.id ? (
+                            <><Check size={12} className="text-success" /> Copied</>
+                          ) : (
+                            <><Copy size={12} /> Copy</>
+                          )}
+                        </button>
+                        <span className="text-muted text-xs">•</span>
+                        <button
+                          onClick={() => handleRegenerate(idx)}
+                          className="text-xs text-muted hover:text-main flex items-center gap-1 transition-colors"
+                          title="Regenerate Response"
+                        >
+                          <RefreshCw size={12} /> Regenerate
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
             ))}
 
-            {/* Live Typing Indicator */}
+            {/* Live Thinking Indicator */}
             {isTyping && (
-              <div className="flex items-center gap-2 text-zinc-400 text-xs pl-1">
-                <span className="text-primary animate-pulse">✦</span>
-                <span className="animate-pulse">Claude is thinking and formulating response...</span>
+              <div className="flex items-center gap-2 text-muted text-xs pl-1 animate-pulse">
+                <span className="text-primary font-bold">✦</span>
+                <span>Claude is thinking and reasoning through the response...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* ── FLOATING BOTTOM PROMPT BAR ── */}
-        <div className="p-md shrink-0 flex flex-col items-center border-t border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
+        {/* ── CLAUDE FLOATING BOTTOM INPUT CAPSULE ── */}
+        <div 
+          className="p-md shrink-0 flex flex-col items-center"
+          style={{ 
+            background: 'var(--bg-card)', 
+            borderTop: '1px solid var(--border-color)' 
+          }}
+        >
           <div className="w-full max-w-3xl flex flex-col gap-xs">
-            {/* Attached files indicator */}
+            
+            {/* Attached files chips */}
             {attachedFiles.length > 0 && (
-              <div className="flex items-center gap-xs px-2">
+              <div className="flex items-center gap-xs px-2 mb-1">
                 {attachedFiles.map((file, i) => (
-                  <span key={i} className="badge bg-zinc-800 text-zinc-300 text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                    <FileText size={11} className="text-primary" /> {file}
-                    <X size={10} className="cursor-pointer ml-1 text-zinc-400 hover:text-white" onClick={() => setAttachedFiles(attachedFiles.filter(f => f !== file))} />
+                  <span 
+                    key={i} 
+                    className="badge text-xs px-2.5 py-1 rounded-md flex items-center gap-1"
+                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                  >
+                    <FileText size={12} className="text-primary" /> {file}
+                    <X 
+                      size={11} 
+                      className="cursor-pointer ml-1 text-muted hover:text-main" 
+                      onClick={() => setAttachedFiles(attachedFiles.filter(f => f !== file))} 
+                    />
                   </span>
                 ))}
               </div>
             )}
 
-            {/* Input Bar */}
+            {/* Hidden File Input */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              className="hidden" 
+              multiple 
+            />
+
+            {/* Input Capsule Box */}
             <form 
               onSubmit={handleSendMessage}
-              className="relative flex items-end gap-2 rounded-2xl p-2 px-3 border border-zinc-700/80 focus-within:border-indigo-500/80 transition-all"
-              style={{ background: '#121215', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}
+              className="relative flex items-end gap-2 rounded-2xl p-2 px-3 skeuo-convex transition-all"
+              style={{ 
+                background: 'var(--input-bg)', 
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.1)' 
+              }}
             >
               <button
                 type="button"
-                onClick={handleAttachMock}
-                className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
-                title="Attach Context Document"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 text-muted hover:text-main rounded-lg hover:bg-[var(--bg-card)] transition-colors"
+                title="Attach Document or Resume (PDF, Code, Text)"
               >
                 <Paperclip size={18} />
               </button>
@@ -522,23 +1026,30 @@ export default function Chatbot() {
                     handleSendMessage();
                   }
                 }}
-                placeholder={`Ask Claude anything about ${currentUser.dreamJob || 'your technical career'}... (Enter to send, Shift+Enter for new line)`}
-                className="flex-1 bg-transparent border-none outline-none text-sm text-zinc-200 placeholder-zinc-500 resize-none py-1.5 max-h-40"
-                style={{ lineHeight: 1.5 }}
+                placeholder={`Ask Claude anything about ${currentUser.dreamJob || 'engineering'}... (Enter to send, Shift+Enter for new line)`}
+                className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-[var(--text-muted)] resize-none py-1.5 max-h-40"
+                style={{ 
+                  color: 'var(--text-main)', 
+                  lineHeight: 1.5 
+                }}
               />
 
               <button
                 type="submit"
                 disabled={!input.trim()}
-                className={`p-2 rounded-xl transition-all ${input.trim() ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'}`}
-                title="Send Message"
+                className={`p-2 rounded-xl transition-all ${
+                  input.trim() 
+                    ? 'bg-[var(--primary)] text-white hover:opacity-90 shadow-md' 
+                    : 'bg-[var(--bg-card)] text-muted cursor-not-allowed opacity-50'
+                }`}
+                title="Send Message to Claude"
               >
                 <ArrowUp size={17} />
               </button>
             </form>
 
-            <span className="text-[11px] text-center text-zinc-500 mt-1">
-              Claude 3.5 Sonnet may generate creative suggestions. Always verify critical production configurations.
+            <span className="text-[11px] text-center text-muted mt-1">
+              Claude 3.5 Sonnet provides career & system architecture intelligence. Verify production configurations.
             </span>
           </div>
         </div>

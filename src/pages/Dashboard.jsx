@@ -557,16 +557,16 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ── ABOUT NEXORA, CORE PILLARS, FEEDBACK & SOCIAL SECTION ── */}
+      {/* ── 1. ABOUT NEXORA SECTION (Stand-Alone Glassmorphic Workstation) ── */}
       <section 
         id="about-nexora-section" 
-        className="glass-panel mt-xl p-lg flex flex-col gap-xl animate-fade-in"
+        className="glass-panel p-lg flex flex-col gap-lg animate-fade-in"
         style={{ 
           padding: '2.5rem', 
           borderRadius: 'var(--radius-xl)', 
-          background: 'linear-gradient(180deg, rgba(24, 24, 27, 0.6) 0%, rgba(9, 9, 11, 0.95) 100%)',
+          background: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
-          marginTop: '3rem'
+          marginTop: '2rem'
         }}
       >
         {/* Section Header */}
@@ -576,11 +576,11 @@ export default function Dashboard() {
             style={{ 
               background: 'rgba(99, 102, 241, 0.15)', 
               color: 'var(--primary)', 
-              padding: '4px 12px', 
+              padding: '4px 14px', 
               borderRadius: 'var(--radius-full)', 
               fontSize: '0.74rem', 
               fontWeight: 700,
-              letterSpacing: '0.5px'
+              letterSpacing: '0.6px'
             }}
           >
             CAREER INTELLIGENCE OPERATING SYSTEM
@@ -595,7 +595,7 @@ export default function Dashboard() {
 
         {/* 4 Core Pillars Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
-          <div className="glass-panel p-md flex flex-col gap-xs" style={{ background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+          <div className="skeuo-convex p-md flex flex-col gap-xs rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', padding: '18px' }}>
             <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
               <Compass size={20} />
             </div>
@@ -605,7 +605,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="glass-panel p-md flex flex-col gap-xs" style={{ background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+          <div className="skeuo-convex p-md flex flex-col gap-xs rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', padding: '18px' }}>
             <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(20, 184, 166, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#14b8a6' }}>
               <Video size={20} />
             </div>
@@ -615,7 +615,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="glass-panel p-md flex flex-col gap-xs" style={{ background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+          <div className="skeuo-convex p-md flex flex-col gap-xs rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', padding: '18px' }}>
             <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(244, 63, 94, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f43f5e' }}>
               <FileText size={20} />
             </div>
@@ -625,7 +625,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="glass-panel p-md flex flex-col gap-xs" style={{ background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+          <div className="skeuo-convex p-md flex flex-col gap-xs rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', padding: '18px' }}>
             <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(168, 85, 247, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a855f7' }}>
               <Users size={20} />
             </div>
@@ -637,7 +637,7 @@ export default function Dashboard() {
         </div>
 
         {/* Platform Telemetry Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-sm pt-md" style={{ borderTop: '1px solid var(--border-color)' }}>
           <div className="text-center p-sm">
             <span className="font-extrabold text-primary" style={{ fontSize: '1.6rem', display: 'block' }}>120,000+</span>
             <span className="text-muted" style={{ fontSize: '0.76rem' }}>Active Engineers</span>
@@ -655,15 +655,128 @@ export default function Dashboard() {
             <span className="text-muted" style={{ fontSize: '0.76rem' }}>Candidate Satisfaction</span>
           </div>
         </div>
+      </section>
 
-        {/* 2-Column: Contact Information & Interactive Candidate Feedback Form */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg pt-md" style={{ borderTop: '1px solid var(--border-color)' }}>
+      {/* ── 2. AI MENTOR INTERACTIVE SHOWCASE (Followed Immediately After About NEXORA) ── */}
+      <section 
+        className="glass-panel p-lg flex flex-col gap-md animate-fade-in"
+        style={{ 
+          padding: '2.2rem', 
+          borderRadius: 'var(--radius-xl)', 
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)'
+        }}
+      >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <div>
+            <div className="flex items-center gap-xs mb-xs">
+              <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.72rem' }}>
+                ✦ CLAUDE 3.5 SONNET ENGINE • ONLINE
+              </span>
+              <span className="text-muted" style={{ fontSize: '0.75rem' }}>24/7 Technical Career Mentorship</span>
+            </div>
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '2px 0 4px 0' }}>
+              NEXORA AI Career Mentor
+            </h3>
+            <p className="text-muted" style={{ fontSize: '0.86rem', margin: 0, lineHeight: 1.5, maxWidth: '680px' }}>
+              Trained on architectural trade-offs, system scalability, and Fortune 500 hiring rubrics. Ask anything to accelerate your trajectory.
+            </p>
+          </div>
+
+          <button 
+            onClick={() => navigate('/chatbot')}
+            className="btn btn-primary flex items-center gap-xs"
+            style={{ padding: '10px 22px', fontSize: '0.84rem', whiteSpace: 'nowrap' }}
+          >
+            <span>Launch Full AI Mentor Workstation</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+
+        {/* Quick Conversational Inquiry Bar */}
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = e.target.query.value;
+            if (q.trim()) {
+              navigate('/chatbot', { state: { initialPrompt: q.trim() } });
+            } else {
+              navigate('/chatbot');
+            }
+          }}
+          className="flex items-center gap-xs p-xs rounded-xl"
+          style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}
+        >
+          <div style={{ padding: '0 8px', color: 'var(--primary)', flexShrink: 0 }}>
+            <Bot size={20} />
+          </div>
+          <input 
+            type="text" 
+            name="query"
+            placeholder={`Ask Claude anything about ${user.dreamJob} architectures, algorithms, or STAR interview preparation...`}
+            className="flex-1 bg-transparent border-none outline-none text-main"
+            style={{ fontSize: '0.85rem', padding: '8px 4px', background: 'transparent', minWidth: 0 }}
+          />
+          <button 
+            type="submit" 
+            className="btn btn-primary flex items-center gap-xs"
+            style={{ width: 'auto', flexShrink: 0, whiteSpace: 'nowrap', padding: '8px 18px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)' }}
+          >
+            <Send size={14} /> Ask Claude
+          </button>
+        </form>
+
+        {/* Quick Prompt Recommendation Chips */}
+        <div className="flex flex-wrap items-center gap-xs pt-xs">
+          <span className="text-muted" style={{ fontSize: '0.74rem', fontWeight: 600 }}>POPULAR INQUIRIES:</span>
+          {[
+            'Audit my resume for Fortune 500 ATS keywords',
+            'Explain distributed rate limiting with Redis',
+            'Simulate a Google system design interview',
+            'Compare React 19 Compiler vs useMemo'
+          ].map((prompt, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => navigate(`/chatbot?q=${encodeURIComponent(prompt)}`)}
+              className="skeuo-convex interactive"
+              style={{
+                padding: '5px 12px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '0.74rem',
+                color: 'var(--text-main)',
+                border: '1px solid var(--border-color)',
+                background: 'var(--input-bg)',
+                cursor: 'pointer'
+              }}
+            >
+              {prompt} →
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 3. DEDICATED CONTACT & CANDIDATE FEEDBACK HUB (Completely Separated at Bottom) ── */}
+      <section 
+        id="contact-feedback-section" 
+        className="glass-panel p-lg flex flex-col gap-lg animate-fade-in"
+        style={{ 
+          padding: '2.5rem', 
+          borderRadius: 'var(--radius-xl)', 
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)'
+        }}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">
           {/* LEFT 5 COLS: Contact & Global Operations */}
           <div className="lg:col-span-5 flex flex-col gap-md">
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 6px 0' }}>Get in Touch with NEXORA</h3>
-              <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0, lineHeight: 1.5 }}>
-                Have questions about enterprise partnerships, career tracks, or technical integrations? Our engineering operations team is on call.
+              <span className="badge" style={{ background: 'rgba(20, 184, 166, 0.15)', color: '#14b8a6', fontWeight: 700, fontSize: '0.72rem', padding: '3px 10px', borderRadius: '4px' }}>
+                GLOBAL OPERATIONS &amp; SUPPORT
+              </span>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '6px 0 4px 0' }}>Get in Touch with NEXORA</h3>
+              <p className="text-muted" style={{ fontSize: '0.82rem', margin: 0, lineHeight: 1.5 }}>
+                Have questions regarding enterprise partnerships, career path calibrations, or university licenses? Our operations desk is available 24/7.
               </p>
             </div>
 
@@ -763,7 +876,7 @@ export default function Dashboard() {
           </div>
 
           {/* RIGHT 7 COLS: Interactive Candidate Feedback Form */}
-          <div className="lg:col-span-7 glass-panel p-md" style={{ borderRadius: 'var(--radius-lg)', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)' }}>
+          <div className="lg:col-span-7 glass-panel p-md" style={{ borderRadius: 'var(--radius-lg)', background: 'var(--input-bg)', border: '1px solid var(--border-color)', padding: '22px' }}>
             <div className="flex items-center gap-xs mb-xs">
               <MessageSquare size={17} className="text-primary" />
               <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>Candidate Experience &amp; Feedback</h3>
@@ -773,7 +886,7 @@ export default function Dashboard() {
             </p>
 
             {feedbackSubmitted ? (
-              <div className="p-lg text-center flex flex-col items-center gap-xs animate-scale-in" style={{ background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+              <div className="p-lg text-center flex flex-col items-center gap-xs animate-scale-in" style={{ background: 'rgba(16, 185, 129, 0.08)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '24px' }}>
                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
                   <Check size={22} />
                 </div>
