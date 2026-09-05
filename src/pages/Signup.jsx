@@ -60,8 +60,8 @@ export default function Signup() {
     
     setTimeout(() => {
       setIsVerifying(false);
-      toast.success('Account successfully verified & created! +150 XP awarded.');
-      navigate('/dashboard');
+      toast.success('Account successfully registered! Please sign in to verify your session.');
+      navigate('/login');
     }, 600);
   };
 
@@ -90,7 +90,10 @@ export default function Signup() {
 
           {/* Google Sign up with Real Firebase + Custom Account support */}
           <div style={{ marginBottom: '18px' }}>
-            <GoogleAuthButton mode="signup" onSuccess={() => navigate('/dashboard')} />
+            <GoogleAuthButton mode="signup" onSuccess={() => {
+              toast.success('Google account verified! Proceeding to Complete Profile.');
+              navigate('/complete-profile');
+            }} />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>

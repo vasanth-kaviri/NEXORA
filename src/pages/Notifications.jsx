@@ -217,105 +217,134 @@ export default function Notifications() {
           )}
         </div>
 
-        {/* ── RIGHT PANE: Live Resolution Canvas (7 Columns on Desktop) ── */}
-        <div className="lg:col-span-7 flex flex-col gap-md">
+        {/* ── RIGHT PANE: Live Resolution Canvas (7 Columns on Desktop - Full Space Utilized) ── */}
+        <div className="lg:col-span-7 flex flex-col" style={{ height: '100%' }}>
           {selectedNotif ? (
-            <div className="glass-panel skeuo-convex flex flex-col gap-md" style={{ padding: '24px', borderRadius: 'var(--radius-lg)' }}>
+            <div 
+              className="glass-panel skeuo-convex flex flex-col justify-between" 
+              style={{ 
+                padding: '24px', 
+                borderRadius: 'var(--radius-lg)', 
+                minHeight: '640px',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
               
-              {/* Header */}
-              <div className="flex justify-between items-start flex-wrap gap-sm">
-                <div>
-                  <div className="flex items-center gap-xs mb-xs">
-                    <span className="badge" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700 }}>
-                      ACTIVE RESOLUTION CANVAS
-                    </span>
-                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>•</span>
-                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>{selectedNotif.time}</span>
+              {/* Top Meta & Action */}
+              <div className="flex flex-col gap-sm">
+                <div className="flex justify-between items-start flex-wrap gap-sm">
+                  <div>
+                    <div className="flex items-center gap-xs mb-xs">
+                      <span className="badge" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontSize: '0.72rem', fontWeight: 700 }}>
+                        ACTIVE RESOLUTION CANVAS
+                      </span>
+                      <span className="text-muted" style={{ fontSize: '0.78rem' }}>•</span>
+                      <span className="text-muted" style={{ fontSize: '0.78rem' }}>{selectedNotif.time}</span>
+                    </div>
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '2px 0 6px 0', letterSpacing: '-0.3px' }}>
+                      {selectedNotif.title}
+                    </h2>
                   </div>
-                  <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '2px 0 6px 0', letterSpacing: '-0.3px' }}>
-                    {selectedNotif.title}
-                  </h2>
+
+                  {selectedNotif.actionPath && (
+                    <button
+                      onClick={() => navigate(selectedNotif.actionPath)}
+                      className="btn btn-primary flex items-center gap-xs"
+                      style={{ fontSize: '0.82rem', padding: '8px 16px' }}
+                    >
+                      <span>{selectedNotif.actionLabel || 'Launch Tool'}</span>
+                      <ArrowRight size={15} />
+                    </button>
+                  )}
                 </div>
 
-                {selectedNotif.actionPath && (
-                  <button
-                    onClick={() => navigate(selectedNotif.actionPath)}
-                    className="btn btn-primary flex items-center gap-xs"
-                    style={{ fontSize: '0.82rem', padding: '8px 16px' }}
-                  >
-                    <span>{selectedNotif.actionLabel || 'Launch Tool'}</span>
-                    <ArrowRight size={15} />
-                  </button>
+                {/* Message Body */}
+                <p className="text-main" style={{ fontSize: '0.92rem', lineHeight: 1.6, margin: 0 }}>
+                  {selectedNotif.message}
+                </p>
+
+                {/* Specific Widget based on alert type */}
+                {selectedNotif.type === 'resume' && (
+                  <div className="skeuo-well" style={{ padding: '16px', borderRadius: 'var(--radius-md)' }}>
+                    <div className="flex justify-between items-center mb-xs">
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--primary)' }}>
+                        AI ATS AUDIT TELEMETRY
+                      </span>
+                      <span className="tabular-numbers text-success font-bold" style={{ fontSize: '1.1rem' }}>
+                        78 / 100
+                      </span>
+                    </div>
+                    <div style={{ height: '8px', background: 'rgba(0,0,0,0.2)', borderRadius: '9999px', overflow: 'hidden', marginBottom: '8px' }}>
+                      <div style={{ width: '78%', height: '100%', background: 'linear-gradient(90deg, #10b981, var(--primary))', borderRadius: '9999px' }} />
+                    </div>
+                    <p className="text-muted" style={{ fontSize: '0.78rem', margin: 0 }}>
+                      Detected 3 high-leverage technical keyword opportunities: <strong>PyTorch Quantization</strong>, <strong>FastAPI Async Inference</strong>, and <strong>Docker Containerization</strong>.
+                    </p>
+                  </div>
+                )}
+
+                {selectedNotif.type === 'reminder' && (
+                  <div className="skeuo-well" style={{ padding: '16px', borderRadius: 'var(--radius-md)' }}>
+                    <div className="flex items-center gap-xs mb-xs">
+                      <Clock size={16} className="text-accent" />
+                      <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>AI Mock Interview Chamber Ready</span>
+                    </div>
+                    <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>
+                      Topics: Machine Learning System Design, Algorithm Latency, and Python Concurrency. Ensure camera & microphone permissions are enabled.
+                    </p>
+                  </div>
                 )}
               </div>
 
-              {/* Message Body */}
-              <p className="text-main" style={{ fontSize: '0.92rem', lineHeight: 1.6, margin: 0 }}>
-                {selectedNotif.message}
-              </p>
-
-              {/* Specific Widget based on alert type */}
-              {selectedNotif.type === 'resume' && (
-                <div className="skeuo-well" style={{ padding: '18px', borderRadius: 'var(--radius-md)' }}>
-                  <div className="flex justify-between items-center mb-sm">
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--primary)' }}>
-                      AI ATS AUDIT TELEMETRY
-                    </span>
-                    <span className="tabular-numbers text-success font-bold" style={{ fontSize: '1.1rem' }}>
-                      78 / 100
-                    </span>
-                  </div>
-                  <div style={{ height: '8px', background: 'rgba(0,0,0,0.2)', borderRadius: '9999px', overflow: 'hidden', marginBottom: '12px' }}>
-                    <div style={{ width: '78%', height: '100%', background: 'linear-gradient(90deg, #10b981, var(--primary))', borderRadius: '9999px' }} />
-                  </div>
-                  <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>
-                    Detected 3 high-leverage technical keyword opportunities: <strong>PyTorch Quantization</strong>, <strong>FastAPI Async Inference</strong>, and <strong>Docker Containerization</strong>.
-                  </p>
-                </div>
-              )}
-
-              {selectedNotif.type === 'reminder' && (
-                <div className="skeuo-well" style={{ padding: '18px', borderRadius: 'var(--radius-md)' }}>
-                  <div className="flex items-center gap-xs mb-xs">
-                    <Clock size={16} className="text-accent" />
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>AI Mock Interview Chamber Ready</span>
-                  </div>
-                  <p className="text-muted" style={{ fontSize: '0.82rem', margin: 0 }}>
-                    Topics: Machine Learning System Design, Algorithm Latency, and Python Concurrency. Ensure camera & microphone permissions are enabled.
-                  </p>
-                </div>
-              )}
-
-              {/* Interactive AI Chat History & In-place Reply */}
-              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-                <div className="flex items-center gap-xs mb-sm">
+              {/* Interactive AI Chat Thread - Expanded to utilize full height */}
+              <div 
+                className="flex-1 flex flex-col justify-between pt-md mt-md" 
+                style={{ borderTop: '1px solid var(--border-color)', minHeight: '340px' }}
+              >
+                <div className="flex items-center gap-xs mb-xs">
                   <Sparkles size={16} className="text-primary" />
-                  <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>In-Place AI Copilot Thread</h4>
+                  <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>In-Place AI Resolution Thread</h4>
                 </div>
 
-                <div className="flex flex-col gap-xs mb-sm custom-scroll" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                {/* Expanded Scrollable Messages Feed */}
+                <div 
+                  className="flex-1 flex flex-col gap-sm p-sm custom-scroll rounded-lg my-xs" 
+                  style={{ 
+                    maxHeight: '380px', 
+                    overflowY: 'auto',
+                    background: 'var(--input-bg)'
+                  }}
+                >
                   {(selectedNotif.chatHistory || []).map((chat, idx) => (
                     <div 
                       key={idx}
-                      className={`p-sm rounded-md ${chat.sender === 'user' ? 'self-end bg-primary text-white' : 'self-start skeuo-well text-main'}`}
-                      style={{ maxWidth: '80%', padding: '8px 12px', fontSize: '0.82rem', borderRadius: 'var(--radius-md)' }}
+                      className={`p-sm rounded-md ${chat.sender === 'user' ? 'self-end bg-primary text-white' : 'self-start glass-panel text-main'}`}
+                      style={{ 
+                        maxWidth: '82%', 
+                        padding: '10px 14px', 
+                        fontSize: '0.84rem', 
+                        borderRadius: 'var(--radius-md)',
+                        boxShadow: chat.sender === 'user' ? '0 4px 12px rgba(99, 102, 241, 0.25)' : 'none'
+                      }}
                     >
-                      <p style={{ margin: 0 }}>{chat.text}</p>
-                      <span style={{ fontSize: '0.66rem', opacity: 0.7, display: 'block', marginTop: '3px' }}>{chat.time}</span>
+                      <p style={{ margin: 0, lineHeight: 1.45 }}>{chat.text}</p>
+                      <span style={{ fontSize: '0.68rem', opacity: 0.7, display: 'block', marginTop: '4px' }}>{chat.time}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Quick Reply Form */}
-                <form onSubmit={handleSendReply} className="flex gap-xs">
+                {/* Quick Reply Form Docked at Bottom */}
+                <form onSubmit={handleSendReply} className="flex gap-xs pt-xs">
                   <input 
                     type="text"
-                    placeholder="Ask AI Mentor for clarification or action..."
+                    placeholder="Type your response or request AI to implement changes..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     className="skeuo-well flex-1"
                     style={{ 
-                      padding: '8px 14px', 
+                      padding: '10px 16px', 
                       borderRadius: 'var(--radius-full)', 
                       border: '1px solid var(--border-color)', 
                       color: 'var(--text-main)',
@@ -326,16 +355,16 @@ export default function Notifications() {
                   <button 
                     type="submit"
                     className="btn btn-primary flex items-center justify-center"
-                    style={{ width: '38px', height: '38px', borderRadius: '50%', padding: 0 }}
+                    style={{ width: '42px', height: '42px', borderRadius: '50%', padding: 0 }}
                   >
-                    <Send size={15} />
+                    <Send size={16} />
                   </button>
                 </form>
               </div>
 
             </div>
           ) : (
-            <div className="glass-panel flex items-center justify-center p-xl text-center" style={{ minHeight: '380px', borderRadius: 'var(--radius-lg)' }}>
+            <div className="glass-panel flex items-center justify-center p-xl text-center" style={{ minHeight: '520px', height: '100%', borderRadius: 'var(--radius-lg)' }}>
               <p className="text-muted">Select an alert from the left feed to resolve it in-place.</p>
             </div>
           )}

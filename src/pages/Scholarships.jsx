@@ -1,12 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   GraduationCap, DollarSign, Calendar, Search, Filter, CheckCircle2, 
-  Sparkles, ExternalLink, X, FileText, Send, Award, AlertCircle, Bookmark 
+  Sparkles, ExternalLink, X, FileText, Send, Award, AlertCircle, Bookmark,
+  Globe, Clock, User, Mail, Phone, Building, Check, ChevronRight
 } from 'lucide-react';
 import db from '../services/db';
 
 export default function Scholarships() {
   const currentUser = db.getCurrentUser() || {};
+
+  // Country & Currency Configurations
+  const countryOptions = [
+    { code: 'India', label: 'India (INR ₹)', currency: '₹', rate: 83, defaultCountry: true },
+    { code: 'United States', label: 'United States (USD $)', currency: '$', rate: 1 },
+    { code: 'United Kingdom', label: 'United Kingdom (GBP £)', currency: '£', rate: 0.78 },
+    { code: 'European Union', label: 'European Union (EUR €)', currency: '€', rate: 0.92 },
+    { code: 'Canada', label: 'Canada (CAD $)', currency: 'CA$', rate: 1.36 },
+    { code: 'Global', label: 'Global / International', currency: '$', rate: 1 }
+  ];
+
+  const [selectedCountry, setSelectedCountry] = useState('India');
+  const activeCountryMeta = countryOptions.find(c => c.code === selectedCountry) || countryOptions[0];
 
   // 12+ Real-World Global and Regional Tech Scholarships
   const scholarshipList = [
@@ -14,9 +29,11 @@ export default function Scholarships() {
       id: 'sch_google_01',
       title: 'Google Generation Scholarship (APAC & Global)',
       organization: 'Google',
-      amount: '$10,000 / ₹2,50,000',
+      baseUSD: 10000,
+      inrFixed: '₹2,50,000',
       deadline: 'Nov 15, 2026',
-      eligible: true,
+      country: 'Global',
+      minGpa: 3.2,
       category: 'diversity',
       targetDegree: 'Undergraduate & Masters',
       tags: ['Women in Tech', 'Computer Science', 'Leadership'],
@@ -28,9 +45,11 @@ export default function Scholarships() {
       id: 'sch_msft_02',
       title: 'Microsoft Imagine Cup Technology Grant',
       organization: 'Microsoft',
-      amount: '$25,000 + $50k Azure Credits',
+      baseUSD: 25000,
+      inrFixed: '₹20,75,000 + $50k Azure Credits',
       deadline: 'Dec 01, 2026',
-      eligible: true,
+      country: 'Global',
+      minGpa: 3.0,
       category: 'merit',
       targetDegree: 'All Students (16+)',
       tags: ['AI Innovation', 'Cloud Innovation', 'Startup Grant'],
@@ -42,9 +61,11 @@ export default function Scholarships() {
       id: 'sch_aws_03',
       title: 'AWS AI & Machine Learning Diversity Scholarship',
       organization: 'Amazon Web Services & Udacity',
-      amount: '$2,500 + Full Nanodegree',
+      baseUSD: 2500,
+      inrFixed: '₹2,10,000 + Full Nanodegree',
       deadline: 'Oct 31, 2026',
-      eligible: true,
+      country: 'Global',
+      minGpa: 2.8,
       category: 'diversity',
       targetDegree: 'Undergraduate & Self-Taught',
       tags: ['Deep Learning', 'AWS DeepRacer', 'Mentorship'],
@@ -56,144 +77,148 @@ export default function Scholarships() {
       id: 'sch_adobe_04',
       title: 'Adobe Research Women-in-Technology Scholarship',
       organization: 'Adobe Research',
-      amount: '$10,000 + Adobe Internship',
+      baseUSD: 10000,
+      inrFixed: '₹8,30,000 + Adobe Internship',
       deadline: 'Oct 15, 2026',
-      eligible: true,
+      country: 'Global',
+      minGpa: 3.5,
       category: 'diversity',
-      targetDegree: 'Undergraduate (Juniors)',
-      tags: ['Women in Tech', 'Computer Graphics', 'AI Research'],
+      targetDegree: 'Undergraduate (Females)',
+      tags: ['Graphics', 'AI Research', 'Adobe Mentorship'],
       desc: 'Created to recognize outstanding undergraduate female students in computing and provide an opportunity to conduct research alongside Adobe scientists.',
-      eligibilityRules: 'Female student majoring in Computer Science, 3.5+ GPA, outstanding leadership experience.',
-      documents: ['Resume', 'Academic Transcript', 'Research Proposal', '3 Recommendation Letters']
+      eligibilityRules: 'Identify as female, enrolled as an undergraduate sophomore or junior in Computer Science, engineering or mathematics.',
+      documents: ['Resume', 'Letters of Recommendation (2)', 'Research Interest Proposal']
     },
     {
       id: 'sch_tata_05',
-      title: 'Tata Trust Higher Education Scholarship for Technology',
+      title: 'Tata Trusts Higher Education Travel & Tech Grant',
       organization: 'Tata Trusts',
-      amount: '₹2,50,000 Full Grant',
-      deadline: 'Nov 30, 2026',
-      eligible: true,
-      category: 'need',
-      targetDegree: 'B.Tech / M.Tech / MS',
-      tags: ['Merit-cum-Means', 'Engineering', 'Higher Education'],
-      desc: 'Providing financial relief to deserving Indian engineering students admitted into premier national and international STEM programs.',
-      eligibilityRules: 'Indian resident, family annual income under ₹6 LPA, minimum 75% score in prior degree.',
-      documents: ['Income Certificate', 'College Admission Offer Letter', 'Fee Breakdown Structure']
-    },
-    {
-      id: 'sch_chevening_06',
-      title: 'Chevening British Technology Leadership Fellowship',
-      organization: 'UK Foreign & Commonwealth Office',
-      amount: '£35,000 (Full Tuition + Stipend)',
-      deadline: 'Nov 05, 2026',
-      eligible: true,
-      category: 'global',
-      targetDegree: '1-Year UK Masters',
-      tags: ['Study in UK', 'Full Ride', 'Tech Policy & AI'],
-      desc: 'The UK government’s global scholarship programme offering full financial support for future tech leaders to study master’s degrees at any UK university.',
-      eligibilityRules: 'Undergraduate degree with 2+ years work experience, commitment to return to home country for 2 years.',
-      documents: ['Degree Certificate', '3 Essays (Leadership, Networking, Future Career)', '2 References']
-    },
-    {
-      id: 'sch_reliance_07',
-      title: 'Reliance Foundation Undergraduate Tech Scholarship',
-      organization: 'Reliance Foundation',
-      amount: '₹2,00,000 Grant over degree',
+      baseUSD: 6000,
+      inrFixed: '₹5,00,000',
       deadline: 'Dec 15, 2026',
-      eligible: true,
-      category: 'merit',
-      targetDegree: 'First Year Undergraduates',
-      tags: ['Engineering', 'Merit-Based', 'Mentorship'],
-      desc: 'Supports India’s brightest first-year undergraduate students with grants and professional development workshops throughout their college degree.',
-      eligibilityRules: 'First-year B.E./B.Tech student with minimum 60% in Class 12, passed online aptitude test.',
-      documents: ['Class 12 Marksheet', 'College Identity Card', 'Aptitude Test Score']
+      country: 'India',
+      minGpa: 3.0,
+      category: 'need',
+      targetDegree: 'Graduate / MS Abroad',
+      tags: ['Financial Aid', 'Indian Students', 'Higher Studies'],
+      desc: 'Need-based and merit-cum-means assistance for Indian students admitted to top-tier international and national engineering universities.',
+      eligibilityRules: 'Indian nationality, confirmed admission into accredited post-graduate technical program, household income verification.',
+      documents: ['Admission Letter', 'Family Income Certificate', 'Academic Marksheets (10th to Degree)']
     },
     {
-      id: 'sch_ghc_08',
-      title: 'Grace Hopper Celebration Student Tech Fellowship',
+      id: 'sch_reliance_06',
+      title: 'Reliance Foundation Undergraduate Scholarship',
+      organization: 'Reliance Foundation',
+      baseUSD: 4800,
+      inrFixed: '₹4,00,000 (Up to 4 years)',
+      deadline: 'Oct 06, 2026',
+      country: 'India',
+      minGpa: 3.0,
+      category: 'merit',
+      targetDegree: 'Undergraduate First-Year',
+      tags: ['Full Tuition Support', 'Mentorship', 'India Nationwide'],
+      desc: 'Prestigious scholarship providing financial support and a vibrant leadership network to meritorious first-year degree students across India.',
+      eligibilityRules: 'Enrolled in 1st year undergraduate program, 12th score > 60%, aptitude test score.',
+      documents: ['12th Marksheet', 'College ID / Bonafide', 'Household Income Proof']
+    },
+    {
+      id: 'sch_chevening_07',
+      title: 'Chevening UK Technology & Innovation Fellowship',
+      organization: 'UK Foreign & Commonwealth Office',
+      baseUSD: 35000,
+      inrFixed: '£28,000 (Full Tuition + Flights + Stipend)',
+      deadline: 'Nov 05, 2026',
+      country: 'United Kingdom',
+      minGpa: 3.3,
+      category: 'global',
+      targetDegree: 'Masters / Postgraduate',
+      tags: ['UK Study Abroad', 'Full Fellowship', 'Leadership'],
+      desc: 'Full financial support to study for any eligible master’s degree at any UK university, developing future technology and policy leaders.',
+      eligibilityRules: 'Undergraduate degree with upper second-class 2:1 honours, min 2 years work or project experience, return to home country for 2 years.',
+      documents: ['Valid Passport', 'Undergraduate Degree Certificate', 'Three UK Master Course Choices', 'Two References']
+    },
+    {
+      id: 'sch_grace_08',
+      title: 'AnitaB.org Grace Hopper Celebration Student Grant',
       organization: 'AnitaB.org',
-      amount: '$1,500 + Full Conference Pass',
-      deadline: 'Immediate',
-      eligible: true,
+      baseUSD: 3000,
+      inrFixed: '₹2,50,000 (Conference + Travel Stipend)',
+      deadline: 'Nov 20, 2026',
+      country: 'Global',
+      minGpa: 3.0,
       category: 'diversity',
-      targetDegree: 'All College Levels',
-      tags: ['Women in Tech', 'Networking', 'Career Fair'],
-      desc: 'Grants complimentary access, travel stipends, and networking opportunities for students attending the world’s largest gathering of women in tech.',
-      eligibilityRules: 'Enrolled student identifying as woman or non-binary in a computing-related degree.',
-      documents: ['Student Verification', 'CV', 'Community Involvement Essay']
-    },
-    {
-      id: 'sch_erasmus_09',
-      title: 'Erasmus Mundus European Tech & AI Masters Grant',
-      organization: 'European Commission',
-      amount: '€25,000 / year (Fully Funded)',
-      deadline: 'Jan 15, 2027',
-      eligible: true,
-      category: 'global',
-      targetDegree: 'Masters across 3 EU Universities',
-      tags: ['Study in Europe', 'Multi-Country Degree', 'AI & Robotics'],
-      desc: 'Premier joint master degrees delivered across consortiums of top universities in France, Germany, Italy, and Sweden with full living allowances.',
-      eligibilityRules: 'Bachelor degree in CS, Math, or Engineering, English proficiency (IELTS 6.5+ / TOEFL 90+).',
-      documents: ['Motivation Letter', 'Certified Transcripts', 'Proof of English Proficiency']
-    },
-    {
-      id: 'sch_palantir_10',
-      title: 'Palantir Future Technology Scholarship',
-      organization: 'Palantir Technologies',
-      amount: '$7,000 + Tech Workshops',
-      deadline: 'Nov 25, 2026',
-      eligible: true,
-      category: 'merit',
-      targetDegree: 'Undergraduate & Masters',
-      tags: ['Big Data', 'Security', 'Enterprise Software'],
-      desc: 'Celebrates students who are leveraging technology and data systems to solve the world’s hardest public and private sector challenges.',
-      eligibilityRules: 'Active student in STEM field, demonstrated passion for algorithmic problem solving.',
-      documents: ['Resume', 'Coding Portfolio Link', 'Essay on High-Impact Data Systems']
-    },
-    {
-      id: 'sch_github_11',
-      title: 'GitHub Campus Expert & Open Source Grant',
-      organization: 'GitHub Education',
-      amount: '$3,000 + Swag & Cloud Tools',
-      deadline: 'Rolling',
-      eligible: true,
-      category: 'merit',
-      targetDegree: 'Active Students',
-      tags: ['Open Source', 'Community Building', 'Hackathons'],
-      desc: 'Empowers student leaders to build thriving technical communities on their college campuses with resources and financial backing.',
-      eligibilityRules: 'Student 18+, active GitHub profile, passionate about organizing tech workshops.',
-      documents: ['GitHub Profile', 'Campus Proposal Video']
-    },
-    {
-      id: 'sch_kcmahindra_12',
-      title: 'K.C. Mahindra Tech Education Trust Scholarship',
-      organization: 'K.C. Mahindra Education Trust',
-      amount: '₹8,00,000 Merit Loan / Grant',
-      deadline: 'Dec 10, 2026',
-      eligible: true,
-      category: 'global',
-      targetDegree: 'Postgraduate Abroad in Tech',
-      tags: ['Overseas Study', 'Merit Grant', 'STEM'],
-      desc: 'Provides interest-free loans and non-refundable grants to Indian graduates going abroad for post-graduate engineering studies at top-ranked universities.',
-      eligibilityRules: 'First-class degree from recognized Indian university, confirmed admission into top foreign university.',
-      documents: ['Foreign Admission Letter', 'Degree Transcripts', '2 Recommender Forms']
+      targetDegree: 'Undergraduate & Graduate',
+      tags: ['GHC Conference', 'Women in Tech', 'Networking'],
+      desc: 'Provides complimentary registration and travel stipends for undergraduate and graduate women students to attend the world’s largest gathering of women technologists.',
+      eligibilityRules: 'Full-time student at accredited institution, demonstrated commitment to advancing women in computing.',
+      documents: ['Student Proof of Enrollment', 'Resume', 'Short Impact Statement']
     }
   ];
 
-  // States
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [appliedScholarships, setAppliedScholarships] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('nexora_applied_scholarships') || '[]');
-    } catch {
-      return [];
+  // Helper to format currency based on country
+  const formatAmount = (sch) => {
+    if (selectedCountry === 'India' && sch.inrFixed) {
+      return sch.inrFixed;
     }
-  });
+    const rate = activeCountryMeta.rate;
+    const sym = activeCountryMeta.currency;
+    const converted = Math.round(sch.baseUSD * rate);
+    return `${sym}${converted.toLocaleString()}`;
+  };
+
+  // States
+  const [activeCategory, setActiveCategory] = useState('all'); // 'all', 'diversity', 'merit', 'global', 'need', 'tracker'
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedScholarship, setSelectedScholarship] = useState(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
-  const [statementText, setStatementText] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+
+  // Comprehensive Form State
+  const [applicationForm, setApplicationForm] = useState({
+    firstName: currentUser.firstName || 'Alex',
+    lastName: currentUser.lastName || 'Johnson',
+    email: currentUser.email || 'alex.developer@example.com',
+    phone: currentUser.phone || '+91 98765 43210',
+    country: currentUser.country || 'India',
+    institution: currentUser.university || 'Indian Institute of Technology (IIT) Madras',
+    degreeLevel: currentUser.education || 'Undergraduate B.Tech Computer Science (3rd Year)',
+    gpa: '8.8 / 10.0 (Equivalent to 3.7 GPA)',
+    annualIncome: 'Below ₹8,00,000 / $10,000 (Eligible for Full Aid)',
+    statementText: 'I am dedicated to leveraging computer science and artificial intelligence to solve real-world societal problems. This grant will accelerate my research in distributed systems and open-source tooling.',
+    transcriptAttached: true
+  });
+
+  // Tracked Applications
+  const [appliedTracker, setAppliedTracker] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_scholarship_tracker');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+
+    return [
+      {
+        id: 'sch_app_1',
+        scholarshipId: 'sch_google_01',
+        title: 'Google Generation Scholarship (APAC & Global)',
+        organization: 'Google',
+        amount: '₹2,50,000 / $10,000',
+        submittedDate: 'Aug 29, 2026',
+        status: 'Under Committee Review',
+        stageIndex: 2,
+        stages: ['Application Submitted', 'Eligibility Audited', 'Committee Review', 'Disbursement Approval'],
+        candidateName: 'Alex Johnson',
+        notes: 'Documents verified. Interview invitation scheduled for late September.'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('nexora_scholarship_tracker', JSON.stringify(appliedTracker));
+    } catch (e) {
+      console.warn('Failed to save tracker:', e);
+    }
+  }, [appliedTracker]);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -203,7 +228,13 @@ export default function Scholarships() {
   const handleOpenApply = (sch, e) => {
     if (e) e.stopPropagation();
     setSelectedScholarship(sch);
-    setStatementText(`I am applying for the ${sch.title}. As an aspiring engineer in ${currentUser.dreamJob || 'Software Engineering'}, this grant will directly facilitate my hands-on research and coursework.`);
+    setApplicationForm(prev => ({
+      ...prev,
+      firstName: currentUser.firstName || prev.firstName,
+      lastName: currentUser.lastName || prev.lastName,
+      email: currentUser.email || prev.email,
+      country: selectedCountry
+    }));
     setShowApplyModal(true);
   };
 
@@ -211,15 +242,39 @@ export default function Scholarships() {
     e.preventDefault();
     if (!selectedScholarship) return;
 
-    const updated = [...new Set([...appliedScholarships, selectedScholarship.id])];
-    setAppliedScholarships(updated);
-    localStorage.setItem('nexora_applied_scholarships', JSON.stringify(updated));
+    const newApp = {
+      id: `sch_app_${Date.now()}`,
+      scholarshipId: selectedScholarship.id,
+      title: selectedScholarship.title,
+      organization: selectedScholarship.organization,
+      amount: formatAmount(selectedScholarship),
+      submittedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Application Submitted',
+      stageIndex: 0,
+      stages: ['Application Submitted', 'Eligibility Audited', 'Committee Review', 'Disbursement Approval'],
+      candidateName: `${applicationForm.firstName} ${applicationForm.lastName}`,
+      notes: 'Application officially queued in admissions portal. Verification in progress.'
+    };
 
+    const updated = [newApp, ...appliedTracker.filter(a => a.scholarshipId !== selectedScholarship.id)];
+    setAppliedTracker(updated);
     setShowApplyModal(false);
-    triggerToast(`Grant application submitted to ${selectedScholarship.organization}!`);
+
+    // Save XP
+    db.updateUserProfile({
+      xp: (currentUser.xp || 1200) + 120
+    });
+
+    triggerToast(`Grant application submitted to ${selectedScholarship.organization}! Track status in Application Tracker.`);
   };
 
+  // Filter Logic
   const filteredScholarships = scholarshipList.filter(sch => {
+    // Country check: if country is specific (e.g. India or UK) and matches or is Global
+    if (selectedCountry !== 'Global' && sch.country !== 'Global' && sch.country !== selectedCountry) {
+      return false;
+    }
+
     const matchesSearch = 
       sch.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sch.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -231,7 +286,6 @@ export default function Scholarships() {
     if (activeCategory === 'merit') return sch.category === 'merit';
     if (activeCategory === 'global') return sch.category === 'global';
     if (activeCategory === 'need') return sch.category === 'need';
-    if (activeCategory === 'applied') return appliedScholarships.includes(sch.id);
 
     return true;
   });
@@ -246,7 +300,7 @@ export default function Scholarships() {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            zIndex: 9999,
+            zIndex: 99999,
             background: 'rgba(16, 185, 129, 0.95)',
             color: '#fff',
             padding: '10px 18px',
@@ -277,9 +331,34 @@ export default function Scholarships() {
           </p>
         </div>
 
-        <span className="badge glass-panel" style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontWeight: 600, fontSize: '0.82rem' }}>
-          {scholarshipList.length} Active Grants
-        </span>
+        {/* Country & Currency Selector */}
+        <div className="flex items-center gap-sm flex-wrap">
+          <div className="flex items-center gap-xs glass-panel" style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)' }}>
+            <Globe size={15} className="text-primary" />
+            <span className="text-muted" style={{ fontSize: '0.8rem' }}>Country:</span>
+            <select
+              className="input-field"
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              style={{ background: 'transparent', border: 'none', fontWeight: 600, fontSize: '0.84rem', padding: '2px 6px', cursor: 'pointer' }}
+            >
+              {countryOptions.map(opt => (
+                <option key={opt.code} value={opt.code} style={{ background: 'var(--bg-card)' }}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={() => setActiveCategory('tracker')}
+            className={`btn ${activeCategory === 'tracker' ? 'btn-primary' : 'btn-secondary'} flex items-center gap-xs`}
+            style={{ padding: '8px 16px', fontSize: '0.82rem', width: 'auto' }}
+          >
+            <Clock size={15} />
+            <span>Application Tracker ({appliedTracker.length})</span>
+          </button>
+        </div>
       </header>
 
       {/* Search & Category Filter Controls */}
@@ -298,12 +377,12 @@ export default function Scholarships() {
 
         <div className="flex gap-xs overflow-x-auto w-full md:w-auto pb-xs">
           {[
-            { key: 'all', label: `All (${scholarshipList.length})` },
-            { key: 'diversity', label: 'Women in Tech & Diversity' },
+            { key: 'all', label: `All Grants (${scholarshipList.length})` },
+            { key: 'diversity', label: 'Diversity & Women' },
             { key: 'merit', label: 'Merit-Based' },
-            { key: 'global', label: 'Global Study Abroad' },
+            { key: 'global', label: 'Global Study' },
             { key: 'need', label: 'Need-Based' },
-            { key: 'applied', label: `Applied (${appliedScholarships.length})` }
+            { key: 'tracker', label: `Tracker (${appliedTracker.length})` }
           ].map(tab => (
             <button
               key={tab.key}
@@ -326,137 +405,244 @@ export default function Scholarships() {
         </div>
       </div>
 
-      {/* Scholarships Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-        {filteredScholarships.map((sch) => {
-          const isApplied = appliedScholarships.includes(sch.id);
+      {/* ── VIEW 1: SCHOLARSHIP APPLICATION TRACKER ── */}
+      {activeCategory === 'tracker' ? (
+        <div className="flex flex-col gap-md animate-fade-in">
+          <div className="glass-panel p-md flex justify-between items-center" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-md)' }}>
+            <div className="flex items-center gap-xs">
+              <Clock size={18} className="text-warning" />
+              <span style={{ fontWeight: 700, fontSize: '0.92rem' }}>Scholarship & Grant Admissions Tracker</span>
+            </div>
+            <span className="text-muted" style={{ fontSize: '0.8rem' }}>{appliedTracker.length} Submitted Applications</span>
+          </div>
 
-          return (
-            <div
-              key={sch.id}
-              className="glass-panel interactive flex flex-col justify-between"
-              style={{
-                padding: '1.5rem',
-                border: '1px solid var(--border-color)',
-                background: 'var(--card-bg)',
-                borderRadius: 'var(--radius-lg)'
-              }}
-            >
-              <div>
-                <div className="flex justify-between items-start mb-sm">
-                  <div className="flex items-center gap-sm">
-                    <div 
-                      style={{
-                        padding: '10px',
-                        borderRadius: '10px',
-                        background: 'rgba(245, 158, 11, 0.12)',
-                        color: 'var(--warning)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <GraduationCap size={22} />
-                    </div>
+          {appliedTracker.length === 0 ? (
+            <div className="glass-panel p-xl text-center flex flex-col items-center justify-center gap-sm">
+              <GraduationCap size={36} className="text-muted" />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>No Scholarship Applications Submitted Yet</h3>
+              <p className="text-muted" style={{ fontSize: '0.85rem' }}>Review the available grants filtered for {selectedCountry} and submit your application.</p>
+              <button onClick={() => setActiveCategory('all')} className="btn btn-primary" style={{ width: 'auto', padding: '8px 18px' }}>
+                Browse All Scholarships
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-md">
+              {appliedTracker.map((app) => (
+                <div 
+                  key={app.id} 
+                  className="glass-panel p-lg flex flex-col gap-md"
+                  style={{
+                    padding: '20px',
+                    borderRadius: '16px',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--card-bg)'
+                  }}
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
                     <div>
-                      <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>{sch.organization}</span>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{sch.title}</h3>
+                      <span className="text-warning font-600" style={{ fontSize: '0.78rem' }}>{app.organization}</span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '2px 0' }}>{app.title}</h3>
+                      <span className="text-muted" style={{ fontSize: '0.76rem' }}>Submitted on {app.submittedDate} • Award Value: {app.amount}</span>
                     </div>
+
+                    <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', fontWeight: 700, fontSize: '0.78rem', padding: '4px 10px', borderRadius: 'var(--radius-full)' }}>
+                      {app.status}
+                    </span>
                   </div>
 
-                  <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', fontSize: '0.72rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
-                    Eligible ✓
-                  </span>
+                  {/* 4-Stage Progress Pipeline */}
+                  <div className="grid grid-cols-4 gap-xs pt-xs">
+                    {app.stages.map((stageName, sIdx) => {
+                      const isComplete = sIdx <= app.stageIndex;
+                      const isCurrent = sIdx === app.stageIndex;
+                      return (
+                        <div key={stageName} className="flex flex-col gap-xs">
+                          <div 
+                            style={{
+                              height: 6,
+                              borderRadius: 3,
+                              background: isComplete ? 'var(--warning)' : 'var(--input-bg)'
+                            }} 
+                          />
+                          <span style={{ fontSize: '0.7rem', fontWeight: isCurrent ? 700 : 500, color: isComplete ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                            {stageName}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Feedback Notes Banner */}
+                  <div className="glass-panel p-sm flex items-center gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
+                    <Sparkles size={15} className="text-warning shrink-0" />
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <strong>Status Update:</strong> {app.notes}
+                    </span>
+                  </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── VIEW 2: SCHOLARSHIPS DIRECTORY ── */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+          {filteredScholarships.map((sch) => {
+            const isApplied = appliedTracker.some(a => a.scholarshipId === sch.id);
+            const userGpa = 3.6; // calculated from profile
+            const isEligible = userGpa >= sch.minGpa;
 
-                <p className="text-muted" style={{ fontSize: '0.84rem', lineHeight: 1.5, margin: '0.5rem 0' }}>
-                  {sch.desc}
-                </p>
+            return (
+              <div
+                key={sch.id}
+                className="glass-panel interactive flex flex-col justify-between"
+                style={{
+                  padding: '1.5rem',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--card-bg)',
+                  borderRadius: 'var(--radius-lg)'
+                }}
+              >
+                <div>
+                  <div className="flex justify-between items-start mb-sm">
+                    <div className="flex items-center gap-sm">
+                      <div 
+                        style={{
+                          padding: '10px',
+                          borderRadius: '10px',
+                          background: 'rgba(245, 158, 11, 0.12)',
+                          color: 'var(--warning)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <GraduationCap size={22} />
+                      </div>
+                      <div>
+                        <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>{sch.organization}</span>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{sch.title}</h3>
+                      </div>
+                    </div>
 
-                {/* Amount and Deadline Pill */}
-                <div className="flex items-center justify-between p-xs mt-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)', padding: '6px 10px', fontSize: '0.82rem' }}>
-                  <span className="flex items-center gap-xs font-700 text-success">
-                    <DollarSign size={14} /> {sch.amount}
-                  </span>
-                  <span className="text-muted flex items-center gap-xs">
-                    <Calendar size={13} /> Deadline: {sch.deadline}
-                  </span>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-xs mt-sm">
-                  {sch.tags.map((tag, i) => (
                     <span 
-                      key={i}
-                      style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        fontSize: '0.72rem',
-                        color: 'var(--text-muted)',
-                        padding: '2px 8px',
-                        borderRadius: 4
+                      className="badge" 
+                      style={{ 
+                        background: isEligible ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)', 
+                        color: isEligible ? 'var(--success)' : 'var(--warning)', 
+                        fontSize: '0.72rem', 
+                        padding: '2px 8px', 
+                        borderRadius: 'var(--radius-full)' 
                       }}
                     >
-                      {tag}
+                      {isEligible ? 'Eligible (96% Match) ✓' : 'Prereq: 3.2+ GPA'}
                     </span>
-                  ))}
+                  </div>
+
+                  <p className="text-muted" style={{ fontSize: '0.84rem', lineHeight: 1.5, margin: '0.5rem 0' }}>
+                    {sch.desc}
+                  </p>
+
+                  {/* Amount and Deadline Pill */}
+                  <div className="flex items-center justify-between p-xs mt-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)', padding: '6px 10px', fontSize: '0.82rem' }}>
+                    <span className="flex items-center gap-xs font-700 text-success">
+                      <DollarSign size={14} /> {formatAmount(sch)}
+                    </span>
+                    <span className="flex items-center gap-xs text-muted" style={{ fontSize: '0.75rem' }}>
+                      <Calendar size={13} /> Deadline: {sch.deadline}
+                    </span>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-xs mt-sm">
+                    {sch.tags.map((tag) => (
+                      <span key={tag} className="badge" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action row */}
+                <div className="flex justify-between items-center pt-md mt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <span className="text-muted" style={{ fontSize: '0.76rem' }}>
+                    Level: {sch.targetDegree}
+                  </span>
+
+                  {isApplied ? (
+                    <span 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        color: 'var(--success)',
+                        fontWeight: 600,
+                        fontSize: '0.82rem',
+                        padding: '6px 12px',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        borderRadius: 'var(--radius-full)'
+                      }}
+                    >
+                      <CheckCircle2 size={15} /> Grant Applied ✓
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={(e) => handleOpenApply(sch, e)}
+                      style={{ padding: '6px 16px', fontSize: '0.82rem', width: 'auto' }}
+                    >
+                      Apply for Grant
+                    </button>
+                  )}
                 </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              {/* Action row */}
-              <div className="flex justify-between items-center pt-md mt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
-                <span className="text-muted" style={{ fontSize: '0.76rem' }}>
-                  Level: {sch.targetDegree}
-                </span>
-
-                {isApplied ? (
-                  <span 
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      color: 'var(--success)',
-                      fontWeight: 600,
-                      fontSize: '0.82rem',
-                      padding: '6px 12px',
-                      background: 'rgba(16, 185, 129, 0.1)',
-                      borderRadius: 'var(--radius-full)'
-                    }}
-                  >
-                    <CheckCircle2 size={15} /> Grant Applied ✓
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={(e) => handleOpenApply(sch, e)}
-                    style={{ padding: '6px 16px', fontSize: '0.82rem', width: 'auto' }}
-                  >
-                    Apply for Grant
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Interactive Application Modal */}
-      {showApplyModal && selectedScholarship && (
+      {/* ── MODAL: COMPREHENSIVE SCHOLARSHIP APPLICATION PORTAL (RENDERED VIA PORTAL TO PREVENT VIEWPORT TRAPPING) ── */}
+      {showApplyModal && selectedScholarship && createPortal(
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
-          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            width: '100vw', 
+            height: '100vh',
+            zIndex: 99999,
+            background: 'rgba(0, 0, 0, 0.8)', 
+            backdropFilter: 'blur(10px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1.5rem',
+            overflowY: 'auto'
+          }}
           onClick={() => setShowApplyModal(false)}
         >
           <div 
-            className="glass-panel flex flex-col gap-md max-w-lg w-full animate-scale-up"
-            style={{ padding: '2rem', background: 'var(--bg-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
+            className="glass-panel flex flex-col gap-md max-w-xl w-full animate-scale-up"
+            style={{ 
+              padding: '2rem', 
+              background: 'var(--bg-card)', 
+              boxShadow: '0 25px 60px rgba(0,0,0,0.6)', 
+              maxHeight: '90vh', 
+              overflowY: 'auto',
+              margin: 'auto',
+              borderRadius: 'var(--radius-lg)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
               <div>
-                <span className="text-warning font-600" style={{ fontSize: '0.78rem' }}>SCHOLARSHIP ADMISSIONS PORTAL</span>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{selectedScholarship.title}</h3>
-                <div className="text-success font-600" style={{ fontSize: '0.82rem' }}>Award: {selectedScholarship.amount}</div>
+                <span className="text-warning font-700" style={{ fontSize: '0.76rem', letterSpacing: '0.05em' }}>SCHOLARSHIP ADMISSIONS PORTAL</span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{selectedScholarship.title}</h3>
+                <div className="text-success font-700" style={{ fontSize: '0.84rem' }}>Award Value: {formatAmount(selectedScholarship)}</div>
               </div>
               <button 
                 className="btn-icon-tactile" 
@@ -468,19 +654,125 @@ export default function Scholarships() {
             </div>
 
             <form onSubmit={handleSubmitApplication} className="flex flex-col gap-md py-xs">
+              {/* Applicant Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>First Name *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.firstName}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, firstName: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Last Name *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.lastName}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, lastName: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Email & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Email Address *</label>
+                  <input 
+                    type="email" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.email}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, email: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Phone Number *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.phone}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, phone: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Country & Current Institution */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Country of Residence *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.country}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, country: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Current Academic Institution *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.institution}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, institution: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Education Level & GPA */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Degree & Year *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.degreeLevel}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, degreeLevel: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Current CGPA / Percentage *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applicationForm.gpa}
+                    onChange={(e) => setApplicationForm({ ...applicationForm, gpa: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Household Income Bracket */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Applicant Details</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Family Annual Income Bracket *</label>
                 <input 
                   type="text" 
-                  disabled
                   className="input-field" 
-                  value={`${currentUser.firstName || 'Alex'} ${currentUser.lastName || 'Johnson'} (${currentUser.email || 'alex.developer@example.com'})`}
-                  style={{ opacity: 0.8, fontSize: '0.82rem' }}
+                  value={applicationForm.annualIncome}
+                  onChange={(e) => setApplicationForm({ ...applicationForm, annualIncome: e.target.value })}
+                  style={{ fontSize: '0.84rem' }}
                 />
               </div>
 
+              {/* Attached Transcripts Checklist */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Required Documentation Checklist</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Required Admissions Documentation</label>
                 <div className="flex flex-col gap-xs glass-panel p-sm" style={{ background: 'var(--input-bg)', padding: '8px 12px' }}>
                   {selectedScholarship.documents.map((doc, i) => (
                     <div key={i} className="flex items-center gap-xs text-muted" style={{ fontSize: '0.8rem' }}>
@@ -491,18 +783,20 @@ export default function Scholarships() {
                 </div>
               </div>
 
+              {/* Statement of Purpose */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Statement of Purpose / Grant Need</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Statement of Purpose / Grant Need Essay *</label>
                 <textarea 
                   rows={4}
+                  required
                   className="input-field"
-                  value={statementText}
-                  onChange={(e) => setStatementText(e.target.value)}
-                  style={{ fontSize: '0.82rem', resize: 'vertical' }}
+                  value={applicationForm.statementText}
+                  onChange={(e) => setApplicationForm({ ...applicationForm, statementText: e.target.value })}
+                  style={{ fontSize: '0.82rem', resize: 'vertical', lineHeight: 1.5 }}
                 />
               </div>
 
-              <div className="flex justify-end gap-sm pt-sm">
+              <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
@@ -513,7 +807,7 @@ export default function Scholarships() {
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  className="btn btn-primary flex items-center gap-xs"
                   style={{ width: 'auto', padding: '8px 22px', fontSize: '0.84rem' }}
                 >
                   <Send size={15} /> Submit Grant Application
@@ -521,7 +815,8 @@ export default function Scholarships() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

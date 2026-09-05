@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Briefcase, Building, DollarSign, MapPin, Search, Filter, Bookmark, 
   BookmarkCheck, CheckCircle2, ArrowRight, ExternalLink, X, Sparkles, 
-  Clock, ShieldCheck, FileText, Send
+  Clock, ShieldCheck, FileText, Send, User, Mail, Phone, GraduationCap,
+  Calendar, Check, AlertCircle, Eye, ChevronRight
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -70,272 +71,224 @@ export default function Jobs() {
       salary: '$135k – $160k · ₹22 – 30 LPA',
       type: 'Full-Time',
       batch: '2026 Batch',
-      match: 92,
+      match: 94,
       remote: false,
       deadline: 'Nov 15, 2026',
-      tags: ['Java', 'Distributed Systems', 'AWS DynamoDB', 'Docker'],
-      desc: 'Be part of the AWS infrastructure team delivering compute and storage virtualization for millions of enterprise customers worldwide.',
+      tags: ['Java', 'Distributed Systems', 'AWS Lambda', 'DynamoDB'],
+      desc: 'Invent on behalf of millions of AWS customers. Build mission-critical cloud primitives powering modern internet applications with extreme durability and microsecond latencies.',
       responsibilities: [
-        'Write high-throughput Java microservices handling millions of transactions per minute.',
-        'Collaborate with principal engineers on fault tolerance and automatic failover.',
-        'Automate deployment canary rollouts using internal CI/CD pipelines.'
+        'Write highly testable, fault-tolerant Java code running on AWS infrastructure.',
+        'Mitigate complex network partitions and state divergence in distributed storage engines.',
+        'Take operational ownership of software services from deployment to live monitoring.'
       ],
       requirements: [
-        'Bachelor’s in CS, EE, or related field.',
-        'Demonstrated grasp of concurrency, thread safety, and memory management.',
-        'Experience building production APIs or cloud-native applications.'
+        'Bachelor’s in Computer Science or related STEM field graduating by Summer 2026.',
+        'Deep understanding of concurrency, multithreading, and algorithmic complexity.',
+        'Hands-on experience with cloud infrastructure or Linux systems.'
       ]
     },
     {
       id: 'job_meta_04',
-      title: 'Frontend Engineer (UI Architecture)',
+      title: 'Frontend Engineer (UI Infrastructure)',
       company: 'Meta',
       logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=80',
-      location: 'Remote (Worldwide)',
+      location: 'Menlo Park, CA & Remote Eligible',
       salary: '$140k – $170k · ₹28 – 36 LPA',
       type: 'Full-Time',
-      batch: 'Open',
+      batch: '2026 Batch',
       match: 96,
       remote: true,
-      deadline: 'Immediate',
+      deadline: 'Nov 01, 2026',
       tags: ['React', 'Relay', 'GraphQL', 'Web Performance'],
-      desc: 'Engineer the future of global communication across Instagram, WhatsApp, and Horizon platforms. Push the boundaries of web UI responsiveness and instant updates.',
+      desc: 'Help evolve the core React infrastructure and design systems powering Instagram, WhatsApp, and Facebook for 3 billion daily active people.',
       responsibilities: [
-        'Optimize complex React trees for 60fps rendering across desktop and mobile browsers.',
-        'Implement real-time collaboration features using GraphQL subscriptions and WebSockets.',
-        'Champion design system token integration and accessibility standards.'
+        'Design composable, zero-runtime CSS primitives and accessible UI widgets.',
+        'Profile and reduce main-thread JavaScript execution latency and bundle sizes.',
+        'Work cross-functionally with product design and accessibility specialists.'
       ],
       requirements: [
-        'Deep mastery of modern JavaScript, DOM internals, and browser performance APIs.',
-        'Experience maintaining state across large-scale single-page apps.',
-        'Passion for pixel-perfect UI and user empathy.'
+        'Exceptional command of modern JavaScript (ESNext), DOM APIs, and CSS architecture.',
+        'Familiarity with AST transforms (Babel, SWC) and modern build tools.',
+        'Passion for web accessibility (WCAG 2.1 AA) and responsive micro-interactions.'
       ]
     },
     {
       id: 'job_stripe_05',
-      title: 'Infrastructure & Payment Core Intern',
+      title: 'Backend Engineering Intern (Payments Core)',
       company: 'Stripe',
-      logo: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80',
-      location: 'San Francisco, CA & Dublin, Ireland',
-      salary: '$50 - $60 / hr · ₹1,00,000 / mo',
-      type: 'Internship',
-      batch: '2026 Batch',
-      match: 94,
-      remote: false,
-      deadline: 'Dec 01, 2026',
-      tags: ['Ruby', 'Go', 'PostgreSQL', 'Idempotent APIs'],
-      desc: 'Help scale the economic infrastructure of the internet. Write software that safely processes hundreds of billions of dollars each year with zero downtime.',
-      responsibilities: [
-        'Build fault-tolerant payment idempotency systems with strict ACID compliance.',
-        'Improve observability, distributed tracing, and real-time ledger verification.',
-        'Collaborate with global financial partner integrations.'
-      ],
-      requirements: [
-        'Strong computer science fundamentals and disciplined testing mindset.',
-        'Familiarity with SQL transactions and distributed logging.',
-        'Clear written and verbal technical communication.'
-      ]
-    },
-    {
-      id: 'job_openai_06',
-      title: 'Research Engineering Intern - Model Scaling',
-      company: 'OpenAI',
-      logo: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=80',
-      location: 'San Francisco, CA (Hybrid / Remote)',
-      salary: '$60 - $75 / hr',
+      logo: 'https://images.unsplash.com/photo-1556742049-0a67e5572293?auto=format&fit=crop&q=80&w=80',
+      location: 'San Francisco, CA & Dublin, Ireland (Remote)',
+      salary: '$58 / hr · ₹1,10,000 / mo',
       type: 'Internship',
       batch: '2026 Batch',
       match: 98,
       remote: true,
-      deadline: 'Oct 20, 2026',
-      tags: ['PyTorch', 'Python', 'CUDA', 'Distributed GPU Clusters'],
-      desc: 'Push the frontiers of artificial intelligence. Work with world-class researchers to scale multi-modal foundation models and optimize high-throughput inference.',
+      deadline: 'Rolling Admission',
+      tags: ['Ruby', 'Go', 'PostgreSQL', 'Idempotency', 'Kafka'],
+      desc: 'Build the financial infrastructure that moves hundreds of billions of dollars each year. You will write code where correctness, idempotency, and auditability are paramount.',
       responsibilities: [
-        'Implement parallelized training scripts using PyTorch FSDP and Megatron-LM.',
-        'Benchmark matrix multiplication kernels on cutting-edge GPU clusters.',
-        'Analyze model loss trajectories and debug distributed memory bottlenecks.'
+        'Design transactional financial ledgers resistant to duplicate requests.',
+        'Implement resilient retry strategies and circuit breakers for global banking partners.',
+        'Write developer documentation and public API SDK interfaces.'
       ],
       requirements: [
-        'Solid background in linear algebra, probability, and machine learning.',
-        'Hands-on experience training deep neural networks with PyTorch.',
-        'Familiarity with CUDA or GPU hardware acceleration is a plus.'
+        'Proficiency in Ruby, Go, Python, or Java with strong OOP fundamentals.',
+        'Understanding of database isolation levels and transactional integrity.',
+        'Clear, empathetic written and verbal communication.'
       ]
     },
     {
-      id: 'job_razorpay_07',
-      title: 'Backend Engineer - FinTech Infrastructure',
-      company: 'Razorpay',
-      logo: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80',
-      location: 'Bangalore, India',
-      salary: '₹16 – 22 LPA',
+      id: 'job_openai_06',
+      title: 'AI Systems & Infrastructure Engineer',
+      company: 'OpenAI',
+      logo: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=80',
+      location: 'San Francisco, CA (Onsite)',
+      salary: '$180k – $220k + Equity',
       type: 'Full-Time',
       batch: '2026 Batch',
-      match: 91,
+      match: 92,
       remote: false,
-      deadline: 'Nov 10, 2026',
-      tags: ['Golang', 'Kafka', 'MySQL', 'Redis'],
-      desc: 'Empower over 8 million Indian businesses with instant digital transactions, banking APIs, and fraud detection engines.',
+      deadline: 'Dec 15, 2026',
+      tags: ['PyTorch', 'CUDA', 'Python', 'Distributed GPU Clusters'],
+      desc: 'Scale high-throughput model inference infrastructure serving hundreds of millions of ChatGPT queries daily across tens of thousands of GPUs.',
       responsibilities: [
-        'Build low-latency payment processing pipelines handling 10,000+ RPS.',
-        'Integrate bank webhooks with guaranteed delivery and retry mechanics.',
-        'Optimize Redis caching for instantaneous payment status polling.'
+        'Optimize model quantization (FP8, INT4) and KV-cache utilization algorithms.',
+        'Develop low-latency model serving runtimes using Triton and vLLM.',
+        'Collaborate with research scientists to deploy experimental frontier checkpoints.'
       ],
       requirements: [
-        'Proficiency in Golang, Java, or Node.js.',
-        'Understanding of message brokers (Kafka, RabbitMQ) and caching.',
-        'Eagerness to solve high-volume financial reliability problems.'
+        'Strong background in systems programming (C++, Rust, or CUDA).',
+        'Familiarity with transformer architectures and attention optimizations (FlashAttention).',
+        'Proven track record building and benchmarking performance-critical software.'
       ]
     },
     {
-      id: 'job_swiggy_08',
-      title: 'Associate Data Scientist - Routing & Logistics',
-      company: 'Swiggy',
-      logo: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=80',
-      location: 'Bangalore, India (Hybrid)',
-      salary: '₹15 – 20 LPA',
+      id: 'job_tcs_07',
+      title: 'Systems Engineer - Digital & Prime',
+      company: 'Tata Consultancy Services',
+      logo: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=80',
+      location: 'Hyderabad, Bangalore, Pune (India)',
+      salary: '₹7.5 – 11.5 LPA',
+      type: 'Full-Time',
+      batch: '2026 Batch',
+      match: 90,
+      remote: false,
+      deadline: 'Oct 15, 2026',
+      tags: ['Java', 'Spring Boot', 'Angular', 'Cloud Essentials'],
+      desc: 'TCS Digital hiring track for elite graduates. Work on digital transformation programs for Fortune 100 banking, healthcare, and retail clients.',
+      responsibilities: [
+        'Develop enterprise microservices using Spring Boot and Hibernate.',
+        'Build responsive front-end dashboards in Angular and TypeScript.',
+        'Participate in agile sprint ceremonies and code audits.'
+      ],
+      requirements: [
+        'B.Tech / B.E / M.Tech in CS / IT / Circuit branches graduating in 2026.',
+        'Minimum 70% or 7.0 CGPA throughout academic career.',
+        'Strong problem solving skills evaluated in TCS NQT coding rounds.'
+      ]
+    },
+    {
+      id: 'job_accenture_08',
+      title: 'Associate Software Engineer (Advanced Tech)',
+      company: 'Accenture',
+      logo: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=80',
+      location: 'Bangalore, Gurgaon, Chennai (India)',
+      salary: '₹6.5 – 9.0 LPA',
       type: 'Full-Time',
       batch: '2026 Batch',
       match: 89,
       remote: false,
-      deadline: 'Oct 25, 2026',
-      tags: ['Python', 'Operations Research', 'Machine Learning', 'SQL'],
-      desc: 'Develop hyper-local demand forecasting and delivery dispatch optimization algorithms powering millions of daily food and grocery orders.',
+      deadline: 'Oct 20, 2026',
+      tags: ['Python', 'Cloud Ingress', 'SQL', 'Automation'],
+      desc: 'Join Accenture’s Advanced Technology Centers to build cloud solutions, AI-driven automation workflows, and enterprise web portals.',
       responsibilities: [
-        'Model ETA predictions based on real-time traffic and kitchen preparation times.',
-        'Design combinatorial optimization algorithms for driver batching.',
-        'Execute rigorous A/B tests to validate delivery efficiency gains.'
+        'Implement automated testing and continuous integration scripts.',
+        'Analyze client datasets and build automated reporting pipelines.',
+        'Collaborate with international delivery teams across agile sprints.'
       ],
       requirements: [
-        'Degree in Statistics, Computer Science, Data Science, or Operations Research.',
-        'Strong skills in Python, Scikit-Learn, and analytical SQL.',
-        'Solid problem-solving intuition and metric-driven thinking.'
+        'B.E/B.Tech from recognized university graduating in 2026.',
+        'Good understanding of SQL databases, basic networking, and modern programming.',
+        'Strong analytical thinking and adaptability.'
       ]
     },
-    {
-      id: 'job_uber_09',
-      title: 'Platform Engineering Intern',
-      company: 'Uber',
-      logo: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&q=80&w=80',
-      location: 'Hyderabad, India & San Francisco, CA',
-      salary: '$48 - $58 / hr · ₹80,000 / mo',
-      type: 'Internship',
-      batch: '2026 Batch',
-      match: 93,
-      remote: false,
-      deadline: 'Nov 30, 2026',
-      tags: ['Go', 'Microservices', 'Kafka', 'Cassandra'],
-      desc: 'Build the core platforms that power global mobility, dispatching millions of rides and deliveries across 10,000+ cities daily.',
-      responsibilities: [
-        'Develop highly concurrent backend services in Go.',
-        'Improve automated testing harnesses for microservice integration.',
-        'Participate in chaos engineering drills and disaster recovery tests.'
-      ],
-      requirements: [
-        'Strong algorithmic reasoning and data structures background.',
-        'Comfort with Unix/Linux development environments.',
-        'Familiarity with distributed data stores.'
-      ]
-    },
-    {
-      id: 'job_atlassian_10',
-      title: 'Junior Software Engineer - Cloud Tools',
-      company: 'Atlassian',
-      logo: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=80',
-      location: 'Remote (Worldwide)',
-      salary: '$110k – $135k · ₹20 – 26 LPA',
-      type: 'Full-Time',
-      batch: 'Open',
-      match: 92,
-      remote: true,
-      deadline: 'Rolling',
-      tags: ['React', 'TypeScript', 'Java', 'AWS'],
-      desc: 'Build teamwork software used by millions at Jira, Confluence, and Trello. Work from anywhere with Atlassian’s revolutionary Team Anywhere model.',
-      responsibilities: [
-        'Build responsive web interfaces using Atlassian Design System.',
-        'Collaborate with product designers to streamline developer collaboration.',
-        'Deploy microservices to AWS multi-region infrastructure.'
-      ],
-      requirements: [
-        'Experience building web applications with modern JS/TS frameworks.',
-        'Good understanding of REST APIs and relational databases.',
-        'Self-motivated with excellent remote asynchronous communication.'
-      ]
-    },
-    {
-      id: 'job_tcs_11',
-      title: 'Digital Systems Engineer - Cloud & AI',
-      company: 'TCS Digital',
-      logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=80',
-      location: 'Pune, Mumbai, Hyderabad, India',
-      salary: '₹7.5 – 11.5 LPA',
-      type: 'Full-Time',
-      batch: '2026 Batch',
-      match: 88,
-      remote: false,
-      deadline: 'Oct 31, 2026',
-      tags: ['Java', 'Spring Boot', 'Cloud Fundamentals', 'Python'],
-      desc: 'Deliver digital transformation and cloud modernization projects for Fortune 500 banking, retail, and healthcare leaders worldwide.',
-      responsibilities: [
-        'Develop enterprise REST microservices in Java Spring Boot.',
-        'Automate deployment pipelines and cloud infrastructure provisioning.',
-        'Conduct code quality reviews and automated security scanning.'
-      ],
-      requirements: [
-        'BE/B.Tech/MCA in Computer Science or IT streams.',
-        'Strong core Java, OOP concepts, and SQL fundamentals.',
-        'Good aptitude, logical reasoning, and communication skills.'
-      ]
-    },
-    {
-      id: 'job_accenture_12',
-      title: 'Cybersecurity Operations Associate',
-      company: 'Accenture',
-      logo: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=80',
-      location: 'Gurgaon & Bangalore, India',
-      salary: '₹8.0 – 12.0 LPA',
-      type: 'Full-Time',
-      batch: '2026 Batch',
-      match: 86,
-      remote: false,
-      deadline: 'Nov 20, 2026',
-      tags: ['SIEM', 'Network Security', 'Wireshark', 'SOC'],
-      desc: 'Protect multinational enterprise clients against sophisticated cyber attacks, monitor global threat intelligence feeds, and conduct vulnerability remediation.',
-      responsibilities: [
-        'Analyze security telemetry and alert events in SIEM platforms.',
-        'Perform basic vulnerability assessments and penetration test triage.',
-        'Draft incident response reports and assist in security remediation.'
-      ],
-      requirements: [
-        'Knowledge of networking (TCP/IP, DNS, Firewalls) and OS security.',
-        'Certifications such as CompTIA Security+ or CEH are an advantage.',
-        'Analytical problem-solving skills under high-pressure scenarios.'
-      ]
-    }
   ];
 
   // States
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'internships', 'fulltime', 'remote', 'saved', 'tracker'
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
-  const [savedJobIds, setSavedJobIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('nexora_saved_jobs') || '[]');
-    } catch {
-      return [];
-    }
-  });
-  const [appliedJobIds, setAppliedJobIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('nexora_applied_jobs') || '[]');
-    } catch {
-      return [];
-    }
-  });
   const [selectedJob, setSelectedJob] = useState(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applyingJob, setApplyingJob] = useState(null);
-  const [coverNote, setCoverNote] = useState('');
-  const [portfolioLink, setPortfolioLink] = useState('');
   const [toastMessage, setToastMessage] = useState('');
+
+  // Editable Application Form State
+  const [applyForm, setApplyForm] = useState({
+    firstName: currentUser.firstName || 'Alex',
+    lastName: currentUser.lastName || 'Johnson',
+    email: currentUser.email || 'alex.developer@example.com',
+    phone: currentUser.phone || '+1 (234) 567-8900',
+    education: currentUser.education || 'B.S. Computer Science & Engineering (2026)',
+    portfolioLink: 'https://github.com/alexjohnson',
+    resumeName: 'Alex_Johnson_Resume_ATS_Ready.pdf (92/100 ATS Match)',
+    coverNote: ''
+  });
+
+  // Saved Jobs
+  const [savedJobIds, setSavedJobIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_saved_jobs');
+      return saved ? JSON.parse(saved) : ['job_google_01', 'job_stripe_05'];
+    } catch {
+      return ['job_google_01', 'job_stripe_05'];
+    }
+  });
+
+  // Application Tracker Data
+  const [applications, setApplications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_job_applications');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+
+    // Default authentic demo applications
+    return [
+      {
+        id: 'app_1',
+        jobId: 'job_google_01',
+        company: 'Google',
+        title: 'Software Engineering Intern - Cloud & Systems',
+        appliedDate: 'Aug 26, 2026',
+        status: 'Interview Scheduled',
+        stageIndex: 2,
+        atsScore: 96,
+        nextStep: 'Technical Round 1: System Design & Algorithms on Sep 14',
+        candidateName: 'Alex Johnson',
+        email: 'alex.developer@example.com'
+      },
+      {
+        id: 'app_2',
+        jobId: 'job_stripe_05',
+        company: 'Stripe',
+        title: 'Backend Engineering Intern (Payments Core)',
+        appliedDate: 'Sep 01, 2026',
+        status: 'ATS Resume Screened',
+        stageIndex: 1,
+        atsScore: 94,
+        nextStep: 'Recruiter review in progress. Expect update in 3-5 days.',
+        candidateName: 'Alex Johnson',
+        email: 'alex.developer@example.com'
+      }
+    ];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('nexora_job_applications', JSON.stringify(applications));
+    } catch (e) {
+      console.warn('Failed to save applications:', e);
+    }
+  }, [applications]);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -343,7 +296,7 @@ export default function Jobs() {
   };
 
   const handleToggleBookmark = (jobId, e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     let updated;
     if (savedJobIds.includes(jobId)) {
       updated = savedJobIds.filter(id => id !== jobId);
@@ -359,8 +312,13 @@ export default function Jobs() {
   const handleOpenApplyModal = (job, e) => {
     if (e) e.stopPropagation();
     setApplyingJob(job);
-    setCoverNote(`I am excited to apply for the ${job.title} position at ${job.company}. My background in modern software engineering and hands-on projects directly matches the required technical stack.`);
-    setPortfolioLink('https://github.com/' + (currentUser.firstName || 'alex').toLowerCase());
+    setApplyForm(prev => ({
+      ...prev,
+      firstName: currentUser.firstName || prev.firstName,
+      lastName: currentUser.lastName || prev.lastName,
+      email: currentUser.email || prev.email,
+      coverNote: `I am excited to apply for the ${job.title} position at ${job.company}. My background in high-scale systems and hands-on projects directly aligns with your requirements.`
+    }));
     setShowApplyModal(true);
   };
 
@@ -368,17 +326,34 @@ export default function Jobs() {
     e.preventDefault();
     if (!applyingJob) return;
 
-    const updated = [...new Set([...appliedJobIds, applyingJob.id])];
-    setAppliedJobIds(updated);
-    localStorage.setItem('nexora_applied_jobs', JSON.stringify(updated));
+    const newApp = {
+      id: `app_${Date.now()}`,
+      jobId: applyingJob.id,
+      company: applyingJob.company,
+      title: applyingJob.title,
+      appliedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Application Submitted',
+      stageIndex: 0,
+      atsScore: 92,
+      nextStep: 'Application dispatched to hiring team. Automated ATS screening underway.',
+      candidateName: `${applyForm.firstName} ${applyForm.lastName}`,
+      email: applyForm.email
+    };
 
+    const updated = [newApp, ...applications.filter(a => a.jobId !== applyingJob.id)];
+    setApplications(updated);
     setShowApplyModal(false);
-    triggerToast(`Application officially submitted to ${applyingJob.company}! Status: Under Review.`);
+
+    // Save XP
+    db.updateUserProfile({
+      xp: (currentUser.xp || 1200) + 100
+    });
+
+    triggerToast(`Application officially submitted to ${applyingJob.company}! Tracked in Application Tracker.`);
   };
 
   // Filter logic
   const filteredJobs = allJobs.filter(job => {
-    // Search
     const matchesSearch = 
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -386,7 +361,6 @@ export default function Jobs() {
 
     if (!matchesSearch) return false;
 
-    // Tabs
     if (activeTab === 'internships') return job.type === 'Internship';
     if (activeTab === 'fulltime') return job.type === 'Full-Time';
     if (activeTab === 'remote') return job.remote === true;
@@ -394,6 +368,8 @@ export default function Jobs() {
 
     return true;
   });
+
+  const stages = ['Submitted', 'ATS Screened', 'Interview', 'Final Decision'];
 
   return (
     <div className="animate-fade-in flex flex-col gap-lg" style={{ paddingBottom: '5rem' }}>
@@ -432,13 +408,20 @@ export default function Jobs() {
             Real-World Jobs & Internships
           </h1>
           <p className="text-muted" style={{ fontSize: '0.9rem' }}>
-            Curated opportunities from Google, Microsoft, Amazon, Stripe, and leading tech employers.
+            Verified engineering roles from Google, Microsoft, Amazon, Stripe, and leading tech employers.
           </p>
         </div>
 
-        <span className="badge glass-panel" style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontWeight: 600, fontSize: '0.82rem' }}>
-          {allJobs.length} Verified Positions Live
-        </span>
+        <div className="flex items-center gap-sm">
+          <button
+            onClick={() => setActiveTab('tracker')}
+            className={`btn ${activeTab === 'tracker' ? 'btn-primary' : 'btn-secondary'} flex items-center gap-xs`}
+            style={{ padding: '8px 16px', fontSize: '0.82rem', width: 'auto' }}
+          >
+            <Clock size={15} />
+            <span>Application Tracker ({applications.length})</span>
+          </button>
+        </div>
       </header>
 
       {/* Search & Filter Controls */}
@@ -448,7 +431,7 @@ export default function Jobs() {
           <Search size={18} className="text-muted" style={{ position: 'absolute', top: 12, left: 14 }} />
           <input 
             type="text" 
-            className="input-field w-full"
+            className="input-field w-full" 
             placeholder="Search by role, company (e.g. Google), or skill..."
             style={{ paddingLeft: '2.6rem', fontSize: '0.88rem' }}
             value={searchQuery}
@@ -463,7 +446,8 @@ export default function Jobs() {
             { key: 'internships', label: 'Internships' },
             { key: 'fulltime', label: 'Full-Time' },
             { key: 'remote', label: 'Remote Only' },
-            { key: 'saved', label: `Saved (${savedJobIds.length})` }
+            { key: 'saved', label: `Saved (${savedJobIds.length})` },
+            { key: 'tracker', label: `Tracker (${applications.length})` }
           ].map(tab => (
             <button
               key={tab.key}
@@ -486,134 +470,182 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* Job Cards Directory */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-        {filteredJobs.map((job) => {
-          const isSaved = savedJobIds.includes(job.id);
-          const isApplied = appliedJobIds.includes(job.id);
+      {/* ── VIEW 1: APPLICATION TRACKER ── */}
+      {activeTab === 'tracker' ? (
+        <div className="flex flex-col gap-md animate-fade-in">
+          <div className="glass-panel p-md flex justify-between items-center" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-md)' }}>
+            <div className="flex items-center gap-xs">
+              <Clock size={18} className="text-primary" />
+              <span style={{ fontWeight: 700, fontSize: '0.92rem' }}>Live Candidate Application Tracking Pipeline</span>
+            </div>
+            <span className="text-muted" style={{ fontSize: '0.8rem' }}>{applications.length} Active Dispatches</span>
+          </div>
 
-          return (
-            <div
-              key={job.id}
-              onClick={() => setSelectedJob(job)}
-              className="glass-panel interactive flex flex-col justify-between cursor-pointer transition-all"
-              style={{
-                padding: '1.5rem',
-                border: '1px solid var(--border-color)',
-                background: 'var(--card-bg)',
-                borderRadius: 'var(--radius-lg)'
-              }}
-            >
-              <div>
-                {/* Header row with Match and Bookmark */}
-                <div className="flex justify-between items-start mb-sm">
-                  <div className="flex gap-sm items-center">
-                    <div 
-                      style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '10px',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 800,
-                        color: 'var(--primary)',
-                        fontSize: '1.2rem',
-                        border: '1px solid rgba(99, 102, 241, 0.2)'
-                      }}
-                    >
-                      {job.company[0]}
-                    </div>
+          {applications.length === 0 ? (
+            <div className="glass-panel p-xl text-center flex flex-col items-center justify-center gap-sm">
+              <Briefcase size={36} className="text-muted" />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>No Applications Submitted Yet</h3>
+              <p className="text-muted" style={{ fontSize: '0.85rem' }}>Explore verified roles above and apply with 1-click Quick Apply.</p>
+              <button onClick={() => setActiveTab('all')} className="btn btn-primary" style={{ width: 'auto', padding: '8px 18px' }}>
+                Browse All Roles
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-md">
+              {applications.map((app) => (
+                <div 
+                  key={app.id} 
+                  className="glass-panel p-lg flex flex-col gap-md"
+                  style={{
+                    padding: '20px',
+                    borderRadius: '16px',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--card-bg)'
+                  }}
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
                     <div>
-                      <div className="flex items-center gap-xs">
-                        <span style={{ fontWeight: 700, fontSize: '0.96rem' }}>{job.company}</span>
-                        {job.remote && (
-                          <span className="badge" style={{ background: 'rgba(6, 182, 212, 0.12)', color: 'var(--secondary)', fontSize: '0.7rem', padding: '1px 6px', borderRadius: 4 }}>
-                            Remote
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-xs text-muted" style={{ fontSize: '0.78rem', marginTop: '2px' }}>
-                        <MapPin size={12} /> {job.location}
-                      </div>
+                      <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>{app.company}</span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '2px 0' }}>{app.title}</h3>
+                      <span className="text-muted" style={{ fontSize: '0.76rem' }}>Applied on {app.appliedDate} • Candidate: {app.candidateName}</span>
+                    </div>
+
+                    <div className="flex items-center gap-xs">
+                      <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.12)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.78rem', padding: '4px 10px', borderRadius: 'var(--radius-full)' }}>
+                        ATS: {app.atsScore}/100 Match
+                      </span>
+                      <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', fontWeight: 700, fontSize: '0.78rem', padding: '4px 10px', borderRadius: 'var(--radius-full)' }}>
+                        {app.status}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-xs">
-                    <span 
-                      style={{
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        color: 'var(--success)',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: 'var(--radius-full)'
-                      }}
-                    >
-                      {job.match}% Match
-                    </span>
+                  {/* 4-Stage Visual Progress Pipeline */}
+                  <div className="grid grid-cols-4 gap-xs pt-xs">
+                    {stages.map((stageName, sIdx) => {
+                      const isComplete = sIdx <= app.stageIndex;
+                      const isCurrent = sIdx === app.stageIndex;
+                      return (
+                        <div key={stageName} className="flex flex-col gap-xs">
+                          <div 
+                            style={{
+                              height: 6,
+                              borderRadius: 3,
+                              background: isComplete ? 'var(--primary)' : 'var(--input-bg)'
+                            }} 
+                          />
+                          <span style={{ fontSize: '0.7rem', fontWeight: isCurrent ? 700 : 500, color: isComplete ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                            {stageName}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                    <button
-                      type="button"
-                      onClick={(e) => handleToggleBookmark(job.id, e)}
-                      className="btn-icon-tactile"
-                      style={{ padding: '6px', borderRadius: '50%' }}
-                    >
-                      {isSaved ? (
-                        <BookmarkCheck size={18} className="text-primary" />
-                      ) : (
-                        <Bookmark size={18} className="text-muted" />
-                      )}
-                    </button>
+                  {/* Next Step Banner */}
+                  <div className="glass-panel p-sm flex items-center gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
+                    <Sparkles size={15} className="text-primary shrink-0" />
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <strong>Next Step:</strong> {app.nextStep}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── VIEW 2: JOB CARDS DIRECTORY ── */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+          {filteredJobs.map((job) => {
+            const isSaved = savedJobIds.includes(job.id);
+            const isApplied = applications.some(a => a.jobId === job.id);
+
+            return (
+              <div
+                key={job.id}
+                onClick={() => setSelectedJob(job)}
+                className="glass-panel interactive flex flex-col justify-between cursor-pointer transition-all"
+                style={{
+                  padding: '1.5rem',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--card-bg)',
+                  borderRadius: 'var(--radius-lg)'
+                }}
+              >
+                <div>
+                  {/* Header row with Match and Bookmark */}
+                  <div className="flex justify-between items-start mb-sm">
+                    <div className="flex gap-sm items-center">
+                      <div 
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: '10px',
+                          background: 'rgba(99, 102, 241, 0.1)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          color: 'var(--primary)',
+                          border: '1px solid rgba(99, 102, 241, 0.2)'
+                        }}
+                      >
+                        <Building size={20} />
+                      </div>
+                      <div>
+                        <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>{job.company}</span>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>{job.title}</h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-xs">
+                      <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', fontSize: '0.72rem', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                        {job.match}% Match
+                      </span>
+                      <button
+                        className="btn-icon-tactile"
+                        onClick={(e) => handleToggleBookmark(job.id, e)}
+                        style={{ padding: '6px', borderRadius: '50%' }}
+                      >
+                        {isSaved ? <BookmarkCheck size={16} className="text-primary" /> : <Bookmark size={16} className="text-muted" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Location and Salary */}
+                  <div className="flex flex-wrap items-center gap-md text-muted mb-sm" style={{ fontSize: '0.8rem' }}>
+                    <span className="flex items-center gap-xs">
+                      <MapPin size={13} /> {job.location}
+                    </span>
+                    <span className="flex items-center gap-xs text-success font-600">
+                      <DollarSign size={13} /> {job.salary}
+                    </span>
+                  </div>
+
+                  <p className="text-muted" style={{ fontSize: '0.84rem', lineHeight: 1.5, margin: '0.5rem 0' }}>
+                    {job.desc.length > 140 ? `${job.desc.substring(0, 140)}...` : job.desc}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-xs mt-sm">
+                    <span className="badge" style={{ background: 'var(--input-bg)', color: 'var(--text-main)', fontSize: '0.7rem' }}>
+                      {job.type}
+                    </span>
+                    {job.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="badge" style={{ background: 'rgba(99, 102, 241, 0.08)', color: 'var(--primary)', fontSize: '0.7rem' }}>
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                {/* Job Title */}
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0.5rem 0' }}>
-                  {job.title}
-                </h3>
-
-                <p className="text-muted" style={{ fontSize: '0.84rem', lineHeight: 1.5, marginBottom: '0.75rem' }}>
-                  {job.desc.slice(0, 115)}...
-                </p>
-
-                {/* Compensation & Type */}
-                <div className="flex items-center justify-between p-xs" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)', padding: '6px 10px', fontSize: '0.82rem' }}>
-                  <span className="flex items-center gap-xs font-600">
-                    <DollarSign size={14} className="text-success" /> {job.salary}
+                {/* Card Action Row */}
+                <div className="flex justify-between items-center pt-md mt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                    Deadline: {job.deadline}
                   </span>
-                  <span className="text-muted">
-                    {job.type} • {job.batch}
-                  </span>
-                </div>
 
-                {/* Tech Tags */}
-                <div className="flex flex-wrap gap-xs mt-sm">
-                  {job.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        fontSize: '0.74rem',
-                        color: 'var(--text-muted)',
-                        padding: '2px 8px',
-                        borderRadius: 4
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action row */}
-              <div className="flex justify-between items-center pt-md mt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
-                <span className="text-muted" style={{ fontSize: '0.76rem' }}>
-                  Deadline: {job.deadline}
-                </span>
-
-                <div className="flex gap-xs">
                   {isApplied ? (
                     <span 
                       style={{
@@ -622,32 +654,32 @@ export default function Jobs() {
                         gap: '4px',
                         color: 'var(--success)',
                         fontWeight: 600,
-                        fontSize: '0.82rem',
+                        fontSize: '0.8rem',
                         padding: '6px 12px',
                         background: 'rgba(16, 185, 129, 0.1)',
                         borderRadius: 'var(--radius-full)'
                       }}
                     >
-                      <CheckCircle2 size={15} /> Applied ✓
+                      <CheckCircle2 size={14} /> Applied ✓
                     </span>
                   ) : (
                     <button
                       type="button"
                       className="btn btn-primary"
                       onClick={(e) => handleOpenApplyModal(job, e)}
-                      style={{ padding: '6px 14px', fontSize: '0.82rem', width: 'auto' }}
+                      style={{ padding: '6px 16px', fontSize: '0.82rem', width: 'auto' }}
                     >
                       Quick Apply
                     </button>
                   )}
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Slide-Out Detail Modal */}
+      {/* ── SLIDE-OUT DETAIL MODAL ── */}
       {selectedJob && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
@@ -735,7 +767,7 @@ export default function Jobs() {
         </div>
       )}
 
-      {/* Interactive Quick Apply Modal */}
+      {/* ── INTERACTIVE QUICK APPLY MODAL (WITH EDITABLE FIELDS) ── */}
       {showApplyModal && applyingJob && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
@@ -744,12 +776,12 @@ export default function Jobs() {
         >
           <div 
             className="glass-panel flex flex-col gap-md max-w-lg w-full animate-scale-up"
-            style={{ padding: '2rem', background: 'var(--bg-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
+            style={{ padding: '2rem', background: 'var(--bg-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
               <div>
-                <span className="text-primary font-600" style={{ fontSize: '0.78rem' }}>DIRECT APPLICATION DISPATCH</span>
+                <span className="text-primary font-600" style={{ fontSize: '0.78rem' }}>CANDIDATE DISPATCH PORTAL</span>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Apply to {applyingJob.company}</h3>
                 <div className="text-muted" style={{ fontSize: '0.8rem' }}>Role: {applyingJob.title}</div>
               </div>
@@ -763,54 +795,110 @@ export default function Jobs() {
             </div>
 
             <form onSubmit={handleSubmitApplication} className="flex flex-col gap-md py-xs">
+              {/* First & Last Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>First Name *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applyForm.firstName}
+                    onChange={(e) => setApplyForm({ ...applyForm, firstName: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Last Name *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applyForm.lastName}
+                    onChange={(e) => setApplyForm({ ...applyForm, lastName: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Email & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Email Address *</label>
+                  <input 
+                    type="email" 
+                    required
+                    className="input-field" 
+                    value={applyForm.email}
+                    onChange={(e) => setApplyForm({ ...applyForm, email: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Phone Number *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input-field" 
+                    value={applyForm.phone}
+                    onChange={(e) => setApplyForm({ ...applyForm, phone: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Education */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Candidate Name & Contact</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Education & Institution</label>
                 <input 
                   type="text" 
-                  disabled
                   className="input-field" 
-                  value={`${currentUser.firstName || 'Alex'} ${currentUser.lastName || 'Johnson'} (${currentUser.email || 'alex.developer@example.com'})`}
-                  style={{ opacity: 0.8, fontSize: '0.82rem' }}
+                  value={applyForm.education}
+                  onChange={(e) => setApplyForm({ ...applyForm, education: e.target.value })}
+                  style={{ fontSize: '0.84rem' }}
                 />
               </div>
 
+              {/* Resume Document Selection */}
               <div>
                 <label className="input-label" style={{ fontSize: '0.8rem' }}>Attached Resume Document</label>
                 <div className="glass-panel p-sm flex justify-between items-center" style={{ background: 'var(--input-bg)', padding: '8px 12px' }}>
                   <div className="flex items-center gap-xs text-muted" style={{ fontSize: '0.82rem' }}>
                     <FileText size={16} className="text-primary" />
-                    <span>Alex_Johnson_Resume_ATS_Ready.pdf (Analyzed 86/100)</span>
+                    <span>{applyForm.resumeName}</span>
                   </div>
                   <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', fontSize: '0.7rem' }}>
-                    Active
+                    ATS Verified
                   </span>
                 </div>
               </div>
 
+              {/* GitHub / Portfolio */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>GitHub / Portfolio Profile</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>GitHub / Portfolio Profile Link</label>
                 <input 
                   type="url" 
                   className="input-field" 
-                  value={portfolioLink}
-                  onChange={(e) => setPortfolioLink(e.target.value)}
+                  value={applyForm.portfolioLink}
+                  onChange={(e) => setApplyForm({ ...applyForm, portfolioLink: e.target.value })}
                   placeholder="https://github.com/yourhandle"
                   style={{ fontSize: '0.84rem' }}
                 />
               </div>
 
+              {/* Cover Pitch */}
               <div>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Short Candidate Cover Pitch</label>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Candidate Pitch / Cover Note</label>
                 <textarea 
                   rows={3}
                   className="input-field"
-                  value={coverNote}
-                  onChange={(e) => setCoverNote(e.target.value)}
+                  value={applyForm.coverNote}
+                  onChange={(e) => setApplyForm({ ...applyForm, coverNote: e.target.value })}
                   style={{ fontSize: '0.82rem', resize: 'vertical' }}
                 />
               </div>
 
-              <div className="flex justify-end gap-sm pt-sm">
+              <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
@@ -821,16 +909,17 @@ export default function Jobs() {
                 </button>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
-                  style={{ width: 'auto', padding: '8px 22px', fontSize: '0.84rem' }}
+                  className="btn btn-primary flex items-center gap-xs"
+                  style={{ width: 'auto', padding: '8px 24px', fontSize: '0.84rem' }}
                 >
-                  <Send size={15} /> Submit Application
+                  <Send size={14} /> Submit Application
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 }

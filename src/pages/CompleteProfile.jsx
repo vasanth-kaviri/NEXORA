@@ -6,6 +6,7 @@ import CountryCodePicker from '../components/CountryCodePicker';
 import IconInput from '../components/IconInput';
 import { useCountryCodes } from '../hooks/useCountryCodes';
 import db from '../services/db';
+import { useToast } from '../contexts/ToastContext';
 
 const domains = [
   'Artificial Intelligence', 'Web Development', 'Cloud Computing', 'Cybersecurity',
@@ -23,6 +24,7 @@ const jobs = [
 
 export default function CompleteProfile() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '',
     phone: '', education: '', domain: '', dreamJob: ''
@@ -44,8 +46,14 @@ export default function CompleteProfile() {
     db.updateUserProfile({
       firstName: formData.firstName,
       lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone ? `${countryCode} ${formData.phone}` : '',
+      education: formData.education,
+      domain: formData.domain,
       dreamJob: formData.dreamJob,
+      profileCompleted: true
     });
+    toast.success('Profile calibrated! Welcome to your NEXORA engineering workstation.');
     navigate('/dashboard');
   };
 

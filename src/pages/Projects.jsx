@@ -1,21 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import {
   FolderKanban, Star, Clock, Users, ArrowUpRight,
   CheckCircle2, Circle, Flame, Lock, Sparkles,
   Code2, Database, Layers, Globe, Cpu, ShieldCheck,
+  Plus, ExternalLink, GitBranch, BookOpen, X, Send, Eye, FileCode
 } from 'lucide-react';
+import db from '../services/db';
 
-/* ─── Data ─────────────────────────────────────────────────── */
-/* ─── Data ─────────────────────────────────────────────────── */
+/* ─── Difficulty & Data ─────────────────────────────────────── */
 const difficultyConfig = {
   Beginner:     { color: 'var(--minimal-emerald)', bg: 'rgba(16, 185, 129, 0.08)', dot: 'var(--minimal-emerald)' },
   Intermediate: { color: 'var(--minimal-indigo)',  bg: 'rgba(99, 102, 241, 0.08)', dot: 'var(--minimal-indigo)' },
   Advanced:     { color: 'var(--minimal-violet)',  bg: 'rgba(168, 85, 247, 0.08)', dot: 'var(--minimal-violet)' },
 };
 
-const categories = [
+const referenceCategories = [
   {
     label: 'Web Systems & Distributed Architecture',
     icon: Globe,
@@ -23,16 +24,19 @@ const categories = [
     rgb: '99, 102, 241',
     projects: [
       {
-        title: 'High-Performance Developer Portfolio',
-        desc: 'Build a sleek, responsive portfolio with React 19, custom canvas animations, and contact form telemetry.',
+        id: 'ref_1',
+        title: 'High-Performance Developer Portfolio & CMS',
+        desc: 'Build a sleek, responsive developer portfolio with React 19, custom canvas animations, and automated GitHub telemetry.',
         tags: ['React 19', 'CSS Engine', 'Vite'],
         difficulty: 'Beginner',
         duration: '3–5 days',
         stars: 4.9,
         enrolled: 1840,
-        locked: false,
+        architecture: 'Single-Page Architecture with Vite bundler, modular CSS variables, and serverless edge form handling.',
+        milestones: ['Setup Vite & CSS tokens', 'Build canvas interactive background', 'Integrate GitHub GraphQL API', 'Deploy to Vercel/Netlify']
       },
       {
+        id: 'ref_2',
         title: 'Full-Stack Job & Talent Marketplace',
         desc: 'Build an end-to-end recruitment platform with instant search indexing, candidate filters, and JWT session handling.',
         tags: ['React', 'Node.js', 'PostgreSQL'],
@@ -40,9 +44,11 @@ const categories = [
         duration: '2–3 weeks',
         stars: 4.8,
         enrolled: 1420,
-        locked: false,
+        architecture: 'RESTful API backend in Express with PostgreSQL relational schema and client-side debounce search indexing.',
+        milestones: ['Design relational schema with Prisma', 'Implement JWT auth & cookie sessions', 'Build application tracking drawer', 'Setup Redis query caching']
       },
       {
+        id: 'ref_3',
         title: 'Real-Time Distributed Chat Protocol',
         desc: 'Build a high-concurrency messaging service with WebSockets, room sharding, read receipts, and typing telemetry.',
         tags: ['WebSockets', 'Redis', 'Express'],
@@ -50,7 +56,8 @@ const categories = [
         duration: '3–4 weeks',
         stars: 4.9,
         enrolled: 980,
-        locked: false,
+        architecture: 'Pub/Sub event backbone using Redis cluster, WebSocket connection pooling, and message persistence in MongoDB.',
+        milestones: ['Setup WebSocket server heartbeat', 'Implement Redis Pub/Sub room sharding', 'Add typing indicators & receipts', 'End-to-end encryption layer']
       },
     ],
   },
@@ -61,6 +68,7 @@ const categories = [
     rgb: '6, 182, 212',
     projects: [
       {
+        id: 'ref_4',
         title: 'Vector Embedding Recommendation Engine',
         desc: 'Build a semantic content filtering model that computes cosine similarity over multi-dimensional embeddings.',
         tags: ['Python', 'PyTorch', 'Vector DB'],
@@ -68,9 +76,11 @@ const categories = [
         duration: '1–2 weeks',
         stars: 4.8,
         enrolled: 1650,
-        locked: false,
+        architecture: 'FastAPI microservice querying Pinecone vector database with HuggingFace MiniLM sentence transformers.',
+        milestones: ['Generate text embeddings with HuggingFace', 'Index into Pinecone / ChromaDB', 'Build cosine similarity search endpoint', 'Expose REST API to React front-end']
       },
       {
+        id: 'ref_5',
         title: 'Real-Time LLM Sentiment & Market Dashboard',
         desc: 'Analyze streaming tech discussion feeds using transformer models and visualize market momentum in real-time.',
         tags: ['Transformers', 'FastAPI', 'Plotly'],
@@ -78,7 +88,8 @@ const categories = [
         duration: '2–3 weeks',
         stars: 4.9,
         enrolled: 1140,
-        locked: false,
+        architecture: 'Event-driven ingestion pipeline consuming RSS feeds, running sentiment classification, and streaming updates via SSE.',
+        milestones: ['Connect live data ingestion stream', 'Run HuggingFace RoBERTa sentiment model', 'Store rolling time-series in PostgreSQL', 'Build interactive UI charts']
       },
     ],
   },
@@ -89,6 +100,7 @@ const categories = [
     rgb: '245, 158, 11',
     projects: [
       {
+        id: 'ref_6',
         title: 'Multi-Stage Production CI/CD Pipeline',
         desc: 'Automate static analysis, unit testing, container build, and zero-downtime deployment using GitHub Actions.',
         tags: ['GitHub Actions', 'Docker', 'AWS'],
@@ -96,9 +108,11 @@ const categories = [
         duration: '1 week',
         stars: 4.7,
         enrolled: 1210,
-        locked: false,
+        architecture: 'Multi-stage Docker builds with GitHub Actions runner matrix and automated ECS rolling task definition deployments.',
+        milestones: ['Write Dockerfile with multi-stage build', 'Configure GitHub Actions test matrix', 'Automate vulnerability scanning with Trivy', 'Setup AWS ECS blue-green deploy']
       },
       {
+        id: 'ref_7',
         title: 'High-Availability Containerized Microservices',
         desc: 'Orchestrate a multi-tenant microservices cluster with Kubernetes Ingress, Prometheus telemetry, and service mesh.',
         tags: ['Kubernetes', 'Docker', 'Helm'],
@@ -106,252 +120,540 @@ const categories = [
         duration: '3–4 weeks',
         stars: 4.9,
         enrolled: 890,
-        locked: false,
+        architecture: 'K8s deployment with NGINX Ingress controller, horizontal pod autoscalers (HPA), and Grafana metrics dashboard.',
+        milestones: ['Containerize 3 decoupled microservices', 'Write Helm charts for staging & prod', 'Configure HPA based on CPU/memory', 'Setup Prometheus alerting rules']
       },
     ],
-  },
-  {
-    label: 'Cybersecurity & Defense Engineering',
-    icon: ShieldCheck,
-    color: 'var(--minimal-emerald)',
-    rgb: '16, 185, 129',
-    projects: [
-      {
-        title: 'Automated OWASP Security Audit Bot',
-        desc: 'Scan API endpoints for SQL injection, CSRF vulnerabilities, and misconfigured JWT security headers.',
-        tags: ['Python', 'OWASP', 'Pen-Testing'],
-        difficulty: 'Intermediate',
-        duration: '1–2 weeks',
-        stars: 4.8,
-        enrolled: 760,
-        locked: false,
-      },
-    ],
-  },
+  }
 ];
 
-/* ─── Project Card ──────────────────────────────────────────── */
-function ProjectCard({ project, accentRgb, delay }) {
-  const navigate = useNavigate();
-  const toast = useToast();
-  const [hovered, setHovered] = useState(false);
-  const diff = difficultyConfig[project.difficulty];
+/* ─── Default Initial Developed Projects ────────────────────── */
+const INITIAL_DEVELOPED_PROJECTS = [
+  {
+    id: 'user_proj_1',
+    title: 'CloudScale - Distributed Microservices Ingress',
+    desc: 'High-concurrency API gateway and rate-limiter built with Go and Redis, handling 40,000 requests/sec with automated token bucket algorithm.',
+    tags: ['Go', 'Redis', 'Docker', 'Kubernetes'],
+    demoUrl: 'https://demo.cloudscale-nexora.dev',
+    repoUrl: 'https://github.com/alexjohnson/cloudscale-ingress',
+    status: 'Live & Deployed',
+    verified: true,
+    stars: 128,
+    date: 'Aug 28, 2026'
+  },
+  {
+    id: 'user_proj_2',
+    title: 'NeuroVision - Medical X-Ray Diagnostic AI',
+    desc: 'DenseNet-121 convolutional neural network fine-tuned on NIH chest X-rays to detect 14 pulmonary conditions with 94.2% AUC accuracy.',
+    tags: ['PyTorch', 'FastAPI', 'React', 'TailwindCSS'],
+    demoUrl: 'https://neurovision-ai.vercel.app',
+    repoUrl: 'https://github.com/alexjohnson/neurovision-diagnostics',
+    status: 'AI Architecture Verified',
+    verified: true,
+    stars: 94,
+    date: 'Sep 02, 2026'
+  }
+];
 
-  const handleCardClick = () => {
-    toast.success(`Enrolled in "${project.title}"! Production sandbox loaded (+100 XP).`);
-    navigate('/resource/fs_1_3');
+export default function Projects() {
+  const toast = useToast();
+  const navigate = useNavigate();
+  const currentUser = db.getCurrentUser() || {};
+
+  // Developed Projects State
+  const [userProjects, setUserProjects] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_user_projects');
+      return saved ? JSON.parse(saved) : INITIAL_DEVELOPED_PROJECTS;
+    } catch {
+      return INITIAL_DEVELOPED_PROJECTS;
+    }
+  });
+
+  // Modal States
+  const [selectedReference, setSelectedReference] = useState(null);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    desc: '',
+    tags: 'React, Node.js, PostgreSQL',
+    demoUrl: '',
+    repoUrl: '',
+    basedOnReference: ''
+  });
+
+  // Persist Developed Projects
+  useEffect(() => {
+    try {
+      localStorage.setItem('nexora_user_projects', JSON.stringify(userProjects));
+    } catch (e) {
+      console.warn('Failed to persist user projects:', e);
+    }
+  }, [userProjects]);
+
+  const handleOpenSubmit = (refTitle = '') => {
+    setNewProject(prev => ({
+      ...prev,
+      basedOnReference: refTitle,
+      title: refTitle ? `My ${refTitle} Build` : ''
+    }));
+    setShowSubmitModal(true);
+  };
+
+  const handleSubmitProject = (e) => {
+    e.preventDefault();
+    if (!newProject.title.trim() || !newProject.desc.trim()) {
+      toast.error('Please enter a project title and description.');
+      return;
+    }
+
+    const created = {
+      id: `user_proj_${Date.now()}`,
+      title: newProject.title.trim(),
+      desc: newProject.desc.trim(),
+      tags: newProject.tags.split(',').map(t => t.trim()).filter(Boolean),
+      demoUrl: newProject.demoUrl.trim() || 'https://github.com',
+      repoUrl: newProject.repoUrl.trim() || 'https://github.com',
+      status: 'Live & Deployed',
+      verified: true,
+      stars: 1,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    };
+
+    const updated = [created, ...userProjects];
+    setUserProjects(updated);
+    setShowSubmitModal(false);
+    setSelectedReference(null);
+    setNewProject({ title: '', desc: '', tags: '', demoUrl: '', repoUrl: '', basedOnReference: '' });
+
+    // Reward XP
+    db.updateUserProfile({
+      xp: (currentUser.xp || 1200) + 200,
+      projectsCompleted: (currentUser.projectsCompleted || 2) + 1
+    });
+
+    toast.success(`Project "${created.title}" successfully published! +200 XP added.`);
   };
 
   return (
-    <div
-      onClick={handleCardClick}
-      className={`skeuo-card tactile-press animate-fade-in delay-${delay}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: hovered ? `rgba(${accentRgb}, 0.07)` : 'var(--skeuo-surface-card)',
-        border: `1px solid ${hovered ? `rgba(${accentRgb}, 0.5)` : 'var(--border-color)'}`,
-        borderTop: `1px solid ${hovered ? `rgba(${accentRgb}, 0.8)` : 'var(--skeuo-highlight)'}`,
-        borderBottom: `1px solid ${hovered ? `rgba(${accentRgb}, 0.6)` : 'var(--skeuo-shadow-rim)'}`,
-        borderRadius: '14px',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '14px',
-        transition: 'transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered
-          ? `inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4.5px 0 rgba(${accentRgb}, 0.4), 0 14px 28px rgba(${accentRgb}, 0.18)`
-          : 'inset 0 1px 0 var(--skeuo-highlight-subtle), 0 3px 0 var(--skeuo-btn-sec-lip), 0 4px 10px rgba(0,0,0,0.08)',
-        position: 'relative',
-        overflow: 'hidden',
-        cursor: 'pointer'
-      }}
-    >
-      {/* Top shimmer line */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
-        background: `linear-gradient(90deg, transparent, rgba(${accentRgb}, 0.8), transparent)`,
-        opacity: hovered ? 1 : 0,
-        transition: 'opacity 0.3s ease',
-      }} />
+    <div className="animate-fade-in flex flex-col gap-lg" style={{ paddingBottom: '5rem' }}>
 
-      {/* Header row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.3, flex: 1 }}>
-          {project.title}
-        </h3>
-        <div className="btn-icon-tactile" style={{ width: 28, height: 28, padding: 0, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <ArrowUpRight size={14} style={{ color: `rgb(${accentRgb})`, transform: hovered ? 'translate(1px,-1px)' : 'none', transition: 'transform 0.2s ease' }} />
+      {/* ── Center-Aligned Header ── */}
+      <header className="flex flex-col items-center text-center justify-center gap-xs" style={{ margin: '0 auto', maxWidth: '720px', paddingBottom: 'var(--space-xs)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '999px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 'var(--space-xs)' }}>
+          <Sparkles size={12} /> Production Portfolio Builder
         </div>
-      </div>
-
-      {/* Description */}
-      <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-        {project.desc}
-      </p>
-
-      {/* Tags */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-        {project.tags.map(tag => (
-          <span key={tag} style={{ fontSize: '0.72rem', fontWeight: 600, padding: '3px 10px', background: `rgba(${accentRgb}, 0.1)`, color: `rgb(${accentRgb})`, borderRadius: '999px', border: `1px solid rgba(${accentRgb}, 0.2)` }}>
-            {tag}
-          </span>
-        ))}
-      </div>
-
-      {/* Footer row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Difficulty badge */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.73rem', fontWeight: 700, color: diff.color, background: diff.bg, padding: '3px 9px', borderRadius: '999px' }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: diff.dot }} />
-            {project.difficulty}
-          </span>
-          {/* Duration */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            <Clock size={12} /> {project.duration}
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', color: 'var(--warning)', fontWeight: 600 }}>
-            <Star size={12} fill="currentColor" /> {project.stars}
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            <Users size={12} /> {project.enrolled.toLocaleString()}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Category Section ──────────────────────────────────────── */
-function CategorySection({ cat, sectionDelay }) {
-  const CatIcon = cat.icon;
-
-  return (
-    <section
-      className="glass-panel animate-fade-in"
-      style={{
-        animationDelay: `${sectionDelay}ms`,
-        borderRadius: '20px',
-        padding: '28px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Corner glow */}
-      <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: `radial-gradient(circle, rgba(${cat.rgb}, 0.08) 0%, transparent 70%)`, pointerEvents: 'none' }} />
-
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: 36, height: 36, borderRadius: '10px', background: `rgba(${cat.rgb}, 0.12)`, border: `1px solid rgba(${cat.rgb}, 0.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <CatIcon size={18} style={{ color: cat.color }} />
-        </div>
-        <div>
-          <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '2px' }}>{cat.label}</h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{cat.projects.length} projects available</p>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: '1px', background: `linear-gradient(90deg, rgba(${cat.rgb}, 0.3), var(--border-color) 60%, transparent)` }} />
-
-      {/* Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '14px' }}>
-        {cat.projects.map((p, i) => (
-          <ProjectCard key={i} project={p} accentRgb={cat.rgb} delay={(i + 1) * 100} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ─── Stats Bar ─────────────────────────────────────────────── */
-function StatsBar() {
-  const stats = [
-    { icon: FolderKanban, label: 'Projects', value: '18+', color: 'var(--primary)' },
-    { icon: Users,        label: 'Students', value: '5.4k', color: 'var(--success)' },
-    { icon: Flame,        label: 'Streak Days', value: '12', color: 'var(--warning)' },
-    { icon: CheckCircle2, label: 'Completed', value: '0', color: 'var(--secondary)' },
-  ];
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-      {stats.map(s => {
-        const S = s.icon;
-        return (
-          <div key={s.label} className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', borderRadius: '14px', textAlign: 'center' }}>
-            <S size={20} style={{ color: s.color }} />
-            <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1 }}>{s.value}</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{s.label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ─── Page ──────────────────────────────────────────────────── */
-export default function Projects() {
-  return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-
-      {/* Header */}
-      <header style={{ paddingBottom: 'var(--space-xs)' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '999px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 'var(--space-sm)' }}>
-          <Sparkles size={12} /> Portfolio Builder
-        </div>
-        <h1 className="text-gradient" style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '6px', lineHeight: 1.2 }}>
-          Hands-On Projects
+        <h1 className="text-gradient" style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '6px', lineHeight: 1.2 }}>
+          Hands-On Engineering Projects
         </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '500px' }}>
-          Build real-world projects guided by AI mentors. Earn certificates and add them directly to your portfolio.
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '580px' }}>
+          Explore enterprise reference blueprints, clone production architectures, and showcase your own developed projects directly in your portfolio.
         </p>
+
+        <div className="flex items-center gap-sm mt-sm">
+          <button 
+            onClick={() => handleOpenSubmit()}
+            className="btn btn-primary flex items-center gap-xs"
+            style={{ padding: '8px 20px', fontSize: '0.86rem' }}
+          >
+            <Plus size={16} /> Submit Your Developed Project
+          </button>
+        </div>
       </header>
 
-      {/* Stats */}
-      <StatsBar />
-
-      {/* Open Production Labs Architectural Banner */}
-      <div 
-        className="glass-panel" 
-        style={{ 
-          padding: '16px 20px', 
-          background: 'var(--input-bg)', 
-          border: '1px solid var(--border-color)', 
-          borderRadius: '14px', 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          gap: '16px',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 280px' }}>
-          <div style={{ width: 38, height: 38, borderRadius: '10px', background: 'rgba(99, 102, 241, 0.12)', border: '1px solid rgba(99, 102, 241, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ShieldCheck size={19} className="text-minimal-indigo" />
-          </div>
-          <div>
-            <p style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-main)', marginBottom: '2px' }}>Open Production Labs · All Workspaces Unlocked</p>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Clone production boilerplates, build distributed services, and submit for automated ATS portfolio audits.</p>
-          </div>
-        </div>
-        <div className="minimal-badge" style={{ color: 'var(--minimal-emerald)', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
-          <span className="minimal-dot" style={{ background: 'var(--minimal-emerald)' }} />
-          <span>Full Access Granted</span>
-        </div>
+      {/* ── Stats Strip ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+        {[
+          { label: 'Reference Blueprints', val: '7 Certified', icon: BookOpen, color: 'var(--primary)' },
+          { label: 'User Developed Projects', val: `${userProjects.length} Built`, icon: Code2, color: 'var(--success)' },
+          { label: 'ATS Portfolio Match', val: '96% Benchmark', icon: Star, color: 'var(--warning)' },
+          { label: 'Code Telemetry XP', val: `+${userProjects.length * 200} Earned`, icon: Sparkles, color: 'var(--secondary)' },
+        ].map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <div key={i} className="glass-panel" style={{ padding: '14px 18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ padding: '8px', borderRadius: '10px', background: 'var(--input-bg)', color: stat.color }}>
+                <Icon size={18} />
+              </div>
+              <div>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: 0, fontWeight: 600 }}>{stat.label}</p>
+                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>{stat.val}</h4>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Category Sections */}
-      {categories.map((cat, idx) => (
-        <CategorySection key={idx} cat={cat} sectionDelay={(idx + 1) * 120} />
-      ))}
+      {/* ── SECTION 1: MY DEVELOPED PROJECTS ── */}
+      <section className="flex flex-col gap-md">
+        <div className="flex justify-between items-center flex-wrap gap-sm">
+          <div>
+            <div className="flex items-center gap-xs text-success font-600 mb-xs" style={{ fontSize: '0.8rem' }}>
+              <CheckCircle2 size={14} /> CANDIDATE PRODUCTION SHOWCASE
+            </div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
+              My Developed Projects ({userProjects.length})
+            </h2>
+            <p className="text-muted" style={{ fontSize: '0.86rem', margin: '2px 0 0 0' }}>
+              Custom software solutions built by {currentUser.firstName || 'you'}, verified by AI architecture audits.
+            </p>
+          </div>
+
+          <button 
+            onClick={() => handleOpenSubmit()}
+            className="btn btn-secondary flex items-center gap-xs"
+            style={{ fontSize: '0.82rem', padding: '8px 16px', width: 'auto' }}
+          >
+            <Plus size={15} /> Add Developed Project
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+          {userProjects.map((proj) => (
+            <div 
+              key={proj.id}
+              className="glass-panel flex flex-col justify-between"
+              style={{
+                padding: '20px',
+                borderRadius: '16px',
+                border: '1px solid var(--border-color)',
+                background: 'var(--card-bg)'
+              }}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-sm">
+                  <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', padding: '3px 10px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 700 }}>
+                    ● {proj.status}
+                  </span>
+                  <span className="text-muted" style={{ fontSize: '0.74rem' }}>{proj.date}</span>
+                </div>
+
+                <h3 style={{ fontSize: '1.12rem', fontWeight: 700, marginBottom: '6px' }}>{proj.title}</h3>
+                <p className="text-muted" style={{ fontSize: '0.84rem', lineHeight: 1.55, marginBottom: '12px' }}>
+                  {proj.desc}
+                </p>
+
+                <div className="flex flex-wrap gap-xs mb-md">
+                  {proj.tags.map((t, idx) => (
+                    <span key={idx} className="badge" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                <span className="text-muted flex items-center gap-xs" style={{ fontSize: '0.76rem' }}>
+                  <Star size={13} className="text-warning fill-warning" /> {proj.stars} GitHub Stars
+                </span>
+
+                <div className="flex items-center gap-xs">
+                  {proj.repoUrl && (
+                    <button 
+                      onClick={() => window.open(proj.repoUrl, '_blank')}
+                      className="btn-icon-tactile"
+                      title="GitHub Repository"
+                      style={{ padding: '6px', borderRadius: '8px' }}
+                    >
+                      <GitBranch size={15} />
+                    </button>
+                  )}
+                  {proj.demoUrl && (
+                    <button 
+                      onClick={() => window.open(proj.demoUrl, '_blank')}
+                      className="btn btn-primary flex items-center gap-xs"
+                      style={{ padding: '5px 12px', fontSize: '0.76rem', width: 'auto' }}
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SECTION 2: REFERENCE BLUEPRINTS ── */}
+      <section className="flex flex-col gap-lg mt-md">
+        <div>
+          <div className="flex items-center gap-xs text-primary font-600 mb-xs" style={{ fontSize: '0.8rem' }}>
+            <FolderKanban size={14} /> PRODUCTION BLUEPRINTS TO STUDY & CLONE
+          </div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>
+            Enterprise Reference Projects
+          </h2>
+          <p className="text-muted" style={{ fontSize: '0.86rem', margin: '2px 0 0 0' }}>
+            Inspect production architecture diagrams, technical specifications, and clone as reference for your builds.
+          </p>
+        </div>
+
+        {referenceCategories.map((cat) => {
+          const CatIcon = cat.icon;
+          return (
+            <div key={cat.label} className="flex flex-col gap-md">
+              <div className="flex items-center gap-xs">
+                <div style={{ width: 28, height: 28, borderRadius: '8px', background: `rgba(${cat.rgb}, 0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cat.color }}>
+                  <CatIcon size={16} />
+                </div>
+                <h3 style={{ fontSize: '1.08rem', fontWeight: 700 }}>{cat.label}</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+                {cat.projects.map((proj) => {
+                  const diff = difficultyConfig[proj.difficulty];
+                  return (
+                    <div 
+                      key={proj.id}
+                      className="glass-panel interactive flex flex-col justify-between"
+                      style={{
+                        padding: '20px',
+                        borderRadius: '16px',
+                        border: '1px solid var(--border-color)',
+                        background: 'var(--card-bg)'
+                      }}
+                    >
+                      <div>
+                        <div className="flex justify-between items-center mb-xs">
+                          <span className="badge" style={{ background: diff.bg, color: diff.color, fontSize: '0.72rem', fontWeight: 700 }}>
+                            ● {proj.difficulty}
+                          </span>
+                          <span className="text-muted" style={{ fontSize: '0.74rem' }}>{proj.duration}</span>
+                        </div>
+
+                        <h4 style={{ fontSize: '1.02rem', fontWeight: 700, margin: '6px 0' }}>{proj.title}</h4>
+                        <p className="text-muted" style={{ fontSize: '0.82rem', lineHeight: 1.5, marginBottom: '12px' }}>
+                          {proj.desc}
+                        </p>
+
+                        <div className="flex flex-wrap gap-xs mb-sm">
+                          {proj.tags.map((t, idx) => (
+                            <span key={idx} className="badge" style={{ background: 'var(--input-bg)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-sm mt-xs" style={{ borderTop: '1px solid var(--border-color)' }}>
+                        <span className="text-muted" style={{ fontSize: '0.76rem' }}>
+                          {proj.enrolled.toLocaleString()} engineers referenced
+                        </span>
+
+                        <button 
+                          onClick={() => setSelectedReference(proj)}
+                          className="btn btn-primary flex items-center gap-xs"
+                          style={{ padding: '6px 14px', fontSize: '0.78rem', width: 'auto' }}
+                        >
+                          <Eye size={13} />
+                          <span>Use as Reference</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
+      {/* ── MODAL 1: REFERENCE BLUEPRINT DETAILS ── */}
+      {selectedReference && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
+          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setSelectedReference(null)}
+        >
+          <div 
+            className="glass-panel flex flex-col gap-md max-w-xl w-full animate-scale-up"
+            style={{ padding: '2rem', background: 'var(--bg-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div>
+                <span className="badge font-700 text-primary mb-xs" style={{ background: 'rgba(99, 102, 241, 0.12)', fontSize: '0.72rem' }}>
+                  REFERENCE SPECIFICATION BLUEPRINT
+                </span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{selectedReference.title}</h3>
+              </div>
+              <button 
+                className="btn-icon-tactile" 
+                onClick={() => setSelectedReference(null)}
+                style={{ borderRadius: '50%', padding: '6px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-md py-xs">
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Architecture Blueprint Pattern</label>
+                <div className="glass-panel p-sm text-main" style={{ background: 'var(--input-bg)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                  {selectedReference.architecture}
+                </div>
+              </div>
+
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Recommended Step-by-Step Milestones</label>
+                <div className="flex flex-col gap-xs">
+                  {selectedReference.milestones.map((m, i) => (
+                    <div key={i} className="flex items-center gap-xs text-muted" style={{ fontSize: '0.82rem' }}>
+                      <CheckCircle2 size={14} className="text-primary shrink-0" />
+                      <span>{m}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Target Tech Stack</label>
+                <div className="flex flex-wrap gap-xs">
+                  {selectedReference.tags.map((tag, i) => (
+                    <span key={i} className="badge" style={{ background: 'var(--input-bg)', color: 'var(--text-main)', fontSize: '0.76rem', padding: '4px 10px' }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={() => setSelectedReference(null)}
+                style={{ width: 'auto', padding: '8px 16px', fontSize: '0.84rem' }}
+              >
+                Close
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-primary flex items-center gap-xs"
+                onClick={() => handleOpenSubmit(selectedReference.title)}
+                style={{ width: 'auto', padding: '8px 20px', fontSize: '0.84rem' }}
+              >
+                <Plus size={15} /> Build My Version of This
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL 2: SUBMIT DEVELOPED PROJECT ── */}
+      {showSubmitModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
+          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setShowSubmitModal(false)}
+        >
+          <div 
+            className="glass-panel flex flex-col gap-md max-w-lg w-full animate-scale-up"
+            style={{ padding: '2rem', background: 'var(--bg-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div>
+                <span className="badge text-success font-700 mb-xs" style={{ background: 'rgba(16, 185, 129, 0.12)', fontSize: '0.72rem' }}>
+                  SHOWCASE YOUR WORK
+                </span>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Submit Your Developed Project</h3>
+              </div>
+              <button 
+                className="btn-icon-tactile" 
+                onClick={() => setShowSubmitModal(false)}
+                style={{ borderRadius: '50%', padding: '6px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitProject} className="flex flex-col gap-md py-xs">
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Project Title *</label>
+                <input 
+                  type="text" 
+                  required
+                  className="input-field" 
+                  placeholder="e.g. Distributed WebSocket Notification Protocol"
+                  value={newProject.title}
+                  onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                  style={{ fontSize: '0.84rem' }}
+                />
+              </div>
+
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Description & Architecture Summary *</label>
+                <textarea 
+                  rows={3}
+                  required
+                  className="input-field" 
+                  placeholder="Describe your technical implementation, concurrency handling, database choices, and key accomplishments..."
+                  value={newProject.desc}
+                  onChange={(e) => setNewProject({ ...newProject, desc: e.target.value })}
+                  style={{ fontSize: '0.84rem', resize: 'vertical' }}
+                />
+              </div>
+
+              <div>
+                <label className="input-label" style={{ fontSize: '0.8rem' }}>Tech Stack (Comma-separated)</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="React 19, TypeScript, Node.js, Redis, Docker"
+                  value={newProject.tags}
+                  onChange={(e) => setNewProject({ ...newProject, tags: e.target.value })}
+                  style={{ fontSize: '0.84rem' }}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>Live Demo URL</label>
+                  <input 
+                    type="url" 
+                    className="input-field" 
+                    placeholder="https://yourproject.com"
+                    value={newProject.demoUrl}
+                    onChange={(e) => setNewProject({ ...newProject, demoUrl: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label className="input-label" style={{ fontSize: '0.8rem' }}>GitHub Repository</label>
+                  <input 
+                    type="url" 
+                    className="input-field" 
+                    placeholder="https://github.com/handle/repo"
+                    value={newProject.repoUrl}
+                    onChange={(e) => setNewProject({ ...newProject, repoUrl: e.target.value })}
+                    style={{ fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowSubmitModal(false)}
+                  style={{ width: 'auto', padding: '8px 16px', fontSize: '0.84rem' }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary flex items-center gap-xs"
+                  style={{ width: 'auto', padding: '8px 22px', fontSize: '0.84rem' }}
+                >
+                  <Send size={14} /> Publish to Portfolio
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

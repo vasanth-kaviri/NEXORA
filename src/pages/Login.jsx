@@ -49,8 +49,13 @@ export default function Login() {
 
     setTimeout(() => {
       setIsLoading(false);
+      const currentUser = db.getCurrentUser();
       toast.success('Successfully authenticated! Welcome back.');
-      navigate('/dashboard');
+      if (!currentUser?.profileCompleted) {
+        navigate('/complete-profile');
+      } else {
+        navigate('/dashboard');
+      }
     }, 600);
   };
 
@@ -89,7 +94,14 @@ export default function Login() {
 
       {/* Google Authentication with Real Firebase + Custom Account support */}
       <div style={{ marginBottom: '18px' }}>
-        <GoogleAuthButton mode="signin" onSuccess={() => navigate('/dashboard')} />
+        <GoogleAuthButton mode="signin" onSuccess={() => {
+          const currentUser = db.getCurrentUser();
+          if (!currentUser?.profileCompleted) {
+            navigate('/complete-profile');
+          } else {
+            navigate('/dashboard');
+          }
+        }} />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>

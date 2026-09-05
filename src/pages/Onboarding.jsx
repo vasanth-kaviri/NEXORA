@@ -94,16 +94,10 @@ export default function Onboarding() {
         <div className="flex items-center gap-sm">
           <button 
             onClick={() => navigate('/login')} 
-            className="text-muted text-sm font-semibold hover:text-main transition-colors"
-          >
-            Sign In
-          </button>
-          <button 
-            onClick={handleStart} 
-            className="btn btn-primary"
+            className="btn btn-secondary"
             style={{ padding: '6px 16px', fontSize: '0.82rem' }}
           >
-            Get Started
+            Sign In
           </button>
         </div>
       </div>
@@ -253,13 +247,13 @@ export default function Onboarding() {
             <button 
               onClick={handleStart} 
               className="btn btn-primary w-full flex items-center justify-center gap-xs"
-              style={{ padding: '12px 24px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
+              style={{ padding: '14px 28px', fontSize: '0.98rem', borderRadius: 'var(--radius-md)', fontWeight: 700, letterSpacing: '0.2px' }}
             >
-              <span>Initialize Career Trajectory</span>
-              <ArrowRight size={17} />
+              <span>Initialize Career Trajectory →</span>
+              <ArrowRight size={18} />
             </button>
             <p className="text-muted text-center" style={{ fontSize: '0.75rem', marginTop: '8px' }}>
-              No credit card required · Free 14-day full platform access
+              Sequential Onboarding Flow: Configuration → Account Creation → Login → Profile Verification
             </p>
           </div>
         </div>
