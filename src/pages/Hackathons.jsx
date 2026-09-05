@@ -121,31 +121,39 @@ function HackathonCard({ hack, delay }) {
 
   return (
     <div
-      className={`animate-fade-in delay-${delay}`}
+      className={`skeuo-card tactile-press animate-fade-in delay-${delay}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         background: hack.featured
-          ? 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(244,63,94,0.05))'
-          : hovered ? `rgba(${hack.glowRgb}, 0.04)` : 'var(--bg-card-glass)',
+          ? 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(244,63,94,0.08))'
+          : hovered ? `rgba(${hack.glowRgb}, 0.06)` : 'var(--skeuo-surface-card)',
         border: `1px solid ${
           hack.featured
-            ? 'rgba(99, 102, 241, 0.4)'
-            : hovered ? `rgba(${hack.glowRgb}, 0.4)` : 'var(--border-color)'
+            ? 'rgba(99, 102, 241, 0.45)'
+            : hovered ? `rgba(${hack.glowRgb}, 0.5)` : 'var(--border-color)'
+        }`,
+        borderTop: `1px solid ${
+          hack.featured ? 'rgba(99, 102, 241, 0.8)' : hovered ? `rgba(${hack.glowRgb}, 0.8)` : 'var(--skeuo-highlight)'
+        }`,
+        borderBottom: `1px solid ${
+          hack.featured ? 'rgba(99, 102, 241, 0.6)' : hovered ? `rgba(${hack.glowRgb}, 0.6)` : 'var(--skeuo-shadow-rim)'
         }`,
         borderRadius: '16px',
         padding: '22px',
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
-        transition: 'all 0.25s cubic-bezier(0.34, 1.28, 0.64, 1)',
+        transition: 'transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease',
         transform: hovered && !isEnded ? 'translateY(-3px)' : 'translateY(0)',
         boxShadow: hovered && !isEnded
-          ? `0 12px 32px rgba(${hack.glowRgb}, 0.15), 0 2px 8px rgba(0,0,0,0.15)`
-          : hack.featured ? '0 4px 20px rgba(139,92,246,0.15)' : '0 2px 8px rgba(0,0,0,0.1)',
+          ? `inset 0 1px 0 rgba(255,255,255,0.4), 0 5px 0 rgba(${hack.glowRgb}, 0.4), 0 16px 32px rgba(${hack.glowRgb}, 0.2)`
+          : hack.featured 
+            ? 'inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 0 rgba(99, 102, 241, 0.4), 0 8px 24px rgba(99, 102, 241, 0.25)' 
+            : 'inset 0 1px 0 var(--skeuo-highlight-subtle), 0 3px 0 var(--skeuo-btn-sec-lip), 0 6px 14px rgba(0,0,0,0.08)',
         position: 'relative',
         overflow: 'hidden',
-        opacity: isEnded ? 0.6 : 1,
+        opacity: isEnded ? 0.65 : 1,
       }}
     >
       {/* Top shimmer */}
@@ -223,8 +231,17 @@ function HackathonCard({ hack, delay }) {
         </div>
         {!isEnded ? (
           <button
-            className="interactive"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 16px', borderRadius: '999px', background: hack.status === 'Registering' || hack.status === 'Ongoing' ? `rgba(${hack.glowRgb}, 0.15)` : 'var(--input-bg)', border: `1px solid rgba(${hack.glowRgb}, 0.3)`, color: `rgb(${hack.glowRgb})`, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease' }}
+            className="btn-icon-tactile"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              padding: '6px 16px', 
+              borderRadius: 'var(--radius-full)', 
+              color: `rgb(${hack.glowRgb})`, 
+              fontSize: '0.8rem', 
+              fontWeight: 700 
+            }}
           >
             {hack.status === 'Ongoing' ? <><Zap size={13} /> Join Now</> : <><ExternalLink size={13} /> Register</>}
           </button>
@@ -290,27 +307,17 @@ export default function Hackathons() {
       {/* Stats */}
       <StatsBar />
 
-      {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      {/* Filter tabs (Skeuomorphic Sunken Track + Rocker Tabs) */}
+      <div className="skeuo-tab-track flex-wrap" style={{ alignSelf: 'flex-start' }}>
         {FILTERS.map(f => (
           <button
             key={f}
             onClick={() => setActiveFilter(f)}
-            style={{
-              padding: '7px 16px',
-              borderRadius: '999px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              border: activeFilter === f ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-              background: activeFilter === f ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-card-glass)',
-              color: activeFilter === f ? 'var(--primary)' : 'var(--text-muted)',
-            }}
+            className={`skeuo-tab-btn flex items-center gap-xs ${activeFilter === f ? 'active' : ''}`}
           >
-            {f}
-            <span style={{ marginLeft: '6px', fontSize: '0.7rem', opacity: 0.7 }}>
-              {f === 'All' ? hackathons.length : hackathons.filter(h => h.status === f).length}
+            <span>{f}</span>
+            <span style={{ fontSize: '0.7rem', opacity: 0.75 }}>
+              ({f === 'All' ? hackathons.length : hackathons.filter(h => h.status === f).length})
             </span>
           </button>
         ))}

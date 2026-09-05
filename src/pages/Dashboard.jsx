@@ -231,7 +231,7 @@ export default function Dashboard() {
           className="glass-panel interactive"
           style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: 'var(--radius-md)' }}
         >
-          <div style={{ padding: '7px', background: 'rgba(99, 102, 241, 0.12)', borderRadius: 'var(--radius-sm)', color: 'var(--primary)' }}>
+          <div className="skeuo-well" style={{ padding: '7px', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Target size={18} />
           </div>
           <div>
@@ -244,7 +244,7 @@ export default function Dashboard() {
           className="glass-panel interactive"
           style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: 'var(--radius-md)' }}
         >
-          <div style={{ padding: '7px', background: 'rgba(16, 185, 129, 0.12)', borderRadius: 'var(--radius-sm)', color: 'var(--success)' }}>
+          <div className="skeuo-well" style={{ padding: '7px', color: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <TrendingUp size={18} />
           </div>
           <div>
@@ -257,7 +257,7 @@ export default function Dashboard() {
           className="glass-panel interactive"
           style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: 'var(--radius-md)' }}
         >
-          <div style={{ padding: '7px', background: 'rgba(244, 63, 94, 0.12)', borderRadius: 'var(--radius-sm)', color: 'var(--secondary)' }}>
+          <div className="skeuo-well" style={{ padding: '7px', color: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Flame size={18} />
           </div>
           <div>
@@ -270,7 +270,7 @@ export default function Dashboard() {
           className="glass-panel interactive"
           style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px', borderRadius: 'var(--radius-md)' }}
         >
-          <div style={{ padding: '7px', background: 'rgba(245, 158, 11, 0.12)', borderRadius: 'var(--radius-sm)', color: 'var(--warning)' }}>
+          <div className="skeuo-well" style={{ padding: '7px', color: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Trophy size={18} />
           </div>
           <div>
@@ -379,17 +379,17 @@ export default function Dashboard() {
           
           <div className="flex items-center gap-sm">
             <div className="flex items-center gap-xs" title="Completion">
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)' }}>
                 {taskPercent}%
               </span>
-              <div style={{ width: '70px', height: '6px', background: 'var(--input-bg)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
-                <div style={{ width: `${taskPercent}%`, height: '100%', background: 'linear-gradient(90deg, var(--primary), var(--secondary))', transition: 'width 0.5s ease' }} />
+              <div className="skeuo-progress-track" style={{ width: '70px', height: '7px' }}>
+                <div className="skeuo-progress-bar" style={{ width: `${taskPercent}%` }} />
               </div>
             </div>
 
             <button 
-              className="interactive text-primary" 
-              style={{ fontSize: '0.78rem', fontWeight: 600, background: 'rgba(99, 102, 241, 0.1)', padding: '4px 10px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer' }}
+              className="skeuo-pill text-primary" 
+              style={{ fontSize: '0.75rem', padding: '3px 12px' }}
               onClick={() => navigate('/progress')}
             >
               Progress
@@ -429,21 +429,21 @@ export default function Dashboard() {
               
               <div style={{ flexShrink: 0, display: 'flex', gap: '6px' }}>
                 <button 
-                  className="interactive btn-secondary" 
-                  style={{ padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: '1px solid var(--border-color)', background: 'transparent' }}
+                  className="skeuo-pill" 
+                  style={{ padding: '4px 12px', fontSize: '0.72rem' }}
                   onClick={() => navigate(`/task/${task.id}`)}
                 >
                   Preview
                 </button>
 
                 {task.completed ? (
-                  <div style={{ padding: '4px 10px', borderRadius: 'var(--radius-full)', background: 'rgba(16, 185, 129, 0.1)', fontSize: '0.72rem', fontWeight: 600, color: 'var(--success)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'inline-block' }}>
+                  <div className="skeuo-well" style={{ padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--success)', display: 'inline-block' }}>
                     Done
                   </div>
                 ) : (
                   <button 
-                    className="interactive btn-primary" 
-                    style={{ padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', border: 'none' }}
+                    className="skeuo-pill active" 
+                    style={{ padding: '4px 12px', fontSize: '0.72rem' }}
                     onClick={() => navigate(`/task/${task.id}`)}
                   >
                     Resume

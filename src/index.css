@@ -47,6 +47,20 @@
 
   /* Typography */
   --font-family: 'Inter', sans-serif;
+
+  /* SKEUOMORPHIC LIGHT TOKENS */
+  --skeuo-highlight: rgba(255, 255, 255, 0.95);
+  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.6);
+  --skeuo-shadow-rim: rgba(15, 23, 42, 0.08);
+  --skeuo-shadow-deep: rgba(15, 23, 42, 0.12);
+  --skeuo-surface-grad: linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  --skeuo-surface-card: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.85) 100%);
+  --skeuo-recessed-bg: #eef2f6;
+  --skeuo-recessed-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1), inset 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 0 rgba(255, 255, 255, 0.9);
+  --skeuo-btn-lip: #4338ca;
+  --skeuo-btn-sec-lip: rgba(148, 163, 184, 0.7);
+  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  --skeuo-bevel-dark: 0 -1px 0 rgba(15, 23, 42, 0.08) inset;
 }
 
 html.dark {
@@ -67,6 +81,20 @@ html.dark {
   --input-bg: rgba(255, 255, 255, 0.1);
   /* Brighter input bg */
   --primary-glow: rgba(99, 102, 241, 0.6);
+
+  /* SKEUOMORPHIC DARK TOKENS */
+  --skeuo-highlight: rgba(255, 255, 255, 0.22);
+  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.1);
+  --skeuo-shadow-rim: rgba(0, 0, 0, 0.6);
+  --skeuo-shadow-deep: rgba(0, 0, 0, 0.7);
+  --skeuo-surface-grad: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+  --skeuo-surface-card: linear-gradient(180deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
+  --skeuo-recessed-bg: rgba(2, 6, 23, 0.7);
+  --skeuo-recessed-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.08);
+  --skeuo-btn-lip: #312e81;
+  --skeuo-btn-sec-lip: rgba(0, 0, 0, 0.65);
+  --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  --skeuo-bevel-dark: 0 -1px 0 rgba(0, 0, 0, 0.5) inset;
 }
 
 * {
@@ -110,34 +138,60 @@ button {
   outline: none;
 }
 
-/* Glassmorphism utility classes */
-.glass-panel {
-  background: var(--bg-card-glass);
+/* ─── Skeuomorphic Tactile Panels & Cards ─── */
+.glass-panel,
+.skeuo-card {
+  background: var(--skeuo-surface-card);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  box-shadow:
+    inset 0 1px 0 var(--skeuo-highlight-subtle),
+    inset 0 -1px 0 var(--skeuo-shadow-rim),
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 10px 28px -4px var(--skeuo-shadow-deep);
+  transition: 
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), 
+    box-shadow 0.28s ease, 
+    border-color 0.28s ease;
   transform: translateZ(0);
   backface-visibility: hidden;
-  will-change: transform;
+  will-change: transform, box-shadow;
+  position: relative;
 }
 
-html.dark .glass-panel {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+html.dark .glass-panel,
+html.dark .skeuo-card {
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 14px 34px -4px rgba(0, 0, 0, 0.65);
 }
 
-.glass-panel.interactive:hover {
-  transform: translateY(-6px) translateZ(0);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 0 20px var(--primary-glow);
-  border-color: rgba(99, 102, 241, 0.5);
+.glass-panel.interactive:hover,
+.skeuo-card.interactive:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow:
+    inset 0 1px 0 var(--skeuo-highlight),
+    inset 0 -1px 0 var(--skeuo-shadow-rim),
+    0 18px 40px -4px var(--skeuo-shadow-deep),
+    0 0 20px var(--primary-glow);
+  border-color: rgba(99, 102, 241, 0.45);
 }
 
-html.dark .glass-panel.interactive:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--primary-glow);
+.glass-panel.interactive:active,
+.skeuo-card.interactive:active {
+  transform: translateY(1px) scale(0.995);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  transition-duration: 0.06s;
 }
 
 /* Animations */
@@ -309,21 +363,25 @@ html.dark .blob {
   font-weight: 500;
 }
 
+/* ─── Recessed Sunken Input Wells ─── */
 .input-field {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
-  background: var(--input-bg);
+  background: var(--skeuo-recessed-bg);
   border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-shadow-rim);
+  border-bottom: 1px solid var(--skeuo-highlight-subtle);
   color: var(--text-main);
   font-size: 0.875rem;
-  transition: all 0.3s ease;
+  box-shadow: var(--skeuo-recessed-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
   width: 100%;
 }
 
 @media (min-width: 640px) {
   .input-field {
-    padding: var(--space-md);
+    padding: 12px 16px;
     font-size: 0.95rem;
   }
 }
@@ -336,129 +394,276 @@ select.input-field option {
 .input-field:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-top-color: var(--primary);
+  box-shadow: var(--skeuo-recessed-shadow), 0 0 0 3px rgba(99, 102, 241, 0.25);
+  background: var(--bg-card);
 }
 
-/* ─── Button Styles (Tailwind-enhanced) ─── */
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-
-  100% {
-    background-position: 200% center;
-  }
+/* Recessed Well Container */
+.skeuo-well {
+  background: var(--skeuo-recessed-bg);
+  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-shadow-rim);
+  border-bottom: 1px solid var(--skeuo-highlight-subtle);
+  box-shadow: var(--skeuo-recessed-shadow);
+  border-radius: var(--radius-md);
 }
 
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    box-shadow: 0 4px 15px var(--primary-glow);
-  }
-
-  50% {
-    box-shadow: 0 6px 28px rgba(99, 102, 241, 0.55);
-  }
-}
-
-@keyframes btn-pop {
-  0% {
-    transform: scale(1);
-  }
-
-  40% {
-    transform: scale(0.94);
-  }
-
-  70% {
-    transform: scale(1.04);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-.btn {
+/* ─── Skeuomorphic Tactile Button Architecture ─── */
+.btn,
+.btn-tactile {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-md) var(--space-lg);
+  padding: 11px 22px;
   border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
   gap: var(--space-sm);
   width: 100%;
-  overflow: hidden;
   outline: none;
   cursor: pointer;
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s ease,
-    background-position 0.4s ease;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* Tactile Spring Physics */
+  transition: 
+    transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.12s ease;
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
 }
 
-/* ripple pseudo-element */
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: inherit;
-  opacity: 0;
-  transform: scale(0);
-  transition: transform 0.5s ease, opacity 0.4s ease;
-}
-
-.btn:active::after {
-  transform: scale(2.5);
-  opacity: 0;
-  transition: 0s;
-}
-
-.btn:active {
-  animation: btn-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* ── Primary ── */
+/* ── Primary Tactile Push Button ── */
 .btn-primary {
-  background: linear-gradient(120deg,
-      var(--primary) 0%,
-      var(--secondary) 50%,
-      var(--primary) 100%);
-  background-size: 200% auto;
-  color: white;
-  border: none;
-  box-shadow: 0 4px 15px var(--primary-glow);
-  animation: pulse-glow 3s ease-in-out infinite;
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 45%, #4f46e5 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.45);
+  /* 3D Physical Ledge Base */
+  box-shadow: 
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 0 var(--skeuo-btn-lip),
+    0 8px 18px rgba(99, 102, 241, 0.38);
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.5);
-  animation: shimmer 1.6s linear infinite, pulse-glow 3s ease-in-out infinite;
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 6px 0 var(--skeuo-btn-lip),
+    0 12px 24px rgba(99, 102, 241, 0.48);
 }
 
-/* ── Secondary ── */
+/* Tactile Mechanical Depression on Active / Click */
+.btn-primary:active,
+.btn-primary.pressed {
+  transform: translateY(3.5px) scale(0.99) !important;
+  filter: brightness(0.95);
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0.5px 0 var(--skeuo-btn-lip),
+    0 2px 4px rgba(99, 102, 241, 0.2) !important;
+  transition-duration: 0.05s;
+}
+
+/* ── Secondary Tactile Push Button ── */
 .btn-secondary {
-  background: var(--input-bg);
+  background: var(--skeuo-surface-grad);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
+  /* 3D Physical Ledge Base */
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 3.5px 0 var(--skeuo-btn-sec-lip),
+    0 6px 14px rgba(0, 0, 0, 0.09);
 }
 
 .btn-secondary:hover {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
-  transform: translateY(-2px);
+  transform: translateY(-1.5px);
+  filter: brightness(1.04);
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 5px 0 var(--skeuo-btn-sec-lip),
+    0 10px 20px rgba(0, 0, 0, 0.12);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary:active,
+.btn-secondary.pressed {
+  transform: translateY(3px) scale(0.99) !important;
+  filter: brightness(0.95);
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 0.5px 0 var(--skeuo-btn-sec-lip),
+    0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition-duration: 0.05s;
+}
+
+/* ── Tactile Icon Key Button ── */
+.btn-icon-tactile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: var(--skeuo-surface-grad);
+  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 3px 0 var(--skeuo-btn-sec-lip),
+    0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: 
+    transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.12s ease;
+}
+
+.btn-icon-tactile:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 4.5px 0 var(--skeuo-btn-sec-lip),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-icon-tactile:active {
+  transform: translateY(2.5px) scale(0.98) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 0.5px 0 var(--skeuo-btn-sec-lip) !important;
+  transition-duration: 0.05s;
+}
+
+/* ── Tactile Pill / Chip Switches ── */
+.skeuo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  background: var(--skeuo-surface-grad);
+  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight-subtle),
+    0 2.5px 0 var(--skeuo-btn-sec-lip),
+    0 3px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.skeuo-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 3.5px 0 var(--skeuo-btn-sec-lip),
+    0 5px 10px rgba(0, 0, 0, 0.12);
+}
+
+.skeuo-pill:active {
+  transform: translateY(2px) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 0.5px 0 var(--skeuo-btn-sec-lip) !important;
+  transition-duration: 0.05s;
+}
+
+.skeuo-pill.active {
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2.5px 0 #4338ca,
+    0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+/* ── Skeuomorphic Tab Switcher (Sunken Track + Raised Rocker) ── */
+.skeuo-tab-track {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--skeuo-recessed-bg);
+  border-radius: var(--radius-full);
+  box-shadow: var(--skeuo-recessed-shadow);
+  border: 1px solid var(--border-color);
+  gap: 4px;
+}
+
+.skeuo-tab-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+}
+
+.skeuo-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.skeuo-tab-btn.active {
+  background: var(--skeuo-surface-grad);
+  color: var(--primary);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
+  box-shadow: 
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 3px 0 var(--skeuo-btn-sec-lip),
+    0 4px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.skeuo-tab-btn.active:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── Skeuomorphic Groove Progress Track & Illuminated Fluid Cylinder ── */
+.skeuo-progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--skeuo-recessed-bg);
+  border-radius: var(--radius-full);
+  box-shadow: var(--skeuo-recessed-shadow);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+}
+
+.skeuo-progress-bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 60%), linear-gradient(90deg, var(--primary), var(--secondary));
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 12px var(--primary-glow);
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Layout */
@@ -610,13 +815,41 @@ a[aria-label]:hover {
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
 }
 
-/* interactive utility */
+/* ─── Universal Tactile Press & Interactive Utilities ─── */
 .interactive {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: 
+    transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.14s ease,
+    filter 0.14s ease;
+  user-select: none;
 }
 
 .interactive:hover {
-  opacity: 0.85;
+  filter: brightness(1.04);
+}
+
+.interactive:active {
+  transform: translateY(2.5px) scale(0.99) !important;
+  filter: brightness(0.95);
+  transition-duration: 0.05s;
+}
+
+/* Explicit Tactile Click Depression Utility */
+.tactile-press {
+  cursor: pointer;
+  user-select: none;
+  transition: 
+    transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), 
+    box-shadow 0.12s ease;
+}
+
+.tactile-press:hover {
+  transform: translateY(-1.5px);
+}
+
+.tactile-press:active {
+  transform: translateY(2.5px) scale(0.985) !important;
+  transition-duration: 0.04s;
 }
 
 /* cursor */

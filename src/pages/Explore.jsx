@@ -146,22 +146,25 @@ function FeatureCard({ item, onNavigate }) {
       onClick={() => onNavigate(item.path)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="skeuo-card tactile-press"
       style={{
         cursor: 'pointer',
         background: hovered
-          ? `rgba(${item.glowColor}, 0.06)`
-          : 'var(--bg-card-glass)',
-        border: `1px solid ${hovered ? `rgba(${item.glowColor}, 0.45)` : 'var(--border-color)'}`,
+          ? `rgba(${item.glowColor}, 0.08)`
+          : 'var(--skeuo-surface-card)',
+        border: `1px solid ${hovered ? `rgba(${item.glowColor}, 0.5)` : 'var(--border-color)'}`,
+        borderTop: `1px solid ${hovered ? `rgba(${item.glowColor}, 0.8)` : 'var(--skeuo-highlight)'}`,
+        borderBottom: `1px solid ${hovered ? `rgba(${item.glowColor}, 0.6)` : 'var(--skeuo-shadow-rim)'}`,
         borderRadius: '14px',
         padding: '20px',
         display: 'flex',
         flexDirection: 'column',
         gap: '14px',
-        transition: 'all 0.25s cubic-bezier(0.34, 1.28, 0.64, 1)',
-        transform: hovered ? 'translateY(-4px) scale(1.01)' : 'translateY(0) scale(1)',
+        transition: 'transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease, border-color 0.16s ease',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
         boxShadow: hovered
-          ? `0 16px 40px rgba(${item.glowColor}, 0.18), 0 2px 8px rgba(0,0,0,0.2)`
-          : '0 2px 8px rgba(0,0,0,0.12)',
+          ? `inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 5px 0 rgba(${item.glowColor}, 0.4), 0 16px 36px rgba(${item.glowColor}, 0.22)`
+          : 'inset 0 1px 0 var(--skeuo-highlight-subtle), 0 3px 0 var(--skeuo-btn-sec-lip), 0 6px 14px rgba(0,0,0,0.08)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -179,30 +182,34 @@ function FeatureCard({ item, onNavigate }) {
 
       {/* Top row: icon + arrow */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: '10px',
-          background: item.iconBg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          transition: 'transform 0.25s ease',
-          transform: hovered ? 'scale(1.1)' : 'scale(1)',
-        }}>
+        <div 
+          className="skeuo-well"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '10px',
+            background: item.iconBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            transition: 'transform 0.25s ease',
+            transform: hovered ? 'scale(1.1)' : 'scale(1)',
+          }}
+        >
           <Icon size={22} style={{ color: item.iconColor }} />
         </div>
-        <div style={{
-          width: 28, height: 28,
-          borderRadius: '8px',
-          background: hovered ? `rgba(${item.glowColor}, 0.12)` : 'var(--bg-main)',
-          border: `1px solid ${hovered ? `rgba(${item.glowColor}, 0.3)` : 'var(--border-color)'}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.25s ease',
-        }}>
+        <div 
+          className="btn-icon-tactile"
+          style={{
+            width: 28, height: 28,
+            borderRadius: '8px',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <ArrowUpRight
             size={14}
             style={{
@@ -243,11 +250,9 @@ function SectionFrame({ section, onNavigate, animDelay }) {
 
   return (
     <section
-      className="animate-fade-in"
+      className="glass-panel animate-fade-in"
       style={{
         animationDelay: `${animDelay}ms`,
-        background: 'var(--bg-card-glass)',
-        border: '1px solid var(--border-color)',
         borderRadius: '20px',
         padding: '28px',
         display: 'flex',

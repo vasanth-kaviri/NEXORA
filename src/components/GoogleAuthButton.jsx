@@ -57,26 +57,11 @@ export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
         type="button"
         onClick={handleInstantGoogle}
         disabled={isConnecting}
-        className="w-full flex items-center justify-center gap-3 interactive"
+        className="w-full flex items-center justify-center gap-3 btn btn-secondary"
         style={{
           padding: '11px 16px',
-          background: 'var(--input-bg)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-full)',
-          color: 'var(--text-main)',
           fontSize: '0.92rem',
-          fontWeight: '600',
           cursor: isConnecting ? 'wait' : 'pointer',
-          transition: 'all 0.25s ease',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'var(--primary)';
-          e.currentTarget.style.transform = 'translateY(-1px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'var(--border-color)';
-          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
         {isConnecting ? (

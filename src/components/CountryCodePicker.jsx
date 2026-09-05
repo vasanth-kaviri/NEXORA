@@ -35,7 +35,7 @@ export default function CountryCodePicker({
       {/* Trigger button */}
       <button
         type="button"
-        className="input-field flex items-center justify-between"
+        className="input-field flex items-center justify-between tactile-press"
         style={{
           width: '100px',
           paddingLeft: '12px',

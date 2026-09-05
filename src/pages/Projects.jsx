@@ -117,25 +117,27 @@ function ProjectCard({ project, accentRgb, delay }) {
 
   return (
     <div
-      className={`animate-fade-in delay-${delay}`}
+      className={`skeuo-card tactile-press animate-fade-in delay-${delay}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: hovered ? `rgba(${accentRgb}, 0.04)` : 'var(--bg-card-glass)',
-        border: `1px solid ${hovered ? `rgba(${accentRgb}, 0.4)` : 'var(--border-color)'}`,
+        background: hovered ? `rgba(${accentRgb}, 0.07)` : 'var(--skeuo-surface-card)',
+        border: `1px solid ${hovered ? `rgba(${accentRgb}, 0.5)` : 'var(--border-color)'}`,
+        borderTop: `1px solid ${hovered ? `rgba(${accentRgb}, 0.8)` : 'var(--skeuo-highlight)'}`,
+        borderBottom: `1px solid ${hovered ? `rgba(${accentRgb}, 0.6)` : 'var(--skeuo-shadow-rim)'}`,
         borderRadius: '14px',
         padding: '20px',
         display: 'flex',
         flexDirection: 'column',
         gap: '14px',
-        transition: 'all 0.25s cubic-bezier(0.34, 1.28, 0.64, 1)',
+        transition: 'transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         boxShadow: hovered
-          ? `0 12px 32px rgba(${accentRgb}, 0.15), 0 2px 8px rgba(0,0,0,0.15)`
-          : '0 2px 8px rgba(0,0,0,0.1)',
+          ? `inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4.5px 0 rgba(${accentRgb}, 0.4), 0 14px 28px rgba(${accentRgb}, 0.18)`
+          : 'inset 0 1px 0 var(--skeuo-highlight-subtle), 0 3px 0 var(--skeuo-btn-sec-lip), 0 4px 10px rgba(0,0,0,0.08)',
         position: 'relative',
         overflow: 'hidden',
-        opacity: project.locked ? 0.7 : 1,
+        opacity: project.locked ? 0.75 : 1,
       }}
     >
       {/* Top shimmer line */}
@@ -152,11 +154,11 @@ function ProjectCard({ project, accentRgb, delay }) {
           {project.title}
         </h3>
         {project.locked ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>
+          <div className="skeuo-well" style={{ display: 'flex', alignItems: 'center', gap: '4px', borderRadius: '6px', padding: '4px 8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>
             <Lock size={11} /> Pro
           </div>
         ) : (
-          <div style={{ width: 28, height: 28, borderRadius: '8px', background: `rgba(${accentRgb}, 0.1)`, border: `1px solid rgba(${accentRgb}, 0.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease', flexShrink: 0 }}>
+          <div className="btn-icon-tactile" style={{ width: 28, height: 28, padding: 0, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <ArrowUpRight size={14} style={{ color: `rgb(${accentRgb})`, transform: hovered ? 'translate(1px,-1px)' : 'none', transition: 'transform 0.2s ease' }} />
           </div>
         )}
@@ -208,11 +210,9 @@ function CategorySection({ cat, sectionDelay }) {
 
   return (
     <section
-      className="animate-fade-in"
+      className="glass-panel animate-fade-in"
       style={{
         animationDelay: `${sectionDelay}ms`,
-        background: 'var(--bg-card-glass)',
-        border: '1px solid var(--border-color)',
         borderRadius: '20px',
         padding: '28px',
         display: 'flex',

@@ -30,10 +30,10 @@ export default function Layout() {
           <div style={{ padding: '8px 16px', position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center' }}>
             <button 
               onClick={() => navigate(-1)} 
-              className="flex items-center gap-xs text-primary interactive" 
-              style={{ fontWeight: 600, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, margin: 0, fontSize: '0.88rem' }}
+              className="flex items-center gap-xs text-primary btn-icon-tactile" 
+              style={{ fontWeight: 600, padding: '5px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.84rem' }}
             >
-              <ArrowLeft size={18} /> Back
+              <ArrowLeft size={16} /> Back
             </button>
           </div>
         )}

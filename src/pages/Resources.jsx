@@ -23,8 +23,8 @@ export default function Resources() {
         {topic && (
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-xs interactive mb-xs text-muted"
-            style={{ fontSize: '0.85rem', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+            className="flex items-center gap-xs btn-icon-tactile mb-xs text-muted"
+            style={{ fontSize: '0.82rem', padding: '5px 12px', borderRadius: 'var(--radius-full)' }}
           >
             <ArrowLeft size={16} /> Back to Roadmap
           </button>
@@ -43,7 +43,7 @@ export default function Resources() {
               onClick={() => navigate(`/resource/${res.id}`, { state: { resource: res } })}
             >
               <div className="flex items-center gap-md">
-                <div style={{ padding: '10px', background: 'var(--input-bg)', borderRadius: '50%' }}>
+                <div className="skeuo-well" style={{ width: 42, height: 42, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {renderIcon(res.type)}
                 </div>
                 <div>
@@ -52,8 +52,8 @@ export default function Resources() {
                 </div>
               </div>
               <button 
-                className="text-primary interactive" 
-                style={{ fontWeight: '600', padding: '8px 12px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer' }}
+                className="skeuo-pill active" 
+                style={{ padding: '6px 18px', fontSize: '0.82rem' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/resource/${res.id}`, { state: { resource: res } });

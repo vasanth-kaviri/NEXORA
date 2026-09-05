@@ -129,37 +129,20 @@ export default function Roadmap() {
               {completedCount} of {currentList.length} Modules ({progressPercent}%)
             </span>
           </div>
-          <div style={{ width: '100%', height: '8px', background: 'var(--input-bg)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+          <div className="skeuo-progress-track" style={{ height: '9px' }}>
             <div 
-              style={{ 
-                width: `${progressPercent}%`, 
-                height: '100%', 
-                background: 'linear-gradient(90deg, var(--primary), var(--secondary))', 
-                transition: 'width 0.4s ease' 
-              }} 
+              className="skeuo-progress-bar"
+              style={{ width: `${progressPercent}%` }} 
             />
           </div>
         </div>
       </header>
 
-      {/* ── Subsets & Track Switcher Tabs ── */}
-      <div className="flex gap-sm items-center flex-wrap" style={{ marginTop: '2px' }}>
+      {/* ── Subsets & Track Switcher Tabs (Skeuomorphic Sunken Track + Rocker) ── */}
+      <div className="skeuo-tab-track flex-wrap" style={{ marginTop: '2px', alignSelf: 'flex-start' }}>
         <button
           onClick={() => setActiveTab('core')}
-          className="interactive"
-          style={{
-            padding: '8px 18px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            border: activeTab === 'core' ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-            background: activeTab === 'core' ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-card-glass)',
-            color: activeTab === 'core' ? 'var(--primary)' : 'var(--text-muted)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
+          className={`skeuo-tab-btn flex items-center gap-xs ${activeTab === 'core' ? 'active' : ''}`}
         >
           <Layers size={16} />
           <span>Core Career Track ({roadmapData.coreSteps.length} Milestones)</span>
@@ -168,20 +151,7 @@ export default function Roadmap() {
         {roadmapData.subset && (
           <button
             onClick={() => setActiveTab('subset')}
-            className="interactive"
-            style={{
-              padding: '8px 18px',
-              borderRadius: 'var(--radius-full)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              border: activeTab === 'subset' ? '1px solid var(--secondary)' : '1px solid var(--border-color)',
-              background: activeTab === 'subset' ? 'rgba(244, 63, 94, 0.12)' : 'var(--bg-card-glass)',
-              color: activeTab === 'subset' ? 'var(--secondary)' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
+            className={`skeuo-tab-btn flex items-center gap-xs ${activeTab === 'subset' ? 'active' : ''}`}
           >
             <Sparkles size={16} />
             <span>{roadmapData.subset.title}</span>
@@ -288,14 +258,10 @@ export default function Roadmap() {
 
                   <button
                     onClick={(e) => toggleStepStatus(step.id, e)}
+                    className="skeuo-pill"
                     style={{
                       fontSize: '0.72rem',
-                      padding: '2px 8px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'var(--input-bg)',
-                      color: 'var(--text-muted)',
-                      border: '1px solid var(--border-color)',
-                      cursor: 'pointer'
+                      padding: '3px 10px',
                     }}
                     title="Toggle completion status"
                   >
@@ -322,13 +288,13 @@ export default function Roadmap() {
                     {step.skills.map((skill) => (
                       <span
                         key={skill}
+                        className="skeuo-well"
                         style={{
                           fontSize: '0.7rem',
-                          padding: '2px 8px',
+                          padding: '3px 8px',
                           borderRadius: 'var(--radius-sm)',
-                          background: 'var(--input-bg)',
                           color: 'var(--text-main)',
-                          border: '1px solid var(--border-color)'
+                          fontWeight: 500
                         }}
                       >
                         {skill}
@@ -336,7 +302,10 @@ export default function Roadmap() {
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-xs text-primary" style={{ fontSize: '0.78rem', fontWeight: 600 }}>
+                  <div 
+                    className="flex items-center gap-xs btn-icon-tactile text-primary" 
+                    style={{ fontSize: '0.78rem', fontWeight: 700, padding: '5px 12px', borderRadius: 'var(--radius-full)' }}
+                  >
                     <span>Explore Learning Materials</span>
                     <ChevronRight size={14} />
                   </div>
