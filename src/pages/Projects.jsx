@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 import {
   FolderKanban, Star, Clock, Users, ArrowUpRight,
   CheckCircle2, Circle, Flame, Lock, Sparkles,
@@ -112,11 +113,23 @@ const categories = [
 
 /* ─── Project Card ──────────────────────────────────────────── */
 function ProjectCard({ project, accentRgb, delay }) {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [hovered, setHovered] = useState(false);
   const diff = difficultyConfig[project.difficulty];
 
+  const handleCardClick = () => {
+    if (project.locked) {
+      toast.info(`"${project.title}" requires NEXORA Pro. Upgrade to unlock.`);
+    } else {
+      toast.success(`Enrolled in "${project.title}"! Starter code loaded (+100 XP).`);
+      navigate('/resource/fs_1_3');
+    }
+  };
+
   return (
     <div
+      onClick={handleCardClick}
       className={`skeuo-card tactile-press animate-fade-in delay-${delay}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

@@ -275,6 +275,22 @@ class DatabaseService {
     return updated;
   }
 
+  saveUser(userData) {
+    const currentUser = this.getCurrentUser() || {};
+    const updated = { ...currentUser, ...userData };
+    this.setCurrentUser(updated);
+
+    const users = this.getUsers();
+    const existingIndex = users.findIndex(u => u.id === updated.id);
+    if (existingIndex >= 0) {
+      users[existingIndex] = updated;
+    } else {
+      users.push(updated);
+    }
+    this.saveUsers(users);
+    return updated;
+  }
+
   // --- NOTIFICATIONS TABLE OPERATIONS ---
   getNotifications() {
     try {

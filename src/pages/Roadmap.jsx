@@ -392,18 +392,33 @@ export default function Roadmap() {
                 </div>
               </div>
 
-              {/* Interactive Quick Practice / Terminal Prompt */}
+              {/* Milestone Practical Challenge & Interview Concept */}
               <div className="skeuo-well" style={{ padding: '16px', borderRadius: 'var(--radius-md)' }}>
                 <div className="flex justify-between items-center mb-xs">
                   <div className="flex items-center gap-xs">
-                    <Terminal size={15} className="text-primary" />
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>Quick Practice CLI Prompt</span>
+                    <Code2 size={16} className="text-primary" />
+                    <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>Milestone Practical Challenge</span>
                   </div>
-                  <span className="text-muted" style={{ fontSize: '0.72rem' }}>Interactive Sandbox</span>
+                  <span className="badge text-success font-bold" style={{ fontSize: '0.68rem' }}>Production Ready</span>
                 </div>
-                <pre style={{ margin: 0, padding: '8px 12px', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', fontSize: '0.78rem', color: '#10b981', overflowX: 'auto', fontFamily: 'monospace' }}>
-                  $ nexora test --milestone="{selectedStep.id}" --strict-eval
-                </pre>
+                <p className="text-muted" style={{ fontSize: '0.78rem', margin: '4px 0 10px 0', lineHeight: 1.45 }}>
+                  Deliverable: Build, test, and benchmark a working production module for <strong>{selectedStep.title}</strong> adhering to industry best practices.
+                </p>
+                <div className="flex justify-between items-center pt-xs" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <span className="text-muted" style={{ fontSize: '0.74rem' }}>
+                    💡 <em>Interview Concept: Architecture tradeoffs & latency optimization</em>
+                  </span>
+                  {stepResources.length > 0 && (
+                    <button
+                      onClick={() => navigate(`/resource/${stepResources[0].id}`, { state: { resource: stepResources[0] } })}
+                      className="btn btn-secondary flex items-center gap-xs"
+                      style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                    >
+                      <span>Open Lab Studio</span>
+                      <ArrowRight size={12} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Quick AI Mentor Assist Button */}

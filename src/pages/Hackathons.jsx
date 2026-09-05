@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 import {
   Trophy, Calendar, Clock, Users, MapPin,
   ArrowUpRight, Sparkles, Flame, Zap, Globe,
@@ -115,9 +116,21 @@ const hackathons = [
 
 /* ─── Hackathon Card ─────────────────────────────────────────── */
 function HackathonCard({ hack, delay }) {
+  const toast = useToast();
   const [hovered, setHovered] = useState(false);
+  const [registered, setRegistered] = useState(false);
   const status = statusConfig[hack.status];
   const isEnded = hack.status === 'Ended';
+
+  const handleRegister = (e) => {
+    e.stopPropagation();
+    if (registered) {
+      toast.info(`Already registered for "${hack.name}". Check Alerts for room invite.`);
+      return;
+    }
+    setRegistered(true);
+    toast.success(`Successfully registered for "${hack.name}"! +150 XP awarded.`);
+  };
 
   return (
     <div
@@ -231,19 +244,27 @@ function HackathonCard({ hack, delay }) {
         </div>
         {!isEnded ? (
           <button
-            className="btn-icon-tactile"
+            onClick={handleRegister}
+            data-action="register-hackathon"
+            className="btn-icon-tactile hackathon-register-btn"
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: '6px', 
               padding: '6px 16px', 
               borderRadius: 'var(--radius-full)', 
-              color: `rgb(${hack.glowRgb})`, 
+              color: registered ? 'var(--success)' : `rgb(${hack.glowRgb})`, 
               fontSize: '0.8rem', 
               fontWeight: 700 
             }}
           >
-            {hack.status === 'Ongoing' ? <><Zap size={13} /> Join Now</> : <><ExternalLink size={13} /> Register</>}
+            {registered ? (
+              <><CheckCircle2 size={14} className="text-success" /> Registered</>
+            ) : hack.status === 'Ongoing' ? (
+              <><Zap size={13} /> Join Now</>
+            ) : (
+              <><ExternalLink size={13} /> Register</>
+            )}
           </button>
         ) : (
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Submissions closed</span>
