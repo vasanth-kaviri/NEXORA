@@ -2,9 +2,8 @@
 .nexus-shell {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
   background-color: var(--bg-main);
   position: relative;
 }
@@ -17,10 +16,16 @@
   border-right: 1px solid var(--border-color);
   z-index: 120;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
+  align-self: flex-start;
+  overflow: hidden;
   transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Tablet (768px - 1023px): Compact 74px Rail */
+/* Tablet (768px - 1023px): Compact 76px Rail */
 @media (min-width: 768px) {
   .nexus-sidebar {
     display: flex;
@@ -28,6 +33,7 @@
     height: 100vh;
     position: sticky;
     top: 0;
+    align-self: flex-start;
   }
 
   .brand-info, 
@@ -57,7 +63,12 @@
 /* Desktop (>= 1024px): Full Enterprise 250px Sidebar */
 @media (min-width: 1024px) {
   .nexus-sidebar {
+    display: flex;
     width: 250px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
   }
 
   .brand-info, 

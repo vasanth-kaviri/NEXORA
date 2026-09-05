@@ -95,8 +95,8 @@ export default function Layout() {
 
   return (
     <div className="nexus-shell">
-      {/* ── Desktop & Tablet Sidebar ── */}
-      <aside className="nexus-sidebar">
+      {/* ── Desktop & Tablet Sidebar (Sticky & Stationary) ── */}
+      <aside className="nexus-sidebar sticky top-0 h-screen">
         <div className="sidebar-brand" onClick={() => navigate('/dashboard')}>
           <div className="brand-logo-hex skeuo-convex">
             <Sparkles size={19} className="text-primary" />
