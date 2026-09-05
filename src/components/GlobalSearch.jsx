@@ -11,8 +11,8 @@ export default function GlobalSearch() {
   const allResults = [
     { id: 1, type: 'resource', title: 'Complete Python Pandas Module', url: '/resources', icon: <BookOpen size={16} /> },
     { id: 2, type: 'resource', title: 'Intro to Machine Learning PDF', url: '/resources', icon: <BookOpen size={16} /> },
-    { id: 3, type: 'project', title: 'Build React + Node.js App', url: '/modules', icon: <Briefcase size={16} /> },
-    { id: 4, type: 'project', title: 'E-commerce API with Express', url: '/modules', icon: <Briefcase size={16} /> },
+    { id: 3, type: 'project', title: 'Build React + Node.js App', url: '/projects', icon: <Briefcase size={16} /> },
+    { id: 4, type: 'project', title: 'E-commerce API with Express', url: '/projects', icon: <Briefcase size={16} /> },
     { id: 5, type: 'domain', title: 'Data Science Path', url: '/roadmap', icon: <Bot size={16} /> },
     { id: 6, type: 'domain', title: 'Full Stack Web Development', url: '/roadmap', icon: <Bot size={16} /> },
     { id: 7, type: 'interview', title: 'Frontend Developer Mock Interview', url: '/mock-interview', icon: <Video size={16} /> },
