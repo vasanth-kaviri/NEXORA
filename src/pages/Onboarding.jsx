@@ -80,7 +80,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="workstation-container animate-fade-in flex flex-col gap-md" style={{ minHeight: '100vh', padding: 'var(--space-md) var(--space-lg)' }}>
+    <div className="workstation-container animate-fade-in flex flex-col gap-md" style={{ minHeight: '100vh', padding: '16px 20px', maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
       
       {/* ── Top Bar ── */}
       <div className="flex justify-between items-center py-xs" style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -126,6 +126,27 @@ export default function Onboarding() {
             <p className="text-muted" style={{ fontSize: '0.92rem', margin: 0, lineHeight: 1.5 }}>
               Select your target technical discipline. NEXORA’s AI will calibrate your personalized curriculum, code challenges, and mock interviews.
             </p>
+          </div>
+
+          {/* Mobile Live Snapshot (Visible on mobile/tablet, hidden on desktop) */}
+          <div className="lg:hidden p-3 rounded-xl skeuo-convex" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', margin: '4px 0' }}>
+            <div className="flex justify-between items-center mb-1">
+              <span className="minimal-badge" style={{ color: 'var(--minimal-indigo)', fontSize: '0.68rem' }}>
+                <Sparkles size={11} /> LIVE PREVIEW
+              </span>
+              <span className="text-minimal-emerald font-bold" style={{ fontSize: '0.74rem' }}>
+                94% Match Probability
+              </span>
+            </div>
+            <div className="flex justify-between items-center mt-1">
+              <div>
+                <p className="font-bold text-main" style={{ fontSize: '0.88rem', margin: 0 }}>{selectedTrack.title}</p>
+                <p className="text-muted" style={{ fontSize: '0.74rem', margin: 0 }}>{selectedTrack.weeks} Target · {selectedTrack.skills.slice(0, 2).join(', ')}</p>
+              </div>
+              <div className="text-right">
+                <span className="font-mono font-bold text-minimal-emerald" style={{ fontSize: '0.85rem' }}>{selectedTrack.salary.split('–')[0]}</span>
+              </div>
+            </div>
           </div>
 
           {/* Step 1: Career Track Selection */}
@@ -188,14 +209,14 @@ export default function Onboarding() {
             <span className="text-muted font-bold block mb-xs" style={{ fontSize: '0.78rem', letterSpacing: '0.5px' }}>
               STEP 02 · CURRENT EXPERIENCE TIER
             </span>
-            <div className="grid grid-cols-3 gap-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-xs">
               {['Beginner / Student', 'Junior (1-2 Yrs)', 'Career Transitioner'].map((lvl) => (
                 <button
                   key={lvl}
                   type="button"
                   onClick={() => setExperienceLevel(lvl)}
                   className={`tab-pill text-center ${experienceLevel === lvl ? 'active' : ''}`}
-                  style={{ fontSize: '0.78rem', padding: '8px 10px', borderRadius: 'var(--radius-md)' }}
+                  style={{ fontSize: '0.82rem', padding: '10px 12px', borderRadius: 'var(--radius-md)' }}
                 >
                   {lvl}
                 </button>
@@ -219,7 +240,7 @@ export default function Onboarding() {
                   type="button"
                   onClick={() => setPrimaryGoal(goal)}
                   className={`tab-pill text-center ${primaryGoal === goal ? 'active' : ''}`}
-                  style={{ fontSize: '0.78rem', padding: '8px 10px', borderRadius: 'var(--radius-md)' }}
+                  style={{ fontSize: '0.82rem', padding: '10px 12px', borderRadius: 'var(--radius-md)' }}
                 >
                   {goal}
                 </button>

@@ -53,9 +53,6 @@ export default function CompleteProfile() {
     <AuthLayout
       headline="Personalize Your Experience."
       subtext="Tell us your goals so we can tailor the perfect learning path and job opportunities just for you."
-      gradientDirection="135deg, #1e1b4b 0%, #0f172a 50%, #020617 100%"
-      blobRight="radial-gradient(circle at 80% 20%, rgba(244, 63, 94, 0.4) 0%, transparent 50%)"
-      blobLeft="radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.45) 0%, transparent 50%)"
     >
       {/* Override left column max-width for this page (more fields) */}
       <div style={{ width: '100%', maxWidth: '500px', paddingBottom: 'var(--space-2xl)' }}>

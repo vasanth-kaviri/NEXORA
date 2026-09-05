@@ -23,10 +23,19 @@
   --text-muted: #71717a;
   /* Neutral Graphite */
   --border-color: rgba(0, 0, 0, 0.08);
-  --input-bg: rgba(0, 0, 0, 0.03);
-
   --success: #10b981;
   --warning: #f59e0b;
+
+  /* BESPOKE MINIMAL LUXURY PALETTE (LIGHT) */
+  --minimal-indigo: #4f46e5;
+  --minimal-cyan: #0284c7;
+  --minimal-amber: #d97706;
+  --minimal-emerald: #059669;
+  --minimal-violet: #7c3aed;
+  --minimal-rose: #e11d48;
+  --minimal-zinc: #52525b;
+  --minimal-card: #ffffff;
+  --minimal-card-hover: #fcfcfd;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -90,6 +99,17 @@ html.dark {
 
   --success: #10b981;
   --warning: #f59e0b;
+
+  /* BESPOKE MINIMAL LUXURY PALETTE (DARK) */
+  --minimal-indigo: #6366f1;
+  --minimal-cyan: #38bdf8;
+  --minimal-amber: #f59e0b;
+  --minimal-emerald: #10b981;
+  --minimal-violet: #a855f7;
+  --minimal-rose: #fb7185;
+  --minimal-zinc: #a1a1aa;
+  --minimal-card: #121215;
+  --minimal-card-hover: #16161a;
 
   /* SKEUOMORPHIC DARK TOKENS (Matte Anodized Titanium) */
   --skeuo-highlight: rgba(255, 255, 255, 0.12);
@@ -355,6 +375,52 @@ html.dark .blob {
 
 .text-warning {
   color: var(--warning);
+}
+
+/* Minimal Luxury Taxonomy Utilities */
+.text-minimal-indigo  { color: var(--minimal-indigo); }
+.text-minimal-cyan    { color: var(--minimal-cyan); }
+.text-minimal-amber   { color: var(--minimal-amber); }
+.text-minimal-emerald { color: var(--minimal-emerald); }
+.text-minimal-violet  { color: var(--minimal-violet); }
+
+.minimal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  transition: all 0.2s ease;
+}
+
+.minimal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.minimal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.minimal-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+html:not(.dark) .minimal-card:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.tech-grid-bg {
+  background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .text-center {

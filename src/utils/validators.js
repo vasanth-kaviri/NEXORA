@@ -11,13 +11,9 @@
 export function validateSignupStep1(formData, contactType) {
   const errors = {};
 
-  // Password: min 8 chars, 1 uppercase, 1 number, 1 special char
-  const hasUpperCase = /[A-Z]/.test(formData.password);
-  const hasNumber    = /[0-9]/.test(formData.password);
-  const hasSpecial   = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
-
-  if (!hasUpperCase || !hasNumber || !hasSpecial || formData.password.length < 8) {
-    errors.password = 'Must be 8+ chars, with 1 uppercase, 1 number, and 1 special char.';
+  // Password: min 6 chars
+  if (!formData.password || formData.password.length < 6) {
+    errors.password = 'Password must be at least 6 characters.';
   }
 
   if (formData.password !== formData.confirmPassword) {

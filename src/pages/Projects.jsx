@@ -8,104 +8,123 @@ import {
 } from 'lucide-react';
 
 /* ─── Data ─────────────────────────────────────────────────── */
+/* ─── Data ─────────────────────────────────────────────────── */
 const difficultyConfig = {
-  Beginner:     { color: 'var(--success)',  bg: 'rgba(16, 185, 129, 0.1)',  dot: '#10b981' },
-  Intermediate: { color: 'var(--warning)',  bg: 'rgba(245, 158, 11, 0.1)',  dot: '#f59e0b' },
-  Advanced:     { color: 'var(--accent)',   bg: 'rgba(244, 63, 94, 0.1)',  dot: '#f43f5e' },
+  Beginner:     { color: 'var(--minimal-emerald)', bg: 'rgba(16, 185, 129, 0.08)', dot: 'var(--minimal-emerald)' },
+  Intermediate: { color: 'var(--minimal-indigo)',  bg: 'rgba(99, 102, 241, 0.08)', dot: 'var(--minimal-indigo)' },
+  Advanced:     { color: 'var(--minimal-violet)',  bg: 'rgba(168, 85, 247, 0.08)', dot: 'var(--minimal-violet)' },
 };
 
 const categories = [
   {
-    label: 'Web Development',
+    label: 'Web Systems & Distributed Architecture',
     icon: Globe,
-    color: 'var(--primary)',
+    color: 'var(--minimal-indigo)',
     rgb: '99, 102, 241',
     projects: [
       {
-        title: 'Personal Portfolio Website',
-        desc: 'Build a sleek, responsive portfolio with React, animations, and a contact form to showcase your work to recruiters.',
-        tags: ['React', 'CSS', 'Vite'],
+        title: 'High-Performance Developer Portfolio',
+        desc: 'Build a sleek, responsive portfolio with React 19, custom canvas animations, and contact form telemetry.',
+        tags: ['React 19', 'CSS Engine', 'Vite'],
         difficulty: 'Beginner',
         duration: '3–5 days',
-        stars: 4.8,
-        enrolled: 1240,
+        stars: 4.9,
+        enrolled: 1840,
         locked: false,
       },
       {
-        title: 'Full-Stack Job Board',
-        desc: 'Create a complete job listing platform with search, filters, user auth, and a REST API backend.',
-        tags: ['React', 'Node.js', 'MongoDB'],
+        title: 'Full-Stack Job & Talent Marketplace',
+        desc: 'Build an end-to-end recruitment platform with instant search indexing, candidate filters, and JWT session handling.',
+        tags: ['React', 'Node.js', 'PostgreSQL'],
         difficulty: 'Intermediate',
         duration: '2–3 weeks',
-        stars: 4.6,
-        enrolled: 874,
+        stars: 4.8,
+        enrolled: 1420,
         locked: false,
       },
       {
-        title: 'Real-Time Chat App',
-        desc: 'Build a WhatsApp-style chat with WebSockets, rooms, read receipts, and typing indicators.',
-        tags: ['React', 'Socket.io', 'Express'],
+        title: 'Real-Time Distributed Chat Protocol',
+        desc: 'Build a high-concurrency messaging service with WebSockets, room sharding, read receipts, and typing telemetry.',
+        tags: ['WebSockets', 'Redis', 'Express'],
         difficulty: 'Advanced',
         duration: '3–4 weeks',
         stars: 4.9,
-        enrolled: 512,
-        locked: true,
+        enrolled: 980,
+        locked: false,
       },
     ],
   },
   {
-    label: 'Data Science & AI',
+    label: 'Artificial Intelligence & Neural Systems',
     icon: Cpu,
-    color: 'var(--secondary)',
+    color: 'var(--minimal-cyan)',
     rgb: '6, 182, 212',
     projects: [
       {
-        title: 'Movie Recommendation Engine',
-        desc: 'Build a collaborative filtering model that suggests movies based on user rating history using Python and Pandas.',
-        tags: ['Python', 'Pandas', 'Scikit-learn'],
+        title: 'Vector Embedding Recommendation Engine',
+        desc: 'Build a semantic content filtering model that computes cosine similarity over multi-dimensional embeddings.',
+        tags: ['Python', 'PyTorch', 'Vector DB'],
         difficulty: 'Intermediate',
         duration: '1–2 weeks',
-        stars: 4.7,
-        enrolled: 1087,
+        stars: 4.8,
+        enrolled: 1650,
         locked: false,
       },
       {
-        title: 'Sentiment Analysis Dashboard',
-        desc: 'Analyze Twitter/Reddit sentiment in real-time using NLP models and visualize trends with interactive charts.',
-        tags: ['Python', 'NLTK', 'Plotly'],
+        title: 'Real-Time LLM Sentiment & Market Dashboard',
+        desc: 'Analyze streaming tech discussion feeds using transformer models and visualize market momentum in real-time.',
+        tags: ['Transformers', 'FastAPI', 'Plotly'],
         difficulty: 'Advanced',
         duration: '2–3 weeks',
-        stars: 4.8,
-        enrolled: 634,
-        locked: true,
+        stars: 4.9,
+        enrolled: 1140,
+        locked: false,
       },
     ],
   },
   {
-    label: 'Cloud & DevOps',
+    label: 'Cloud Infrastructure & Kubernetes DevOps',
     icon: Layers,
-    color: 'var(--warning)',
+    color: 'var(--minimal-amber)',
     rgb: '245, 158, 11',
     projects: [
       {
-        title: 'CI/CD Pipeline with GitHub Actions',
-        desc: 'Automate testing, building, and deploying a Node.js app to AWS EC2 using GitHub Actions workflows.',
-        tags: ['GitHub Actions', 'AWS', 'Docker'],
+        title: 'Multi-Stage Production CI/CD Pipeline',
+        desc: 'Automate static analysis, unit testing, container build, and zero-downtime deployment using GitHub Actions.',
+        tags: ['GitHub Actions', 'Docker', 'AWS'],
         difficulty: 'Intermediate',
         duration: '1 week',
-        stars: 4.5,
-        enrolled: 723,
+        stars: 4.7,
+        enrolled: 1210,
         locked: false,
       },
       {
-        title: 'Containerized Microservices',
-        desc: 'Design and deploy a microservices architecture using Docker Compose and Kubernetes on a cloud provider.',
-        tags: ['Docker', 'Kubernetes', 'GCP'],
+        title: 'High-Availability Containerized Microservices',
+        desc: 'Orchestrate a multi-tenant microservices cluster with Kubernetes Ingress, Prometheus telemetry, and service mesh.',
+        tags: ['Kubernetes', 'Docker', 'Helm'],
         difficulty: 'Advanced',
         duration: '3–4 weeks',
         stars: 4.9,
-        enrolled: 389,
-        locked: true,
+        enrolled: 890,
+        locked: false,
+      },
+    ],
+  },
+  {
+    label: 'Cybersecurity & Defense Engineering',
+    icon: ShieldCheck,
+    color: 'var(--minimal-emerald)',
+    rgb: '16, 185, 129',
+    projects: [
+      {
+        title: 'Automated OWASP Security Audit Bot',
+        desc: 'Scan API endpoints for SQL injection, CSRF vulnerabilities, and misconfigured JWT security headers.',
+        tags: ['Python', 'OWASP', 'Pen-Testing'],
+        difficulty: 'Intermediate',
+        duration: '1–2 weeks',
+        stars: 4.8,
+        enrolled: 760,
+        locked: false,
       },
     ],
   },
@@ -119,12 +138,8 @@ function ProjectCard({ project, accentRgb, delay }) {
   const diff = difficultyConfig[project.difficulty];
 
   const handleCardClick = () => {
-    if (project.locked) {
-      toast.info(`"${project.title}" requires NEXORA Pro. Upgrade to unlock.`);
-    } else {
-      toast.success(`Enrolled in "${project.title}"! Starter code loaded (+100 XP).`);
-      navigate('/resource/fs_1_3');
-    }
+    toast.success(`Enrolled in "${project.title}"! Production sandbox loaded (+100 XP).`);
+    navigate('/resource/fs_1_3');
   };
 
   return (
@@ -150,14 +165,14 @@ function ProjectCard({ project, accentRgb, delay }) {
           : 'inset 0 1px 0 var(--skeuo-highlight-subtle), 0 3px 0 var(--skeuo-btn-sec-lip), 0 4px 10px rgba(0,0,0,0.08)',
         position: 'relative',
         overflow: 'hidden',
-        opacity: project.locked ? 0.75 : 1,
+        cursor: 'pointer'
       }}
     >
       {/* Top shimmer line */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
         background: `linear-gradient(90deg, transparent, rgba(${accentRgb}, 0.8), transparent)`,
-        opacity: hovered && !project.locked ? 1 : 0,
+        opacity: hovered ? 1 : 0,
         transition: 'opacity 0.3s ease',
       }} />
 
@@ -166,15 +181,9 @@ function ProjectCard({ project, accentRgb, delay }) {
         <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.3, flex: 1 }}>
           {project.title}
         </h3>
-        {project.locked ? (
-          <div className="skeuo-well" style={{ display: 'flex', alignItems: 'center', gap: '4px', borderRadius: '6px', padding: '4px 8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>
-            <Lock size={11} /> Pro
-          </div>
-        ) : (
-          <div className="btn-icon-tactile" style={{ width: 28, height: 28, padding: 0, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ArrowUpRight size={14} style={{ color: `rgb(${accentRgb})`, transform: hovered ? 'translate(1px,-1px)' : 'none', transition: 'transform 0.2s ease' }} />
-          </div>
-        )}
+        <div className="btn-icon-tactile" style={{ width: 28, height: 28, padding: 0, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <ArrowUpRight size={14} style={{ color: `rgb(${accentRgb})`, transform: hovered ? 'translate(1px,-1px)' : 'none', transition: 'transform 0.2s ease' }} />
+        </div>
       </div>
 
       {/* Description */}
@@ -307,20 +316,36 @@ export default function Projects() {
       {/* Stats */}
       <StatsBar />
 
-      {/* Pro Banner */}
-      <div className="glass-panel interactive" style={{ padding: 'var(--space-md) var(--space-lg)', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(236,72,153,0.07))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', cursor: 'pointer', boxSizing: 'border-box', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1 1 250px' }}>
-          <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ShieldCheck size={20} style={{ color: 'var(--primary)' }} />
+      {/* Open Production Labs Architectural Banner */}
+      <div 
+        className="glass-panel" 
+        style={{ 
+          padding: '16px 20px', 
+          background: 'var(--input-bg)', 
+          border: '1px solid var(--border-color)', 
+          borderRadius: '14px', 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          gap: '16px',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 280px' }}>
+          <div style={{ width: 38, height: 38, borderRadius: '10px', background: 'rgba(99, 102, 241, 0.12)', border: '1px solid rgba(99, 102, 241, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <ShieldCheck size={19} className="text-minimal-indigo" />
           </div>
           <div>
-            <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: '2px' }}>Unlock All Projects with NEXORA Pro</p>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Get access to advanced projects, AI code reviews, and completion certificates.</p>
+            <p style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-main)', marginBottom: '2px' }}>Open Production Labs · All Workspaces Unlocked</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Clone production boilerplates, build distributed services, and submit for automated ATS portfolio audits.</p>
           </div>
         </div>
-        <button className="btn btn-primary" style={{ padding: '8px 18px', borderRadius: 'var(--radius-full)', fontSize: '0.85rem', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
-          Upgrade · ₹299
-        </button>
+        <div className="minimal-badge" style={{ color: 'var(--minimal-emerald)', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+          <span className="minimal-dot" style={{ background: 'var(--minimal-emerald)' }} />
+          <span>Full Access Granted</span>
+        </div>
       </div>
 
       {/* Category Sections */}
