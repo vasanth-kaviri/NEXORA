@@ -657,106 +657,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ── 2. AI MENTOR INTERACTIVE SHOWCASE (Followed Immediately After About NEXORA) ── */}
-      <section 
-        className="glass-panel p-lg flex flex-col gap-md animate-fade-in"
-        style={{ 
-          padding: '2.2rem', 
-          borderRadius: 'var(--radius-xl)', 
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)'
-        }}
-      >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
-          <div>
-            <div className="flex items-center gap-xs mb-xs">
-              <span className="badge" style={{ background: 'rgba(99, 102, 241, 0.15)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.72rem' }}>
-                ✦ CLAUDE 3.5 SONNET ENGINE • ONLINE
-              </span>
-              <span className="text-muted" style={{ fontSize: '0.75rem' }}>24/7 Technical Career Mentorship</span>
-            </div>
-            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '2px 0 4px 0' }}>
-              NEXORA AI Career Mentor
-            </h3>
-            <p className="text-muted" style={{ fontSize: '0.86rem', margin: 0, lineHeight: 1.5, maxWidth: '680px' }}>
-              Trained on architectural trade-offs, system scalability, and Fortune 500 hiring rubrics. Ask anything to accelerate your trajectory.
-            </p>
-          </div>
-
-          <button 
-            onClick={() => navigate('/chatbot')}
-            className="btn btn-primary flex items-center gap-xs"
-            style={{ padding: '10px 22px', fontSize: '0.84rem', whiteSpace: 'nowrap' }}
-          >
-            <span>Launch Full AI Mentor Workstation</span>
-            <ArrowRight size={15} />
-          </button>
-        </div>
-
-        {/* Quick Conversational Inquiry Bar */}
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            const q = e.target.query.value;
-            if (q.trim()) {
-              navigate('/chatbot', { state: { initialPrompt: q.trim() } });
-            } else {
-              navigate('/chatbot');
-            }
-          }}
-          className="flex items-center gap-xs p-xs rounded-xl"
-          style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}
-        >
-          <div style={{ padding: '0 8px', color: 'var(--primary)', flexShrink: 0 }}>
-            <Bot size={20} />
-          </div>
-          <input 
-            type="text" 
-            name="query"
-            placeholder={`Ask Claude anything about ${user.dreamJob} architectures, algorithms, or STAR interview preparation...`}
-            className="flex-1 bg-transparent border-none outline-none text-main"
-            style={{ fontSize: '0.85rem', padding: '8px 4px', background: 'transparent', minWidth: 0 }}
-          />
-          <button 
-            type="submit" 
-            className="btn btn-primary flex items-center gap-xs"
-            style={{ width: 'auto', flexShrink: 0, whiteSpace: 'nowrap', padding: '8px 18px', fontSize: '0.8rem', borderRadius: 'var(--radius-md)' }}
-          >
-            <Send size={14} /> Ask Claude
-          </button>
-        </form>
-
-        {/* Quick Prompt Recommendation Chips */}
-        <div className="flex flex-wrap items-center gap-xs pt-xs">
-          <span className="text-muted" style={{ fontSize: '0.74rem', fontWeight: 600 }}>POPULAR INQUIRIES:</span>
-          {[
-            'Audit my resume for Fortune 500 ATS keywords',
-            'Explain distributed rate limiting with Redis',
-            'Simulate a Google system design interview',
-            'Compare React 19 Compiler vs useMemo'
-          ].map((prompt, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => navigate(`/chatbot?q=${encodeURIComponent(prompt)}`)}
-              className="skeuo-convex interactive"
-              style={{
-                padding: '5px 12px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: '0.74rem',
-                color: 'var(--text-main)',
-                border: '1px solid var(--border-color)',
-                background: 'var(--input-bg)',
-                cursor: 'pointer'
-              }}
-            >
-              {prompt} →
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 3. DEDICATED CONTACT & CANDIDATE FEEDBACK HUB (Completely Separated at Bottom) ── */}
+      {/* ── 2. DEDICATED CONTACT & CANDIDATE FEEDBACK HUB (Completely Separated at Bottom) ── */}
       <section 
         id="contact-feedback-section" 
         className="glass-panel p-lg flex flex-col gap-lg animate-fade-in"
@@ -764,7 +665,8 @@ export default function Dashboard() {
           padding: '2.5rem', 
           borderRadius: 'var(--radius-xl)', 
           background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)'
+          border: '1px solid var(--border-color)',
+          marginTop: '2rem'
         }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg">

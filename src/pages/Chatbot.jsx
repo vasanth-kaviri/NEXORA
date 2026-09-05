@@ -14,26 +14,26 @@ export default function Chatbot() {
   const location = useLocation();
   const currentUser = db.getCurrentUser() || { firstName: 'Alex', dreamJob: 'Full Stack Engineer' };
 
-  // Claude Model Families
+  // NEXORA AI Model Families
   const models = [
     { 
-      id: 'claude-3-5-sonnet', 
-      name: 'Claude 3.5 Sonnet', 
-      tag: 'Most Intelligent • Frontier Coding', 
-      speed: 'High', 
+      id: 'nexora-3-5-sonnet', 
+      name: 'NEXORA 3.5 Sonnet', 
+      tag: 'Neural Core • Frontier Coding & System Architecture', 
+      speed: 'Ultra-Low Latency', 
       tokens: '200K Context' 
     },
     { 
-      id: 'claude-3-opus', 
-      name: 'Claude 3 Opus', 
-      tag: 'Deep Contextual Reasoning & System Design', 
-      speed: 'Moderate', 
+      id: 'nexora-3-opus', 
+      name: 'NEXORA 3.0 Opus', 
+      tag: 'Deep Contextual Reasoning & Executive STAR Synthesis', 
+      speed: 'High Precision', 
       tokens: '200K Context' 
     },
     { 
-      id: 'claude-3-5-haiku', 
-      name: 'Claude 3.5 Haiku', 
-      tag: 'Lightning Fast Technical Answers', 
+      id: 'nexora-3-5-haiku', 
+      name: 'NEXORA 3.5 Haiku', 
+      tag: 'Lightning Fast Technical Insights', 
       speed: 'Fastest', 
       tokens: '200K Context' 
     }
@@ -45,7 +45,7 @@ export default function Chatbot() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sessions, setSessions] = useState(() => {
     try {
-      const saved = localStorage.getItem('nexora_claude_chats');
+      const saved = localStorage.getItem('nexora_ai_mentor_chats');
       if (saved) return JSON.parse(saved);
     } catch {}
     return [
@@ -75,13 +75,13 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([
     {
       id: 'm1',
-      sender: 'claude',
+      sender: 'nexora',
       time: 'Just now',
       thought: `Candidate profile initialized:
 - Target Role: ${currentUser.dreamJob || 'Software Professional'}
 - Current Level: ${currentUser.level || 5}
 - Memory Context: Calibrating responses for high-velocity software engineering interviews, ATS scanning benchmarks, and production distributed system architecture.`,
-      text: `Hello ${currentUser.firstName || 'Alex'}! I am your **NEXORA AI Mentor**, architected with Claude 3.5 Sonnet's technical reasoning engine.\n\nI can assist you in auditing resume bullets against live ATS parsers, conducting real-time mock behavioral & system design interviews, optimizing algorithmic complexity, or architecting distributed cloud systems. What would you like to explore or build today?`,
+      text: `Hello ${currentUser.firstName || 'Alex'}! I am your **NEXORA AI MENTOR**, powered by frontier architectural intelligence.\n\nI can assist you in auditing resume bullet points against live recruiter ATS algorithms, running proctored behavioral & system design simulations, optimizing algorithmic complexity, or architecting distributed cloud systems. What would you like to explore or build today?`,
       code: null,
       codeTitle: null,
       codeLang: null,
@@ -105,25 +105,27 @@ export default function Chatbot() {
   const fileInputRef = useRef(null);
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  useEffect(() => { scrollToBottom(); }, [messages, isTyping]);
+  useEffect(() => { 
+    if (messages.length > 1 || isTyping) {
+      scrollToBottom(); 
+    }
+  }, [messages, isTyping]);
 
   // Persist sessions
   useEffect(() => {
     try {
-      localStorage.setItem('nexora_claude_chats', JSON.stringify(sessions));
+      localStorage.setItem('nexora_ai_mentor_chats', JSON.stringify(sessions));
     } catch (e) {
-      console.warn('Failed to persist Claude chats:', e);
+      console.warn('Failed to persist NEXORA chats:', e);
     }
   }, [sessions]);
 
-  // Handle Initial Prompt passed from Dashboard navigation
+  // Handle Initial Prompt passed from Dashboard or navigation
   useEffect(() => {
     if (location.state?.initialPrompt) {
       const initialText = location.state.initialPrompt;
       setInput(initialText);
-      // Clean location state to avoid re-triggering
       window.history.replaceState({}, document.title);
-      // Trigger execution automatically after short delay
       setTimeout(() => {
         executePrompt(initialText);
       }, 300);
@@ -134,7 +136,7 @@ export default function Chatbot() {
     setInput(e.target.value);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
   };
 
@@ -150,9 +152,9 @@ export default function Chatbot() {
     setMessages([
       {
         id: `m_${Date.now()}`,
-        sender: 'claude',
+        sender: 'nexora',
         time: 'Just now',
-        thought: `Conversation reset. Model: ${selectedModel.name}. Context cleared. Ready for new technical queries or architecture reviews.`,
+        thought: `Conversation reset. Active Engine: ${selectedModel.name}. Context primed. Ready for new technical queries or architecture reviews.`,
         text: `Starting a fresh workspace with **${selectedModel.name}**. How can I assist your ${currentUser.dreamJob || 'engineering'} goals right now?`,
         code: null,
         codeTitle: null,
@@ -216,8 +218,8 @@ export default function Chatbot() {
     }
   };
 
-  // Dynamic Claude Response Synthesis Engine
-  const generateClaudeReply = (userPrompt) => {
+  // Dynamic NEXORA AI Response Synthesis Engine
+  const generateMentorReply = (userPrompt) => {
     const prompt = userPrompt.toLowerCase();
     const dreamJob = currentUser.dreamJob || 'Software Professional';
 
@@ -396,12 +398,12 @@ Formulating structured, actionable breakdown with engineering principles, indust
       textareaRef.current.style.height = 'auto';
     }
 
-    // Simulate Claude's realistic reasoning + streaming response time
+    // Simulate NEXORA AI Mentor's reasoning and response
     setTimeout(() => {
-      const reply = generateClaudeReply(textToSend);
-      const claudeMsg = {
+      const reply = generateMentorReply(textToSend);
+      const mentorMsg = {
         id: `c_${Date.now()}`,
-        sender: 'claude',
+        sender: 'nexora',
         time: 'Just now',
         thought: reply.thought,
         text: reply.text,
@@ -411,9 +413,9 @@ Formulating structured, actionable breakdown with engineering principles, indust
         followUps: reply.followUps
       };
 
-      setMessages(prev => [...prev, claudeMsg]);
+      setMessages(prev => [...prev, mentorMsg]);
       setIsTyping(false);
-      setExpandedThoughtIds(prev => [...prev, claudeMsg.id]);
+      setExpandedThoughtIds(prev => [...prev, mentorMsg.id]);
     }, 1100);
   };
 
@@ -423,12 +425,11 @@ Formulating structured, actionable breakdown with engineering principles, indust
   };
 
   const handleRegenerate = (msgIndex) => {
-    // Find last user message
     const previousUserMsg = [...messages].slice(0, msgIndex).reverse().find(m => m.sender === 'user');
     if (previousUserMsg) {
       setIsTyping(true);
       setTimeout(() => {
-        const reply = generateClaudeReply(previousUserMsg.text);
+        const reply = generateMentorReply(previousUserMsg.text);
         const updated = [...messages];
         updated[msgIndex] = {
           ...updated[msgIndex],
@@ -464,7 +465,7 @@ Formulating structured, actionable breakdown with engineering principles, indust
       }}
     >
       
-      {/* ── LEFT CLAUDE SESSIONS SIDEBAR ── */}
+      {/* ── LEFT NEXORA AI SESSIONS SIDEBAR ── */}
       <aside 
         className={`flex flex-col justify-between transition-all duration-200 shrink-0 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}
         style={{ 
@@ -479,15 +480,18 @@ Formulating structured, actionable breakdown with engineering principles, indust
             <div className="flex items-center gap-xs">
               <div 
                 style={{ 
-                  width: 28, height: 28, borderRadius: 8, 
+                  width: 32, height: 32, borderRadius: 10, 
                   background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'white', fontWeight: 800, fontSize: '0.85rem'
+                  color: 'white', fontWeight: 800, fontSize: '0.92rem',
+                  boxShadow: '0 4px 12px var(--primary-glow)'
                 }}
               >
                 ✦
               </div>
-              <span className="font-bold text-sm tracking-tight text-main">Claude AI Mentor</span>
+              <span className="font-extrabold text-sm tracking-tight text-main uppercase">
+                NEXORA AI MENTOR
+              </span>
             </div>
             <button
               onClick={() => setIsSidebarOpen(false)}
@@ -501,24 +505,25 @@ Formulating structured, actionable breakdown with engineering principles, indust
           {/* New Chat Button */}
           <button
             onClick={handleNewChat}
-            className="flex items-center justify-between p-sm rounded-lg skeuo-convex interactive transition-all font-semibold text-xs"
+            className="flex items-center justify-between p-sm rounded-xl skeuo-convex interactive transition-all font-bold text-xs"
             style={{ 
               background: 'var(--input-bg)', 
               border: '1px solid var(--border-color)',
-              color: 'var(--text-main)'
+              color: 'var(--text-main)',
+              padding: '10px 14px'
             }}
           >
-            <span className="flex items-center gap-xs">
-              <Plus size={15} className="text-primary" /> Start New Chat
+            <span className="flex items-center gap-xs font-bold">
+              <Plus size={16} className="text-primary" /> Start New Session
             </span>
-            <span className="text-[10px] text-muted font-mono bg-[var(--bg-card)] px-1.5 py-0.5 rounded border border-[var(--border-color)]">
+            <span className="text-[10px] text-muted font-mono bg-[var(--bg-card)] px-2 py-0.5 rounded-md border border-[var(--border-color)]">
               +N
             </span>
           </button>
 
           {/* Quick Prompts Drawer List */}
           <div className="flex flex-col gap-xs mt-xs">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-wider px-1">Curated Prompts</span>
+            <span className="text-[11px] font-bold text-muted uppercase tracking-wider px-1">Curated Prompts</span>
             {[
               { label: '📄 Audit Resume for ATS', prompt: 'Audit my resume for high-leverage ATS keywords and metrics.' },
               { label: '🏗️ Distributed Rate Limiter', prompt: 'Architect a distributed sliding-window rate limiter in Redis.' },
@@ -531,7 +536,7 @@ Formulating structured, actionable breakdown with engineering principles, indust
                   setInput(p.prompt);
                   if (textareaRef.current) textareaRef.current.focus();
                 }}
-                className="text-left text-xs p-2 rounded-md hover:bg-[var(--input-bg)] text-muted hover:text-main transition-colors truncate"
+                className="text-left text-xs p-2.5 rounded-lg hover:bg-[var(--input-bg)] text-muted hover:text-main transition-colors truncate font-medium"
               >
                 {p.label}
               </button>
@@ -540,27 +545,27 @@ Formulating structured, actionable breakdown with engineering principles, indust
 
           {/* Recent Sessions List */}
           <div className="flex flex-col gap-xs mt-sm flex-1 overflow-y-auto custom-scroll">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-wider px-1">Recent Sessions</span>
+            <span className="text-[11px] font-bold text-muted uppercase tracking-wider px-1">Recent Sessions</span>
             {sessions.map((s) => (
               <div
                 key={s.id}
                 onClick={() => setActiveSessionId(s.id)}
-                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors group ${
+                className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-colors group ${
                   activeSessionId === s.id 
-                    ? 'bg-[var(--input-bg)] font-semibold text-primary border border-[var(--border-color)]' 
+                    ? 'bg-[var(--input-bg)] font-bold text-primary border border-[var(--border-color)] shadow-sm' 
                     : 'text-muted hover:bg-[var(--input-bg)] hover:text-main'
                 }`}
               >
                 <div className="flex items-center gap-xs min-w-0">
-                  <MessageSquare size={13} className="shrink-0 text-muted" />
-                  <span className="text-xs truncate">{s.title}</span>
+                  <MessageSquare size={14} className="shrink-0 text-muted" />
+                  <span className="text-[13px] truncate">{s.title}</span>
                 </div>
                 <button
                   onClick={(e) => handleDeleteSession(s.id, e)}
                   className="opacity-0 group-hover:opacity-100 text-muted hover:text-error p-1 transition-opacity"
                   title="Delete Chat"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={13} />
                 </button>
               </div>
             ))}
@@ -570,16 +575,16 @@ Formulating structured, actionable breakdown with engineering principles, indust
         {/* Bottom Model Indicator in Sidebar */}
         <div className="p-md" style={{ borderTop: '1px solid var(--border-color)' }}>
           <div 
-            className="flex items-center justify-between p-2 rounded-lg"
+            className="flex items-center justify-between p-2.5 rounded-xl"
             style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}
           >
             <div className="flex items-center gap-xs">
-              <span className="text-primary text-xs">✦</span>
-              <span className="text-xs font-semibold text-main">{selectedModel.name}</span>
+              <span className="text-primary text-xs font-bold">✦</span>
+              <span className="text-xs font-bold text-main">{selectedModel.name}</span>
             </div>
             <span 
-              className="badge text-[10px]"
-              style={{ background: 'rgba(99, 102, 241, 0.12)', color: 'var(--primary)', padding: '2px 6px', borderRadius: 4 }}
+              className="badge text-[10px] font-bold"
+              style={{ background: 'rgba(99, 102, 241, 0.14)', color: 'var(--primary)', padding: '2px 8px', borderRadius: 4 }}
             >
               {selectedModel.tokens}
             </span>
@@ -587,10 +592,10 @@ Formulating structured, actionable breakdown with engineering principles, indust
         </div>
       </aside>
 
-      {/* ── MAIN CLAUDE WORKSPACE CANVAS ── */}
+      {/* ── MAIN NEXORA AI WORKSPACE CANVAS ── */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        {/* Top Claude Sub-Toolbar */}
+        {/* Top NEXORA Sub-Toolbar */}
         <header 
           className="h-14 flex items-center justify-between px-md shrink-0 backdrop-blur-md z-10"
           style={{ 
@@ -613,27 +618,27 @@ Formulating structured, actionable breakdown with engineering principles, indust
             <div className="relative">
               <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-xs px-3 py-1.5 rounded-full skeuo-convex interactive text-xs font-semibold text-main transition-all"
+                className="flex items-center gap-xs px-3.5 py-1.5 rounded-full skeuo-convex interactive text-xs font-bold text-main transition-all"
                 style={{ 
                   background: 'var(--input-bg)', 
                   border: '1px solid var(--border-color)' 
                 }}
               >
                 <span className="text-primary font-bold">✦</span>
-                <span>{selectedModel.name}</span>
-                <ChevronDown size={13} className="text-muted" />
+                <span className="tracking-tight">{selectedModel.name}</span>
+                <ChevronDown size={14} className="text-muted ml-0.5" />
               </button>
 
               {showModelDropdown && (
                 <div 
-                  className="absolute top-10 left-0 w-72 glass-panel p-2 rounded-xl shadow-2xl z-50 animate-scale-up"
+                  className="absolute top-10 left-0 w-80 glass-panel p-2.5 rounded-2xl shadow-2xl z-50 animate-scale-up"
                   style={{ 
                     background: 'var(--bg-card)', 
                     border: '1px solid var(--border-color)' 
                   }}
                 >
-                  <div className="text-[10px] font-bold text-muted uppercase tracking-wider px-2 py-1">
-                    Select Claude Model
+                  <div className="text-[10px] font-extrabold text-muted uppercase tracking-wider px-2 py-1">
+                    Select NEXORA AI Engine
                   </div>
                   {models.map(m => (
                     <div
@@ -642,17 +647,17 @@ Formulating structured, actionable breakdown with engineering principles, indust
                         setSelectedModel(m);
                         setShowModelDropdown(false);
                       }}
-                      className={`p-2.5 rounded-lg cursor-pointer transition-colors ${
+                      className={`p-2.5 rounded-xl cursor-pointer transition-colors ${
                         selectedModel.id === m.id 
-                          ? 'bg-[var(--input-bg)] text-main font-medium border border-[var(--border-color)]' 
+                          ? 'bg-[var(--input-bg)] text-main font-bold border border-[var(--border-color)]' 
                           : 'hover:bg-[var(--input-bg)] text-muted hover:text-main'
                       }`}
                     >
                       <div className="flex items-center justify-between text-xs font-bold">
                         <span className="text-main">{m.name}</span>
-                        {selectedModel.id === m.id && <Check size={13} className="text-primary" />}
+                        {selectedModel.id === m.id && <Check size={14} className="text-primary" />}
                       </div>
-                      <p className="text-[11px] text-muted m-0 mt-0.5">{m.tag}</p>
+                      <p className="text-[11px] text-muted m-0 mt-1 leading-snug">{m.tag}</p>
                     </div>
                   ))}
                 </div>
@@ -665,96 +670,96 @@ Formulating structured, actionable breakdown with engineering principles, indust
             <button
               onClick={handleNewChat}
               className="btn btn-secondary flex items-center gap-xs"
-              style={{ padding: '6px 12px', fontSize: '0.76rem', width: 'auto' }}
+              style={{ padding: '7px 14px', fontSize: '0.78rem', width: 'auto', borderRadius: 'var(--radius-md)' }}
               title="Reset Conversation"
             >
-              <Plus size={13} /> New Chat
+              <Plus size={14} /> New Chat
             </button>
             <button
               onClick={() => navigate('/dashboard')}
               className="btn btn-secondary flex items-center gap-xs"
-              style={{ padding: '6px 12px', fontSize: '0.76rem', width: 'auto' }}
+              style={{ padding: '7px 14px', fontSize: '0.78rem', width: 'auto', borderRadius: 'var(--radius-md)' }}
             >
-              <ArrowLeft size={13} /> Home
+              <ArrowLeft size={14} /> Home
             </button>
           </div>
         </header>
 
-        {/* Conversation Stream & Claude Welcoming State */}
-        <div className="flex-1 overflow-y-auto custom-scroll p-md md:p-lg flex flex-col items-center">
-          <div className="w-full max-w-3xl flex flex-col gap-lg py-sm">
+        {/* Conversation Stream & Welcoming State */}
+        <div className="flex-1 overflow-y-auto custom-scroll p-md md:p-xl flex flex-col items-center">
+          <div className="w-full max-w-3xl flex flex-col gap-xl py-sm">
             
-            {/* Claude Welcoming Hero (Shown when conversation is short or fresh) */}
+            {/* NEXORA AI Welcoming Hero (Shown when conversation is short or fresh) */}
             {messages.length <= 1 && (
               <div className="flex flex-col items-center text-center gap-sm my-md animate-fade-in">
                 <div 
                   style={{ 
-                    width: 56, height: 56, borderRadius: 18, 
+                    width: 64, height: 64, borderRadius: 22, 
                     background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white', fontSize: '1.75rem', fontWeight: 800,
-                    boxShadow: '0 8px 24px var(--primary-glow)'
+                    color: 'white', fontSize: '2rem', fontWeight: 800,
+                    boxShadow: '0 10px 30px var(--primary-glow)'
                   }}
                 >
                   ✦
                 </div>
-                <h2 style={{ fontSize: '1.65rem', fontWeight: 800, margin: '6px 0 2px 0' }}>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '8px 0 2px 0', letterSpacing: '-0.5px' }}>
                   {getGreeting()}, {currentUser.firstName || 'Alex'}.
                 </h2>
-                <p className="text-muted text-sm max-w-lg" style={{ margin: 0, lineHeight: 1.6 }}>
-                  How can Claude assist your {currentUser.dreamJob || 'engineering'} preparation today? Select a technical topic below or type your inquiry.
+                <p className="text-muted" style={{ fontSize: '1.02rem', margin: 0, lineHeight: 1.6, maxWidth: 620 }}>
+                  How can <strong className="text-main">NEXORA AI MENTOR</strong> accelerate your {currentUser.dreamJob || 'engineering'} trajectory today? Select a topic below or type your inquiry.
                 </p>
 
-                {/* 4 Prompt Starter Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm w-full mt-md">
+                {/* 4 Prompt Starter Cards with enhanced font sizes */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-md w-full mt-lg">
                   <div 
                     onClick={() => executePrompt('Architect a distributed sliding-window rate limiter with Redis and Lua scripts')}
-                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
-                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                    className="skeuo-convex rounded-2xl text-left cursor-pointer hover:border-[var(--primary)] hover:translate-y-[-2px] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '18px 20px' }}
                   >
-                    <div className="flex items-center gap-xs font-bold text-xs text-main">
-                      <span style={{ fontSize: '1.1rem' }}>🏗️</span> System Architecture
+                    <div className="flex items-center gap-xs font-bold text-main" style={{ fontSize: '0.98rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>🏗️</span> System Architecture
                     </div>
-                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                    <p className="text-muted m-0 leading-relaxed" style={{ fontSize: '0.88rem' }}>
                       Design a low-latency sliding window rate limiter with atomic Redis Lua scripts.
                     </p>
                   </div>
 
                   <div 
                     onClick={() => executePrompt('Audit my resume for high-leverage ATS keywords and metrics')}
-                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
-                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                    className="skeuo-convex rounded-2xl text-left cursor-pointer hover:border-[var(--primary)] hover:translate-y-[-2px] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '18px 20px' }}
                   >
-                    <div className="flex items-center gap-xs font-bold text-xs text-main">
-                      <span style={{ fontSize: '1.1rem' }}>📄</span> ATS Resume Audit
+                    <div className="flex items-center gap-xs font-bold text-main" style={{ fontSize: '0.98rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>📄</span> ATS Resume Audit
                     </div>
-                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                    <p className="text-muted m-0 leading-relaxed" style={{ fontSize: '0.88rem' }}>
                       Review experience bullet points using Google's XYZ formula and high-density keywords.
                     </p>
                   </div>
 
                   <div 
                     onClick={() => executePrompt('Simulate an Amazon Leadership STAR interview on Customer Obsession')}
-                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
-                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                    className="skeuo-convex rounded-2xl text-left cursor-pointer hover:border-[var(--primary)] hover:translate-y-[-2px] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '18px 20px' }}
                   >
-                    <div className="flex items-center gap-xs font-bold text-xs text-main">
-                      <span style={{ fontSize: '1.1rem' }}>💼</span> STAR Behavioral Prep
+                    <div className="flex items-center gap-xs font-bold text-main" style={{ fontSize: '0.98rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>💼</span> STAR Behavioral Prep
                     </div>
-                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                    <p className="text-muted m-0 leading-relaxed" style={{ fontSize: '0.88rem' }}>
                       Simulate MNC behavioral questions on Customer Obsession and Ownership.
                     </p>
                   </div>
 
                   <div 
                     onClick={() => executePrompt('Explain the React 19 compiler optimizations and automatic memoization')}
-                    className="skeuo-convex p-md rounded-xl text-left cursor-pointer hover:border-[var(--primary)] transition-all flex flex-col gap-xs"
-                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                    className="skeuo-convex rounded-2xl text-left cursor-pointer hover:border-[var(--primary)] hover:translate-y-[-2px] transition-all flex flex-col gap-xs"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '18px 20px' }}
                   >
-                    <div className="flex items-center gap-xs font-bold text-xs text-main">
-                      <span style={{ fontSize: '1.1rem' }}>⚡</span> React 19 Compiler
+                    <div className="flex items-center gap-xs font-bold text-main" style={{ fontSize: '0.98rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>⚡</span> React 19 Compiler
                     </div>
-                    <p className="text-muted text-[12px] m-0 leading-relaxed">
+                    <p className="text-muted m-0 leading-relaxed" style={{ fontSize: '0.88rem' }}>
                       Deep-dive into compiler-driven memoization and elimination of manual hooks.
                     </p>
                   </div>
@@ -769,48 +774,53 @@ Formulating structured, actionable breakdown with engineering principles, indust
                   /* User Message Card */
                   <div className="self-end max-w-xl flex flex-col items-end">
                     <div 
-                      className="p-3 px-4 rounded-2xl text-white text-sm shadow-sm"
+                      className="p-4 px-5 rounded-2xl text-white shadow-sm"
                       style={{ 
                         background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
-                        lineHeight: 1.6 
+                        lineHeight: 1.65,
+                        fontSize: '1rem',
+                        borderBottomRightRadius: '4px'
                       }}
                     >
                       <p className="m-0 whitespace-pre-wrap">{msg.text}</p>
                       {msg.files?.length > 0 && (
                         <div className="flex flex-wrap gap-xs mt-2 pt-2 border-t border-white/20">
                           {msg.files.map((f, i) => (
-                            <span key={i} className="text-[11px] bg-black/20 px-2 py-0.5 rounded flex items-center gap-1">
-                              <FileText size={11} /> {f}
+                            <span key={i} className="text-xs bg-black/20 px-2 py-0.5 rounded flex items-center gap-1">
+                              <FileText size={12} /> {f}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
-                    <span className="text-[10px] text-muted mt-1 mr-1">{currentUser.firstName || 'You'} • {msg.time}</span>
+                    <span className="text-xs text-muted mt-1 mr-1 font-medium">{currentUser.firstName || 'You'} • {msg.time}</span>
                   </div>
                 ) : (
-                  /* Claude AI Response Card */
+                  /* NEXORA AI Response Card */
                   <div className="flex flex-col gap-sm">
-                    {/* Claude Avatar Header */}
+                    {/* NEXORA Avatar Header */}
                     <div className="flex items-center gap-xs">
                       <div 
                         style={{ 
-                          width: 24, height: 24, borderRadius: 6, 
+                          width: 26, height: 26, borderRadius: 8, 
                           background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: 'white', fontWeight: 800, fontSize: '0.78rem'
+                          color: 'white', fontWeight: 800, fontSize: '0.82rem',
+                          boxShadow: '0 2px 8px var(--primary-glow)'
                         }}
                       >
                         ✦
                       </div>
-                      <span className="text-xs font-bold text-main">{selectedModel.name}</span>
-                      <span className="text-[10px] text-muted">• {msg.time}</span>
+                      <span className="text-xs font-extrabold text-main uppercase tracking-wider">
+                        NEXORA AI MENTOR
+                      </span>
+                      <span className="text-[11px] text-muted">• {msg.time}</span>
                     </div>
 
                     {/* Reasoning Accordion ("Thought for 3 seconds") */}
                     {msg.thought && (
                       <div 
-                        className="rounded-lg overflow-hidden transition-all"
+                        className="rounded-xl overflow-hidden transition-all"
                         style={{ 
                           background: 'var(--input-bg)', 
                           border: '1px solid var(--border-color)' 
@@ -818,23 +828,26 @@ Formulating structured, actionable breakdown with engineering principles, indust
                       >
                         <button
                           onClick={() => toggleThought(msg.id)}
-                          className="w-full flex items-center justify-between p-2 px-3 text-left text-xs font-medium text-muted hover:text-main transition-colors"
+                          className="w-full flex items-center justify-between p-2.5 px-3.5 text-left text-xs font-semibold text-muted hover:text-main transition-colors"
+                          style={{ fontSize: '0.86rem' }}
                         >
                           <span className="flex items-center gap-1.5">
-                            <Sparkles size={12} className="text-warning" />
+                            <Sparkles size={14} className="text-warning" />
                             Thought for 3 seconds
                           </span>
                           <ChevronRight 
-                            size={13} 
+                            size={14} 
                             className={`transition-transform ${expandedThoughtIds.includes(msg.id) ? 'rotate-90' : ''}`} 
                           />
                         </button>
                         {expandedThoughtIds.includes(msg.id) && (
                           <div 
-                            className="p-3 px-4 pt-1 text-xs font-mono whitespace-pre-wrap leading-relaxed"
+                            className="p-3.5 px-4 pt-1 font-mono whitespace-pre-wrap leading-relaxed"
                             style={{ 
                               borderTop: '1px solid var(--border-color)', 
-                              color: 'var(--text-muted)' 
+                              color: 'var(--text-muted)',
+                              fontSize: '0.86rem',
+                              lineHeight: 1.65
                             }}
                           >
                             {msg.thought}
@@ -843,10 +856,14 @@ Formulating structured, actionable breakdown with engineering principles, indust
                       </div>
                     )}
 
-                    {/* Claude Message Body */}
+                    {/* Message Body with comfortable, enhanced font size */}
                     <div 
-                      className="text-sm leading-relaxed whitespace-pre-wrap pl-1"
-                      style={{ color: 'var(--text-main)', lineHeight: 1.7 }}
+                      className="whitespace-pre-wrap pl-1"
+                      style={{ 
+                        color: 'var(--text-main)', 
+                        lineHeight: 1.78,
+                        fontSize: '1.02rem'
+                      }}
                     >
                       {msg.text}
                     </div>
@@ -854,7 +871,7 @@ Formulating structured, actionable breakdown with engineering principles, indust
                     {/* Formatted Copyable Code Block Artifact */}
                     {msg.code && (
                       <div 
-                        className="rounded-xl overflow-hidden my-2" 
+                        className="rounded-2xl overflow-hidden my-2" 
                         style={{ 
                           background: '#090d16', 
                           border: '1px solid var(--border-color)',
@@ -862,32 +879,33 @@ Formulating structured, actionable breakdown with engineering principles, indust
                         }}
                       >
                         <div 
-                          className="flex items-center justify-between px-3 py-2"
+                          className="flex items-center justify-between px-3.5 py-2.5"
                           style={{ 
                             background: '#111827', 
                             borderBottom: '1px solid rgba(255,255,255,0.08)' 
                           }}
                         >
-                          <span className="text-xs font-mono text-zinc-300 flex items-center gap-1.5">
-                            <FileCode2 size={13} className="text-primary" /> {msg.codeTitle || 'artifact.code'}
+                          <span className="font-mono text-zinc-300 flex items-center gap-1.5" style={{ fontSize: '0.86rem', fontWeight: 600 }}>
+                            <FileCode2 size={14} className="text-primary" /> {msg.codeTitle || 'artifact.code'}
                             {msg.codeLang && (
-                              <span className="badge text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">
+                              <span className="badge text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-md uppercase font-bold">
                                 {msg.codeLang}
                               </span>
                             )}
                           </span>
                           <button
                             onClick={() => handleCopyCode(msg.code, msg.id)}
-                            className="flex items-center gap-1 text-xs text-zinc-300 hover:text-white px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                            className="flex items-center gap-1 text-zinc-300 hover:text-white px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium"
+                            style={{ fontSize: '0.82rem' }}
                           >
                             {copiedCodeId === msg.id ? (
-                              <><Check size={12} className="text-success" /> Copied</>
+                              <><Check size={13} className="text-success" /> Copied</>
                             ) : (
-                              <><Copy size={12} /> Copy Code</>
+                              <><Copy size={13} /> Copy Code</>
                             )}
                           </button>
                         </div>
-                        <pre className="p-4 text-xs font-mono text-zinc-200 overflow-x-auto leading-relaxed m-0 custom-scroll">
+                        <pre className="p-4 text-zinc-200 overflow-x-auto leading-relaxed m-0 custom-scroll font-mono" style={{ fontSize: '0.90rem', lineHeight: 1.7 }}>
                           <code>{msg.code}</code>
                         </pre>
                       </div>
@@ -902,14 +920,16 @@ Formulating structured, actionable breakdown with engineering principles, indust
                             <button
                               key={i}
                               onClick={() => executePrompt(chip)}
-                              className="text-left text-xs px-3 py-1.5 rounded-full skeuo-convex interactive transition-all"
+                              className="text-left rounded-full skeuo-convex interactive transition-all font-semibold"
                               style={{ 
                                 background: 'var(--input-bg)', 
                                 border: '1px solid var(--border-color)',
-                                color: 'var(--text-muted)',
+                                color: 'var(--text-main)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '6px'
+                                gap: '6px',
+                                fontSize: '0.86rem',
+                                padding: '7px 16px'
                               }}
                             >
                               <span className="text-primary font-bold">✦</span> {chip}
@@ -919,25 +939,27 @@ Formulating structured, actionable breakdown with engineering principles, indust
                       )}
 
                       {/* Tool Actions */}
-                      <div className="flex items-center gap-sm">
+                      <div className="flex items-center gap-sm mt-1">
                         <button
                           onClick={() => handleCopyMessage(msg.text, msg.id)}
-                          className="text-xs text-muted hover:text-main flex items-center gap-1 transition-colors"
+                          className="text-muted hover:text-main flex items-center gap-1 transition-colors font-medium"
+                          style={{ fontSize: '0.84rem' }}
                           title="Copy Full Response"
                         >
                           {copiedMsgId === msg.id ? (
-                            <><Check size={12} className="text-success" /> Copied</>
+                            <><Check size={13} className="text-success" /> Copied</>
                           ) : (
-                            <><Copy size={12} /> Copy</>
+                            <><Copy size={13} /> Copy</>
                           )}
                         </button>
                         <span className="text-muted text-xs">•</span>
                         <button
                           onClick={() => handleRegenerate(idx)}
-                          className="text-xs text-muted hover:text-main flex items-center gap-1 transition-colors"
+                          className="text-muted hover:text-main flex items-center gap-1 transition-colors font-medium"
+                          style={{ fontSize: '0.84rem' }}
                           title="Regenerate Response"
                         >
-                          <RefreshCw size={12} /> Regenerate
+                          <RefreshCw size={13} /> Regenerate
                         </button>
                       </div>
                     </div>
@@ -948,16 +970,16 @@ Formulating structured, actionable breakdown with engineering principles, indust
 
             {/* Live Thinking Indicator */}
             {isTyping && (
-              <div className="flex items-center gap-2 text-muted text-xs pl-1 animate-pulse">
+              <div className="flex items-center gap-2 text-muted pl-1 animate-pulse" style={{ fontSize: '0.92rem' }}>
                 <span className="text-primary font-bold">✦</span>
-                <span>Claude is thinking and reasoning through the response...</span>
+                <span>NEXORA AI MENTOR is reasoning and formulating response...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* ── CLAUDE FLOATING BOTTOM INPUT CAPSULE ── */}
+        {/* ── NEXORA FLOATING BOTTOM INPUT CAPSULE ── */}
         <div 
           className="p-md shrink-0 flex flex-col items-center"
           style={{ 
@@ -973,12 +995,12 @@ Formulating structured, actionable breakdown with engineering principles, indust
                 {attachedFiles.map((file, i) => (
                   <span 
                     key={i} 
-                    className="badge text-xs px-2.5 py-1 rounded-md flex items-center gap-1"
-                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                    className="badge px-3 py-1 rounded-md flex items-center gap-1 font-medium"
+                    style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.84rem' }}
                   >
-                    <FileText size={12} className="text-primary" /> {file}
+                    <FileText size={13} className="text-primary" /> {file}
                     <X 
-                      size={11} 
+                      size={12} 
                       className="cursor-pointer ml-1 text-muted hover:text-main" 
                       onClick={() => setAttachedFiles(attachedFiles.filter(f => f !== file))} 
                     />
@@ -996,10 +1018,10 @@ Formulating structured, actionable breakdown with engineering principles, indust
               multiple 
             />
 
-            {/* Input Capsule Box */}
+            {/* Input Capsule Box with comfortable font size */}
             <form 
               onSubmit={handleSendMessage}
-              className="relative flex items-end gap-2 rounded-2xl p-2 px-3 skeuo-convex transition-all"
+              className="relative flex items-end gap-2 rounded-2xl p-2.5 px-3.5 skeuo-convex transition-all"
               style={{ 
                 background: 'var(--input-bg)', 
                 border: '1px solid var(--border-color)',
@@ -1009,10 +1031,10 @@ Formulating structured, actionable breakdown with engineering principles, indust
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-muted hover:text-main rounded-lg hover:bg-[var(--bg-card)] transition-colors"
+                className="p-2 text-muted hover:text-main rounded-xl hover:bg-[var(--bg-card)] transition-colors"
                 title="Attach Document or Resume (PDF, Code, Text)"
               >
-                <Paperclip size={18} />
+                <Paperclip size={20} />
               </button>
 
               <textarea
@@ -1026,30 +1048,31 @@ Formulating structured, actionable breakdown with engineering principles, indust
                     handleSendMessage();
                   }
                 }}
-                placeholder={`Ask Claude anything about ${currentUser.dreamJob || 'engineering'}... (Enter to send, Shift+Enter for new line)`}
-                className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-[var(--text-muted)] resize-none py-1.5 max-h-40"
+                placeholder={`Ask NEXORA AI MENTOR anything about ${currentUser.dreamJob || 'engineering'}... (Enter to send, Shift+Enter for new line)`}
+                className="flex-1 bg-transparent border-none outline-none placeholder:text-[var(--text-muted)] resize-none py-2 max-h-48"
                 style={{ 
                   color: 'var(--text-main)', 
-                  lineHeight: 1.5 
+                  lineHeight: 1.5,
+                  fontSize: '1rem'
                 }}
               />
 
               <button
                 type="submit"
                 disabled={!input.trim()}
-                className={`p-2 rounded-xl transition-all ${
+                className={`p-2.5 rounded-xl transition-all ${
                   input.trim() 
                     ? 'bg-[var(--primary)] text-white hover:opacity-90 shadow-md' 
                     : 'bg-[var(--bg-card)] text-muted cursor-not-allowed opacity-50'
                 }`}
-                title="Send Message to Claude"
+                title="Send Message to NEXORA AI MENTOR"
               >
-                <ArrowUp size={17} />
+                <ArrowUp size={18} />
               </button>
             </form>
 
-            <span className="text-[11px] text-center text-muted mt-1">
-              Claude 3.5 Sonnet provides career & system architecture intelligence. Verify production configurations.
+            <span className="text-center text-muted mt-1" style={{ fontSize: '0.78rem' }}>
+              NEXORA AI MENTOR provides advanced career, ATS & system architecture intelligence. Always verify production configurations.
             </span>
           </div>
         </div>

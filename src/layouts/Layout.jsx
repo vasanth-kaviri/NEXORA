@@ -81,6 +81,8 @@ export default function Layout() {
     if (path === '/resources') return { section: 'Knowledge Base', title: 'Learning Resources' };
     if (path === '/resume' || path === '/resume-analyzer') return { section: 'AI Tools', title: 'Resume ATS Studio' };
     if (path === '/mock-interview') return { section: 'AI Tools', title: 'Mock Interview Chamber' };
+    if (path === '/chatbot') return { section: 'AI Intelligence', title: 'NEXORA AI MENTOR' };
+    if (path === '/about') return { section: 'Platform', title: 'About NEXORA' };
     if (path === '/profile') return { section: 'Account', title: 'Profile & Mastery' };
     if (path === '/settings') return { section: 'Account', title: 'Preferences & Settings' };
     if (path.startsWith('/resource/')) return { section: 'Resources', title: 'Resource Viewer' };
