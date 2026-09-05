@@ -42,7 +42,12 @@ export default function Chatbot() {
   const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   // Sidebar & Chat Sessions
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
   const [sessions, setSessions] = useState(() => {
     try {
       const saved = localStorage.getItem('nexora_ai_mentor_chats');
@@ -465,13 +470,25 @@ Formulating structured, actionable breakdown with engineering principles, indust
       }}
     >
       
+      {/* ── MOBILE BACKDROP FOR SESSIONS DRAWER ── */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-20 lg:hidden backdrop-blur-xs transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* ── LEFT NEXORA AI SESSIONS SIDEBAR ── */}
       <aside 
-        className={`flex flex-col justify-between transition-all duration-200 shrink-0 ${isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}`}
+        className={`flex flex-col justify-between transition-all duration-200 shrink-0 ${
+          isSidebarOpen 
+            ? 'w-72 max-w-[85vw] fixed lg:static inset-y-0 left-0 z-30 shadow-2xl lg:shadow-none h-full' 
+            : 'w-0 -translate-x-full lg:translate-x-0 overflow-hidden'
+        }`}
         style={{ 
           background: 'var(--bg-card)', 
           borderRight: '1px solid var(--border-color)',
-          zIndex: 10
+          zIndex: 30
         }}
       >
         <div className="flex flex-col p-md gap-md overflow-hidden flex-1">
@@ -534,6 +551,7 @@ Formulating structured, actionable breakdown with engineering principles, indust
                 key={i}
                 onClick={() => {
                   setInput(p.prompt);
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) setIsSidebarOpen(false);
                   if (textareaRef.current) textareaRef.current.focus();
                 }}
                 className="text-left text-xs p-2.5 rounded-lg hover:bg-[var(--input-bg)] text-muted hover:text-main transition-colors truncate font-medium"
@@ -549,7 +567,10 @@ Formulating structured, actionable breakdown with engineering principles, indust
             {sessions.map((s) => (
               <div
                 key={s.id}
-                onClick={() => setActiveSessionId(s.id)}
+                onClick={() => {
+                  setActiveSessionId(s.id);
+                  if (typeof window !== 'undefined' && window.innerWidth < 1024) setIsSidebarOpen(false);
+                }}
                 className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-colors group ${
                   activeSessionId === s.id 
                     ? 'bg-[var(--input-bg)] font-bold text-primary border border-[var(--border-color)] shadow-sm' 
