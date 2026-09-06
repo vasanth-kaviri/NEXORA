@@ -72,157 +72,167 @@ export default function Login() {
     <AuthLayout
       headline="Welcome Back to NEXORA."
       subtext="Your calibrated workstation for hands-on systems architecture, daily coding sprints, and FAANG career readiness."
+      badgeText="NEXORA CAREER PLATFORM"
+      badgeSub="· Verified Curriculum"
+      maxWidth="480px"
     >
-      <div className="flex justify-between items-center mb-1">
-        <h1 className="text-gradient" style={{ fontSize: '2.1rem', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>
-          Welcome Back
-        </h1>
-        <button
-          type="button"
-          onClick={handleQuickDemoFill}
-          className="minimal-badge cursor-pointer"
-          style={{ color: 'var(--minimal-indigo)', fontSize: '0.74rem', padding: '4px 10px' }}
-          title="1-click fill with student test credentials"
-        >
-          <Zap size={12} />
-          <span>Demo Fill</span>
-        </button>
-      </div>
-      <p className="text-muted" style={{ marginBottom: '20px', fontSize: '0.9rem' }}>
-        Log in to continue your technical trajectory with NEXORA.
-      </p>
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-1">
+          <h1 className="text-gradient" style={{ fontSize: '2.1rem', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>
+            Welcome Back
+          </h1>
+          <button
+            type="button"
+            onClick={handleQuickDemoFill}
+            className="minimal-badge cursor-pointer hover:scale-105 transition-transform"
+            style={{ color: 'var(--minimal-indigo)', fontSize: '0.74rem', padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}
+            title="1-click fill with student test credentials"
+          >
+            <Zap size={12} />
+            <span>Demo Fill</span>
+          </button>
+        </div>
+        <p className="text-muted" style={{ marginBottom: '20px', fontSize: '0.9rem' }}>
+          Log in to continue your technical trajectory with NEXORA.
+        </p>
 
-      {/* Google Authentication with Real Firebase + Custom Account support */}
-      <div style={{ marginBottom: '18px' }}>
-        <GoogleAuthButton mode="signin" onSuccess={() => {
-          const currentUser = db.getCurrentUser();
-          if (!currentUser?.profileCompleted) {
-            navigate('/complete-profile');
-          } else {
-            navigate('/dashboard');
-          }
-        }} />
-      </div>
+        {/* Google Authentication with Real Firebase + Custom Account support */}
+        <div style={{ marginBottom: '18px' }}>
+          <GoogleAuthButton mode="signin" onSuccess={() => {
+            const currentUser = db.getCurrentUser();
+            if (!currentUser?.profileCompleted) {
+              navigate('/complete-profile');
+            } else {
+              navigate('/dashboard');
+            }
+          }} />
+        </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-        <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
-        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>or log in with credentials</span>
-        <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
-      </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>or log in with credentials</span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+        </div>
 
-      <form onSubmit={handleLogin} className="glass-panel w-full max-w-full overflow-hidden" style={{ padding: '20px', borderRadius: 'var(--radius-lg)' }}>
+        <form onSubmit={handleLogin} className="w-full">
 
-        {/* Contact Input Toggle */}
-        <div className="input-group">
-          <div className="flex justify-between items-center mb-1">
-            <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Contact Details</label>
-            <div className="flex gap-2">
-              <span
-                onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); }}
-                style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'email' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-              >
-                Email
-              </span>
-              <span style={{ color: 'var(--text-muted)' }}>|</span>
-              <span
-                onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setShowCountryMenu(false); }}
-                style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'phone' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-              >
-                Phone
-              </span>
+          {/* Contact Input Toggle */}
+          <div className="input-group">
+            <div className="flex justify-between items-center mb-1">
+              <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Contact Details</label>
+              <div className="flex gap-2">
+                <span
+                  onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); }}
+                  style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'email' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
+                >
+                  Email
+                </span>
+                <span style={{ color: 'var(--text-muted)' }}>|</span>
+                <span
+                  onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setShowCountryMenu(false); }}
+                  style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'phone' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
+                >
+                  Phone
+                </span>
+              </div>
             </div>
-          </div>
 
-          {contactType === 'email' ? (
-            <IconInput
-              icon={<Mail size={18} />}
-              type="email"
-              placeholder="student@example.com"
-              value={formData.contact}
-              onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-              required
-            />
-          ) : (
-            <div className="flex w-full gap-2" style={{ width: '100%' }}>
-              <CountryCodePicker
-                countryCode={countryCode}
-                setCountryCode={setCountryCode}
-                showCountryMenu={showCountryMenu}
-                setShowCountryMenu={setShowCountryMenu}
-                searchCountry={searchCountry}
-                setSearchCountry={setSearchCountry}
-                filteredCountries={filteredCountries}
-                countryCodes={countryCodes}
-              />
-              <input
-                type="tel"
-                maxLength={countryCodes.find(c => c.code === countryCode)?.maxLength || 15}
-                className="input-field flex-1 min-w-0"
-                style={{ flex: 1, minWidth: 0 }}
-                placeholder="234 567 8900"
+            {contactType === 'email' ? (
+              <IconInput
+                icon={<Mail size={18} />}
+                type="email"
+                placeholder="student@example.com"
                 value={formData.contact}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9]/g, '');
-                  setFormData({ ...formData, contact: val });
-                }}
+                onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                 required
               />
-            </div>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className="input-group mb-2">
-          <div className="flex justify-between items-center mb-1">
-            <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Password</label>
-            <span
-              onClick={() => navigate('/forgot-password')}
-              className="text-primary interactive"
-              style={{ fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}
-            >
-              Forgot password?
-            </span>
+            ) : (
+              <div className="flex w-full gap-2" style={{ width: '100%' }}>
+                <CountryCodePicker
+                  countryCode={countryCode}
+                  setCountryCode={setCountryCode}
+                  showCountryMenu={showCountryMenu}
+                  setShowCountryMenu={setShowCountryMenu}
+                  searchCountry={searchCountry}
+                  setSearchCountry={setSearchCountry}
+                  filteredCountries={filteredCountries}
+                  countryCodes={countryCodes}
+                />
+                <input
+                  type="tel"
+                  maxLength={countryCodes.find(c => c.code === countryCode)?.maxLength || 15}
+                  className="input-field flex-1 min-w-0"
+                  style={{ flex: 1, minWidth: 0 }}
+                  placeholder="234 567 8900"
+                  value={formData.contact}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setFormData({ ...formData, contact: val });
+                  }}
+                  required
+                />
+              </div>
+            )}
           </div>
-          <IconInput
-            icon={<Lock size={18} />}
-            type="password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-          />
-        </div>
 
-        <button 
-          type="submit" 
-          disabled={isLoading}
-          className="btn btn-primary w-full flex items-center justify-center gap-2 mt-4"
-          style={{ padding: '12px', fontSize: '0.92rem', borderRadius: 'var(--radius-md)' }}
-        >
-          {isLoading ? (
-            <>
-              <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-              <span>Authenticating...</span>
-            </>
-          ) : (
-            <>
-              <span>Log in</span>
-              <ArrowRight size={17} />
-            </>
-          )}
-        </button>
-      </form>
+          {/* Password */}
+          <div className="input-group mb-2">
+            <div className="flex justify-between items-center mb-1">
+              <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Password</label>
+              <span
+                onClick={() => navigate('/forgot-password')}
+                className="text-primary interactive hover:underline"
+                style={{ fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Forgot password?
+              </span>
+            </div>
+            <IconInput
+              icon={<Lock size={18} />}
+              type="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+          </div>
 
-      <div className="text-center mt-4">
-        <p className="text-muted" style={{ fontSize: '0.88rem' }}>
-          Don't have an account?{' '}
-          <span
-            onClick={() => navigate('/signup')}
-            className="text-primary font-semibold interactive cursor-pointer"
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="btn btn-primary w-full flex items-center justify-center gap-2 mt-4"
+            style={{ padding: '12px', fontSize: '0.92rem', borderRadius: 'var(--radius-md)' }}
           >
-            Create account
-          </span>
-        </p>
+            {isLoading ? (
+              <>
+                <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span>Log in</span>
+                <ArrowRight size={17} />
+              </>
+            )}
+          </button>
+
+          <div className="mt-4 pt-3 flex items-center justify-between text-xs text-muted" style={{ borderTop: '1px solid var(--border-color)' }}>
+            <span>🔒 TLS 1.3 Encryption</span>
+            <span>⚡ Instant Session Sync</span>
+          </div>
+        </form>
+
+        <div className="text-center mt-4">
+          <p className="text-muted" style={{ fontSize: '0.88rem' }}>
+            Don't have an account?{' '}
+            <span
+              onClick={() => navigate('/signup')}
+              className="text-primary font-semibold interactive cursor-pointer hover:underline"
+            >
+              Create account
+            </span>
+          </p>
+        </div>
       </div>
     </AuthLayout>
   );
