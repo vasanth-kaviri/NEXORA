@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  PlayCircle, CheckCircle2, FileText, ExternalLink, 
-  ArrowLeft, Code2, BookOpen, Terminal, Sparkles, Copy, Check
+  PlayCircle, CheckCircle2, ExternalLink, 
+  ArrowLeft, Code2, BookOpen, Terminal, Copy, Check
 } from 'lucide-react';
 import { useState } from 'react';
 import { getResourceById } from '../utils/resourceData';

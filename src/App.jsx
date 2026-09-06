@@ -45,6 +45,7 @@ import PrivacySettings from './pages/PrivacySettings';
 import LanguageSettings from './pages/LanguageSettings';
 import Help from './pages/Help';
 import About from './pages/About';
+import Terms from './pages/Terms';
 import CompleteProfile from './pages/CompleteProfile';
 import TaskPage from './pages/TaskPage';
 import ResourceViewer from './pages/ResourceViewer';
@@ -106,6 +107,8 @@ function App() {
             <Route path="/settings/language" element={<LanguageSettings />} />
             <Route path="/help" element={<Help />} />
             <Route path="/about" element={<About />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Navigate to="/settings/privacy" replace />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/scholarships" element={<Scholarships />} />

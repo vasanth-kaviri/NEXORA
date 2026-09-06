@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Target, Briefcase, Video, HelpCircle,
+  Briefcase, Video, HelpCircle,
   GraduationCap, Users, BookOpen, ArrowUpRight,
-  Sparkles, TrendingUp, Globe, FolderKanban, Trophy, Compass,
+  Sparkles, Globe, FolderKanban, Trophy, Compass,
 } from 'lucide-react';
 
 /* ─── Data ─────────────────────────────────────────────────── */

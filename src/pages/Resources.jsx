@@ -1,21 +1,59 @@
 import { useState, useEffect } from 'react';
 import { 
-  BookOpen, Video, ExternalLink, ArrowLeft, Search, Filter, 
-  CheckCircle2, Sparkles, Clock, Layers, Star, Play, ChevronRight, Award
+  BookOpen, Video, ExternalLink, ArrowLeft, Search, 
+  CheckCircle2, Sparkles, Play, Award, Compass
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import db from '../services/db';
-import { getRoadmapForJob } from '../utils/roadmapData';
+import { getRoadmapForJob, ROADMAP_DOMAINS } from '../utils/roadmapData';
 import { TOPIC_RESOURCES } from '../utils/resourceData';
 
 export default function Resources() {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = db.getCurrentUser() || {};
-  const dreamJob = currentUser.dreamJob || 'Full-Stack Developer';
 
-  // Load roadmap corresponding to user's dream job
-  const roadmap = getRoadmapForJob(dreamJob);
+  const [currentTrack, setCurrentTrack] = useState(() => {
+    const user = db.getCurrentUser();
+    const savedCourseId = localStorage.getItem('nexora_active_course');
+    if (savedCourseId && ROADMAP_DOMAINS[savedCourseId]) {
+      return savedCourseId;
+    }
+    const domain = getRoadmapForJob(user?.dreamJob || 'Full-Stack Developer');
+    return domain.id;
+  });
+
+  // Listen for trajectory switches from Roadmap or other components
+  useEffect(() => {
+    const handleSessionChange = () => {
+      const user = db.getCurrentUser();
+      const savedCourseId = localStorage.getItem('nexora_active_course');
+      if (savedCourseId && ROADMAP_DOMAINS[savedCourseId]) {
+        setCurrentTrack(savedCourseId);
+      } else {
+        const domain = getRoadmapForJob(user?.dreamJob || 'Full-Stack Developer');
+        setCurrentTrack(domain.id);
+      }
+    };
+    window.addEventListener('user_session_changed', handleSessionChange);
+    return () => window.removeEventListener('user_session_changed', handleSessionChange);
+  }, []);
+
+  const handleTrackChange = (newTrackId) => {
+    const domain = ROADMAP_DOMAINS[newTrackId];
+    if (domain) {
+      setCurrentTrack(newTrackId);
+      setSelectedMilestone('all');
+      localStorage.setItem('nexora_active_course', domain.id);
+      db.updateUserProfile({
+        dreamJob: domain.title,
+        selectedTrack: domain.id
+      });
+      window.dispatchEvent(new Event('user_session_changed'));
+    }
+  };
+
+  // Load roadmap corresponding to active track
+  const roadmap = ROADMAP_DOMAINS[currentTrack] || getRoadmapForJob(currentTrack);
   const coreSteps = roadmap.coreSteps || [];
 
   // Initial step: from location state or 'all'
@@ -40,6 +78,7 @@ export default function Resources() {
     } else {
       updated = [...completedResourceIds, resId];
       // Reward XP
+      const currentUser = db.getCurrentUser() || {};
       db.updateUserProfile({
         xp: (currentUser.xp || 1200) + 40
       });
@@ -142,7 +181,7 @@ export default function Resources() {
             <Sparkles size={14} /> DYNAMIC ROADMAP-ALIGNED CURRICULUM
           </div>
           <h1 style={{ fontSize: '1.85rem', fontWeight: 800, letterSpacing: '-0.3px', margin: '2px 0' }}>
-            Learning Resources for {dreamJob}
+            Learning Resources for {roadmap.title || 'Full-Stack Developer'}
           </h1>
           <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0 }}>
             Curated specifically for your active milestone trajectory. Master concepts, study architecture specs, and complete labs.
@@ -159,10 +198,50 @@ export default function Resources() {
         </div>
       </header>
 
+      {/* ── Active Trajectory / Course Switcher ── */}
+      <div className="flex flex-col gap-xs">
+        <div className="flex justify-between items-center">
+          <span className="text-muted font-600 flex items-center gap-xs" style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <Compass size={14} className="text-primary" /> Active Career Trajectory & Roadmap
+          </span>
+          <button 
+            onClick={() => navigate('/roadmap')}
+            className="text-primary hover:underline text-xs font-bold"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+          >
+            Manage Milestones in Roadmap →
+          </button>
+        </div>
+        <div className="flex gap-xs overflow-x-auto w-full pb-xs custom-scroll">
+          {Object.entries(ROADMAP_DOMAINS).map(([key, domain]) => {
+            const isSelected = currentTrack === key || currentTrack === domain.id;
+            return (
+              <button
+                key={key}
+                onClick={() => handleTrackChange(key)}
+                className={`skeuo-pill shrink-0 flex items-center gap-xs transition-all ${isSelected ? 'font-bold' : ''}`}
+                style={{
+                  padding: '7px 14px',
+                  fontSize: '0.8rem',
+                  background: isSelected ? 'var(--primary)' : 'var(--bg-card)',
+                  color: isSelected ? '#fff' : 'var(--text-main)',
+                  border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-full)',
+                  cursor: 'pointer',
+                  boxShadow: isSelected ? '0 2px 8px var(--primary-glow)' : 'none'
+                }}
+              >
+                <span>{domain.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* ── Active Roadmap Milestones Selector ── */}
       <div className="flex flex-col gap-xs">
         <span className="text-muted font-600" style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Filter by Active Roadmap Milestone
+          Filter by Active Roadmap Milestone ({roadmap.title})
         </span>
         <div className="flex gap-xs overflow-x-auto w-full pb-xs">
           <button
@@ -335,7 +414,7 @@ export default function Resources() {
             );
           })
         )}
-      </div>
+        </div>
 
     </div>
   );

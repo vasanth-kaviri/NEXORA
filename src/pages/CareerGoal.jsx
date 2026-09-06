@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Target, Compass, TrendingUp, DollarSign, CheckCircle2, ArrowRight, 
-  Sparkles, Briefcase, Building, Layers, Zap, Scale, X 
+  Compass, TrendingUp, DollarSign, CheckCircle2, ArrowRight, 
+  Sparkles, Building, Scale, X 
 } from 'lucide-react';
 import db from '../services/db';
 

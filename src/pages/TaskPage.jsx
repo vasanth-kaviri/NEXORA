@@ -1,50 +1,28 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   CheckCircle2, ArrowLeft, PlayCircle, BookOpen, Terminal, Code2, 
-  HelpCircle, Sparkles, ExternalLink, RefreshCw, Check, Lightbulb 
+  Sparkles, ExternalLink, RefreshCw, Check, Lightbulb 
 } from 'lucide-react';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
 
-export default function TaskPage() {
-  const { taskId } = useParams();
-  const navigate = useNavigate();
-  const currentUser = db.getCurrentUser() || {};
-
-  const [task, setTask] = useState(null);
-  const [activeTab, setActiveTab] = useState('code'); // 'code', 'guide', 'tests'
-  const [codeContent, setCodeContent] = useState('');
-  const [testResults, setTestResults] = useState(null);
-  const [runningTests, setRunningTests] = useState(false);
-  const [checklist, setChecklist] = useState([
-    { id: 1, text: 'Review architectural principles and requirements', done: true },
-    { id: 2, text: 'Implement robust parameter validation and error boundaries', done: false },
-    { id: 3, text: 'Pass all 3 automated integration test assertions', done: false }
-  ]);
-  const [showHint, setShowHint] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3500);
-  };
-
-  // Enriched task database keyed by ID or domain
-  const defaultTaskTemplates = {
-    '1': {
-      id: 1,
-      title: 'Build Resilient JWT Authentication Middleware',
-      domain: 'Backend Security & APIs',
-      duration: '45 mins',
-      xp: 50,
-      scenario: 'In production systems at companies like Stripe and Netflix, API endpoints must verify caller identity within 5 milliseconds while protecting against signature tampering, token expiration, and CSRF attacks.',
-      objectives: [
-        'Extract Bearer token from incoming HTTP Authorization header',
-        'Verify cryptographic signature using RS256 public key algorithm',
-        'Validate expiration claims (exp) and subject identifier (sub)',
-        'Attach sanitized user context to request state before next handler'
-      ],
-      starterCode: `// Middleware: authenticateToken.js
+// Enriched task database keyed by ID or domain
+const defaultTaskTemplates = {
+  '1': {
+    id: 1,
+    title: 'Build Resilient JWT Authentication Middleware',
+    domain: 'Backend Security & APIs',
+    duration: '45 mins',
+    xp: 50,
+    scenario: 'In production systems at companies like Stripe and Netflix, API endpoints must verify caller identity within 5 milliseconds while protecting against signature tampering, token expiration, and CSRF attacks.',
+    objectives: [
+      'Extract Bearer token from incoming HTTP Authorization header',
+      'Verify cryptographic signature using RS256 public key algorithm',
+      'Validate expiration claims (exp) and subject identifier (sub)',
+      'Attach sanitized user context to request state before next handler'
+    ],
+    starterCode: `// Middleware: authenticateToken.js
 import jwt from 'jsonwebtoken';
 
 export function authenticateToken(req, res, next) {
@@ -64,21 +42,21 @@ export function authenticateToken(req, res, next) {
     return res.status(403).json({ error: 'Invalid or expired token' });
   }
 }`,
-      hint: 'Remember to verify both the algorithm header to prevent "none" algorithm vulnerabilities and ensure req.headers["authorization"] handles case insensitivity.'
-    },
-    '2': {
-      id: 2,
-      title: 'Optimize Database Query with Compound B-Tree Index',
-      domain: 'Database Engineering',
-      duration: '35 mins',
-      xp: 50,
-      scenario: 'High-throughput analytics queries at Uber can trigger expensive sequential scans across hundreds of millions of ride rows unless compound indices match the exact WHERE, ORDER BY, and LIMIT query predicates.',
-      objectives: [
-        'Analyze EXPLAIN ANALYZE query plans before and after indexing',
-        'Construct a composite B-Tree index respecting left-to-right column selectivity',
-        'Verify query execution time drops below 15 milliseconds'
-      ],
-      starterCode: `-- PostgreSQL Migration: optimize_trips_query.sql
+    hint: 'Remember to verify both the algorithm header to prevent "none" algorithm vulnerabilities and ensure req.headers["authorization"] handles case insensitivity.'
+  },
+  '2': {
+    id: 2,
+    title: 'Optimize Database Query with Compound B-Tree Index',
+    domain: 'Database Engineering',
+    duration: '35 mins',
+    xp: 50,
+    scenario: 'High-throughput analytics queries at Uber can trigger expensive sequential scans across hundreds of millions of ride rows unless compound indices match the exact WHERE, ORDER BY, and LIMIT query predicates.',
+    objectives: [
+      'Analyze EXPLAIN ANALYZE query plans before and after indexing',
+      'Construct a composite B-Tree index respecting left-to-right column selectivity',
+      'Verify query execution time drops below 15 milliseconds'
+    ],
+    starterCode: `-- PostgreSQL Migration: optimize_trips_query.sql
 -- Before: Sequential scan on 25,000,000 rows (~480ms)
 EXPLAIN ANALYZE 
 SELECT id, user_id, pickup_time, fare_amount 
@@ -91,35 +69,57 @@ LIMIT 50;
 -- TODO: Create the optimal composite index
 CREATE INDEX CONCURRENTLY idx_trips_city_status_time 
 ON trips (city_id, status, pickup_time DESC);`,
-      hint: 'Equality columns (city_id, status) should always precede range or ordering columns (pickup_time DESC) in compound B-Tree indexes.'
+    hint: 'Equality columns (city_id, status) should always precede range or ordering columns (pickup_time DESC) in compound B-Tree indexes.'
+  }
+};
+
+export default function TaskPage() {
+  const { taskId } = useParams();
+  const navigate = useNavigate();
+  const currentUser = db.getCurrentUser() || {};
+
+  const template = defaultTaskTemplates[taskId] || defaultTaskTemplates['1'];
+
+  const [task, setTask] = useState(() => {
+    try {
+      const currentTasks = JSON.parse(localStorage.getItem('nexora_current_tasks') || '[]');
+      const foundTask = currentTasks.find(t => t.id.toString() === taskId);
+      const savedProgress = JSON.parse(localStorage.getItem('nexora_task_progress') || '{}');
+      const isCompleted = !!savedProgress[taskId];
+      const tmpl = defaultTaskTemplates[taskId] || defaultTaskTemplates['1'];
+      return {
+        id: taskId,
+        title: foundTask?.title || tmpl.title,
+        domain: tmpl.domain,
+        duration: tmpl.duration,
+        xp: tmpl.xp,
+        scenario: tmpl.scenario,
+        objectives: tmpl.objectives,
+        starterCode: tmpl.starterCode,
+        hint: tmpl.hint,
+        completed: isCompleted
+      };
+    } catch {
+      return null;
     }
+  });
+
+  const [activeTab, setActiveTab] = useState('code'); // 'code', 'guide', 'tests'
+  const [codeContent, setCodeContent] = useState(() => template.starterCode);
+  const [testResults, setTestResults] = useState(null);
+  const [runningTests, setRunningTests] = useState(false);
+  const [checklist, setChecklist] = useState([
+    { id: 1, text: 'Review architectural principles and requirements', done: true },
+    { id: 2, text: 'Implement robust parameter validation and error boundaries', done: false },
+    { id: 3, text: 'Pass all 3 automated integration test assertions', done: false }
+  ]);
+  const [showHint, setShowHint] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3500);
   };
-
-  useEffect(() => {
-    // Check localStorage current tasks first
-    const currentTasks = JSON.parse(localStorage.getItem('nexora_current_tasks') || '[]');
-    const foundTask = currentTasks.find(t => t.id.toString() === taskId);
-
-    const savedProgress = JSON.parse(localStorage.getItem('nexora_task_progress') || '{}');
-    const isCompleted = !!savedProgress[taskId];
-
-    const template = defaultTaskTemplates[taskId] || defaultTaskTemplates['1'];
-
-    setTask({
-      id: taskId,
-      title: foundTask?.title || template.title,
-      domain: template.domain,
-      duration: template.duration,
-      xp: template.xp,
-      scenario: template.scenario,
-      objectives: template.objectives,
-      starterCode: template.starterCode,
-      hint: template.hint,
-      completed: isCompleted
-    });
-
-    setCodeContent(template.starterCode);
-  }, [taskId]);
 
   const handleRunTests = () => {
     setRunningTests(true);
@@ -143,7 +143,12 @@ ON trips (city_id, status, pickup_time DESC);`,
     savedProgress[taskId] = true;
     localStorage.setItem('nexora_task_progress', JSON.stringify(savedProgress));
 
-    // Award XP
+    // Award XP and sync to Realtime Database
+    const user = db.getCurrentUser();
+    const uid = user?.id || user?.uid;
+    if (uid) {
+      realtimeDb.setTaskProgress(uid, taskId, true);
+    }
     db.updateUserProfile({
       xp: (currentUser.xp || 1200) + 50,
       tasksCompleted: (currentUser.tasksCompleted || 0) + 1

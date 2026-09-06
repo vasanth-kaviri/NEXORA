@@ -2,10 +2,11 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   UploadCloud, FileText, CheckCircle2, AlertCircle, Sparkles, Download, 
-  RefreshCw, MessageSquare, ArrowRight, X, Image as ImageIcon, Link as LinkIcon, 
-  FileCode, ShieldCheck, Eye, HelpCircle, Briefcase, Award
+  RefreshCw, ArrowRight, X, Image as ImageIcon, Link as LinkIcon, 
+  FileCode, ShieldCheck, Eye, Briefcase, Award
 } from 'lucide-react';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
 
 export default function ResumeAnalyzer() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function ResumeAnalyzer() {
   const [cloudUrl, setCloudUrl] = useState('');
   const [pastedText, setPastedText] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState('');
-  const [uploadMethod, setUploadMethod] = useState('');
+  const [_uploadMethod, setUploadMethod] = useState('');
   const [result, setResult] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -216,6 +217,15 @@ export default function ResumeAnalyzer() {
         { name: 'Education & Certifications', status: 'Optimal', score: 100 },
       ]
     });
+
+    if (currentUser?.id) {
+      realtimeDb.saveResumeResult(currentUser.id, {
+        role,
+        score: data.score,
+        fileName,
+        tier: data.tier
+      });
+    }
   };
 
   const handleDownloadReport = () => {

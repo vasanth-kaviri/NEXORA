@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  AlertTriangle, TrendingUp, CheckCircle2, ArrowRight, Sparkles, BookOpen, 
-  ExternalLink, Layers, ShieldAlert, Zap, Filter, PlayCircle, X 
+  TrendingUp, CheckCircle2, Sparkles, 
+  ExternalLink, Layers, ShieldAlert, Zap, X 
 } from 'lucide-react';
 import db from '../services/db';
 

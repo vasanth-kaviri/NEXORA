@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import {
-  FolderKanban, Star, Clock, Users, ArrowUpRight,
-  CheckCircle2, Circle, Flame, Lock, Sparkles,
-  Code2, Database, Layers, Globe, Cpu, ShieldCheck,
-  Plus, ExternalLink, GitBranch, BookOpen, X, Send, Eye, FileCode
+  FolderKanban, Star,
+  CheckCircle2, Sparkles,
+  Code2, Layers, Globe, Cpu,
+  Plus, ExternalLink, GitBranch, BookOpen, X, Send, Eye
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -135,7 +134,7 @@ const INITIAL_DEVELOPED_PROJECTS = [
     desc: 'High-concurrency API gateway and rate-limiter built with Go and Redis, handling 40,000 requests/sec with automated token bucket algorithm.',
     tags: ['Go', 'Redis', 'Docker', 'Kubernetes'],
     demoUrl: 'https://demo.cloudscale-nexora.dev',
-    repoUrl: 'https://github.com/alexjohnson/cloudscale-ingress',
+    repoUrl: 'https://github.com/nexora-org/cloudscale-ingress',
     status: 'Live & Deployed',
     verified: true,
     stars: 128,
@@ -147,7 +146,7 @@ const INITIAL_DEVELOPED_PROJECTS = [
     desc: 'DenseNet-121 convolutional neural network fine-tuned on NIH chest X-rays to detect 14 pulmonary conditions with 94.2% AUC accuracy.',
     tags: ['PyTorch', 'FastAPI', 'React', 'TailwindCSS'],
     demoUrl: 'https://neurovision-ai.vercel.app',
-    repoUrl: 'https://github.com/alexjohnson/neurovision-diagnostics',
+    repoUrl: 'https://github.com/nexora-org/neurovision-diagnostics',
     status: 'AI Architecture Verified',
     verified: true,
     stars: 94,
@@ -157,7 +156,6 @@ const INITIAL_DEVELOPED_PROJECTS = [
 
 export default function Projects() {
   const toast = useToast();
-  const navigate = useNavigate();
   const currentUser = db.getCurrentUser() || {};
 
   // Developed Projects State

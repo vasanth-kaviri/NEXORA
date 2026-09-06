@@ -1,35 +1,55 @@
 import { 
-  Bell, Award, Calendar, Compass, FileText, CheckCircle2, 
-  MessageSquare, Sparkles, Search, Check, ExternalLink, ArrowRight,
-  Filter, Trash2, Clock, Send, ChevronRight
+  Bell, Award, Calendar, Compass, FileText, 
+  Sparkles, Search, Check, ArrowRight, Clock, Send
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
 import { useToast } from '../contexts/ToastContext';
 
 export default function Notifications() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(() => db.getNotifications());
   const [filter, setFilter] = useState('all'); // 'all' | 'unread' | 'resume' | 'interview'
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedNotif, setSelectedNotif] = useState(null);
+  const [selectedNotif, setSelectedNotif] = useState(() => {
+    const list = db.getNotifications();
+    return list.length > 0 ? list[0] : null;
+  });
   const [replyText, setReplyText] = useState('');
 
-  const loadNotifications = () => {
-    const list = db.getNotifications();
-    setNotifications(list);
-    if (list.length > 0 && !selectedNotif) {
-      setSelectedNotif(list[0]);
-    }
-  };
-
   useEffect(() => {
-    loadNotifications();
-    window.addEventListener('notifications_updated', loadNotifications);
-    return () => window.removeEventListener('notifications_updated', loadNotifications);
+    const user = db.getCurrentUser();
+    const uid = user?.id || user?.uid;
+    let unsubscribe = null;
+
+    if (uid) {
+      unsubscribe = realtimeDb.subscribeToNotifications(uid, (remoteList) => {
+        if (remoteList && remoteList.length > 0) {
+          setNotifications(remoteList);
+          setSelectedNotif(prev => {
+            if (prev) {
+              return remoteList.find(n => n.id === prev.id) || remoteList[0];
+            }
+            return remoteList[0];
+          });
+        }
+      });
+    }
+
+    const handleUpdate = () => {
+      const list = db.getNotifications();
+      setNotifications(list);
+    };
+    window.addEventListener('notifications_updated', handleUpdate);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      window.removeEventListener('notifications_updated', handleUpdate);
+    };
   }, []);
 
   const getIcon = (type) => {
@@ -71,10 +91,9 @@ export default function Notifications() {
     setReplyText('');
     toast.success('Reply submitted to AI Mentor');
     
-    // Simulate instant AI reply
+    // Instant AI reply synchronized to database
     setTimeout(() => {
       db.addChatToNotification(selectedNotif.id, 'I have noted your update and adjusted your career trajectory accordingly! Keep up the great work.', 'system');
-      loadNotifications();
     }, 800);
   };
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Send, CheckCircle2, AlertCircle, Sparkles, Radio, Users } from 'lucide-react';
+import { Bell, Send, Sparkles, Radio } from 'lucide-react';
 import db from '../../services/db';
 
 export default function ManageNotifications() {

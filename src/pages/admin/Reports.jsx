@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart2, Download, TrendingUp, Users, CheckCircle2, Award, Calendar, Sparkles } from 'lucide-react';
+import { Download, Sparkles } from 'lucide-react';
 
 export default function Reports() {
   const [toastMessage, setToastMessage] = useState('');

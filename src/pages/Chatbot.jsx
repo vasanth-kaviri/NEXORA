@@ -1,18 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Sparkles, Paperclip, ArrowUp, Copy, Check, 
-  ChevronRight, FileCode2, X, RotateCcw,
+  ChevronRight, FileCode2, X,
   FileText, ArrowLeft, MessageSquare, Plus, Trash2,
-  ChevronDown, Bot, Terminal, Play, Download,
-  RefreshCw, CornerDownLeft, Compass, Video, Users
+  ChevronDown, RefreshCw
 } from 'lucide-react';
 import db from '../services/db';
 
 export default function Chatbot() {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = db.getCurrentUser() || { firstName: 'Alex', dreamJob: 'Full Stack Engineer' };
+  const currentUser = db.getCurrentUser() || {};
 
   // NEXORA AI Model Families
   const models = [
@@ -86,7 +85,7 @@ export default function Chatbot() {
 - Target Role: ${currentUser.dreamJob || 'Software Professional'}
 - Current Level: ${currentUser.level || 5}
 - Memory Context: Calibrating responses for high-velocity software engineering interviews, ATS scanning benchmarks, and production distributed system architecture.`,
-      text: `Hello ${currentUser.firstName || 'Alex'}! I am your **NEXORA AI MENTOR**, powered by frontier architectural intelligence.\n\nI can assist you in auditing resume bullet points against live recruiter ATS algorithms, running proctored behavioral & system design simulations, optimizing algorithmic complexity, or architecting distributed cloud systems. What would you like to explore or build today?`,
+      text: `Hello ${currentUser.firstName || 'Candidate'}! I am your **NEXORA AI MENTOR**, powered by frontier architectural intelligence.\n\nI can assist you in auditing resume bullet points against live recruiter ATS algorithms, running proctored behavioral & system design simulations, optimizing algorithmic complexity, or architecting distributed cloud systems. What would you like to explore or build today?`,
       code: null,
       codeTitle: null,
       codeLang: null,
@@ -124,18 +123,6 @@ export default function Chatbot() {
       console.warn('Failed to persist NEXORA chats:', e);
     }
   }, [sessions]);
-
-  // Handle Initial Prompt passed from Dashboard or navigation
-  useEffect(() => {
-    if (location.state?.initialPrompt) {
-      const initialText = location.state.initialPrompt;
-      setInput(initialText);
-      window.history.replaceState({}, document.title);
-      setTimeout(() => {
-        executePrompt(initialText);
-      }, 300);
-    }
-  }, [location.state]);
 
   const handleInput = (e) => {
     setInput(e.target.value);
@@ -183,14 +170,6 @@ export default function Chatbot() {
     }
   };
 
-  const handleAttachMock = () => {
-    const options = ['Resume_2026_ATS.pdf', 'DistributedGateway.go', 'SystemArchitecture.drawio', 'BenchmarkResults.csv'];
-    const chosen = options[Math.floor(Math.random() * options.length)];
-    if (!attachedFiles.includes(chosen)) {
-      setAttachedFiles([...attachedFiles, chosen]);
-    }
-  };
-
   const handleFileUpload = (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -224,7 +203,7 @@ export default function Chatbot() {
   };
 
   // Dynamic NEXORA AI Response Synthesis Engine
-  const generateMentorReply = (userPrompt) => {
+  const generateMentorReply = useCallback((userPrompt) => {
     const prompt = userPrompt.toLowerCase();
     const dreamJob = currentUser.dreamJob || 'Software Professional';
 
@@ -381,9 +360,11 @@ Formulating structured, actionable breakdown with engineering principles, indust
         'Give me a 3-question quiz on this topic'
       ]
     };
-  };
+  }, [currentUser.dreamJob]);
 
-  const executePrompt = (textToSend) => {
+  const handledPromptRef = useRef(false);
+
+  const executePrompt = useCallback((textToSend) => {
     if (!textToSend.trim()) return;
 
     const userMsg = {
@@ -422,7 +403,19 @@ Formulating structured, actionable breakdown with engineering principles, indust
       setIsTyping(false);
       setExpandedThoughtIds(prev => [...prev, mentorMsg.id]);
     }, 1100);
-  };
+  }, [attachedFiles, generateMentorReply]);
+
+  useEffect(() => {
+    if (location.state?.initialPrompt && !handledPromptRef.current) {
+      handledPromptRef.current = true;
+      const initialText = location.state.initialPrompt;
+      window.history.replaceState({}, document.title);
+      const timer = setTimeout(() => {
+        executePrompt(initialText);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state, executePrompt]);
 
   const handleSendMessage = (e) => {
     e?.preventDefault();
@@ -725,7 +718,7 @@ Formulating structured, actionable breakdown with engineering principles, indust
                   ✦
                 </div>
                 <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '8px 0 2px 0', letterSpacing: '-0.5px' }}>
-                  {getGreeting()}, {currentUser.firstName || 'Alex'}.
+                  {getGreeting()}, {currentUser.firstName || 'Candidate'}.
                 </h2>
                 <p className="text-muted" style={{ fontSize: '1.02rem', margin: 0, lineHeight: 1.6, maxWidth: 620 }}>
                   How can <strong className="text-main">NEXORA AI MENTOR</strong> accelerate your {currentUser.dreamJob || 'engineering'} trajectory today? Select a topic below or type your inquiry.

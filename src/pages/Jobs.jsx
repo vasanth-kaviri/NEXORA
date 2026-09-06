@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { 
-  Briefcase, Building, DollarSign, MapPin, Search, Filter, Bookmark, 
-  BookmarkCheck, CheckCircle2, ArrowRight, ExternalLink, X, Sparkles, 
-  Clock, ShieldCheck, FileText, Send, User, Mail, Phone, GraduationCap,
-  Calendar, Check, AlertCircle, Eye, ChevronRight
+  Briefcase, Building, DollarSign, MapPin, Search, Bookmark, 
+  BookmarkCheck, CheckCircle2, X, Sparkles, Clock, FileText, Send,
+  Check, ArrowRight
 } from 'lucide-react';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
 
 export default function Jobs() {
   const currentUser = db.getCurrentUser() || {};
@@ -209,7 +209,7 @@ export default function Jobs() {
       requirements: [
         'B.E/B.Tech from recognized university graduating in 2026.',
         'Good understanding of SQL databases, basic networking, and modern programming.',
-        'Strong analytical thinking and adaptability.'
+        'Strong analytical thinking.'
       ]
     },
   ];
@@ -221,16 +221,17 @@ export default function Jobs() {
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applyingJob, setApplyingJob] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
+  const [selectedTrackerApp, setSelectedTrackerApp] = useState(null);
 
   // Editable Application Form State
   const [applyForm, setApplyForm] = useState({
-    firstName: currentUser.firstName || 'Alex',
-    lastName: currentUser.lastName || 'Johnson',
-    email: currentUser.email || 'alex.developer@example.com',
-    phone: currentUser.phone || '+1 (234) 567-8900',
-    education: currentUser.education || 'B.S. Computer Science & Engineering (2026)',
-    portfolioLink: 'https://github.com/alexjohnson',
-    resumeName: 'Alex_Johnson_Resume_ATS_Ready.pdf (92/100 ATS Match)',
+    firstName: currentUser.firstName || 'Explorer',
+    lastName: currentUser.lastName || '',
+    email: currentUser.email || 'user@nexora.ai',
+    phone: currentUser.phone || '',
+    education: currentUser.education || 'Computer Science & Engineering',
+    portfolioLink: '',
+    resumeName: 'Resume_ATS_Ready.pdf',
     coverNote: ''
   });
 
@@ -238,9 +239,9 @@ export default function Jobs() {
   const [savedJobIds, setSavedJobIds] = useState(() => {
     try {
       const saved = localStorage.getItem('nexora_saved_jobs');
-      return saved ? JSON.parse(saved) : ['job_google_01', 'job_stripe_05'];
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return ['job_google_01', 'job_stripe_05'];
+      return [];
     }
   });
 
@@ -249,38 +250,65 @@ export default function Jobs() {
     try {
       const saved = localStorage.getItem('nexora_job_applications');
       if (saved) return JSON.parse(saved);
-    } catch {}
-
-    // Default authentic demo applications
-    return [
-      {
-        id: 'app_1',
-        jobId: 'job_google_01',
-        company: 'Google',
-        title: 'Software Engineering Intern - Cloud & Systems',
-        appliedDate: 'Aug 26, 2026',
-        status: 'Interview Scheduled',
-        stageIndex: 2,
-        atsScore: 96,
-        nextStep: 'Technical Round 1: System Design & Algorithms on Sep 14',
-        candidateName: 'Alex Johnson',
-        email: 'alex.developer@example.com'
-      },
-      {
-        id: 'app_2',
-        jobId: 'job_stripe_05',
-        company: 'Stripe',
-        title: 'Backend Engineering Intern (Payments Core)',
-        appliedDate: 'Sep 01, 2026',
-        status: 'ATS Resume Screened',
-        stageIndex: 1,
-        atsScore: 94,
-        nextStep: 'Recruiter review in progress. Expect update in 3-5 days.',
-        candidateName: 'Alex Johnson',
-        email: 'alex.developer@example.com'
-      }
-    ];
+      return [
+        {
+          id: 'app_google_seed',
+          jobId: 'job_google_01',
+          company: 'Google',
+          title: 'Software Engineering Intern - Cloud & Systems',
+          appliedDate: 'Sep 02, 2026',
+          status: 'ATS Screened - Shortlisted',
+          stageIndex: 1,
+          atsScore: 97,
+          nextStep: 'Technical phone screen scheduling in progress with Google Cloud Engineering.',
+          candidateName: `${currentUser.firstName || 'Candidate'} ${currentUser.lastName || ''}`.trim() || 'Software Engineer',
+          email: currentUser.email || 'candidate@nexora.ai',
+          phone: '+1 (555) 382-9012',
+          education: 'B.Tech in Computer Science & Systems Engineering',
+          resumeName: 'Resume_ATS_Ready.pdf',
+          portfolioLink: 'https://github.com/nexora-engineer',
+          coverNote: 'Excited to contribute to Google Cloud systems and distributed telemetry pipelines.',
+          jobDetails: {
+            location: 'Bangalore, India & Mountain View, CA (Hybrid)',
+            salary: '$45 - $55 / hr · ₹85,000 / mo',
+            type: 'Internship',
+            batch: '2026 Batch',
+            tags: ['C++', 'Python', 'Distributed Systems', 'Kubernetes'],
+            desc: 'Join Google Cloud engineering to build planetary-scale telemetry pipelines and container infrastructure. You will collaborate directly with senior staff engineers to write production code deployed across global datacenters.',
+            responsibilities: [
+              'Design and deploy scalable asynchronous APIs in Go and C++.',
+              'Optimize multi-tenant database access patterns to eliminate network bottlenecks.',
+              'Participate in design reviews and blameless post-mortems for distributed services.'
+            ],
+            requirements: [
+              'Enrolled in BS/MS Computer Science or equivalent engineering degree.',
+              'Experience with object-oriented programming, data structures, and algorithms.',
+              'Familiarity with container concepts (Docker, Linux namespaces).'
+            ]
+          }
+        }
+      ];
+    } catch {
+      return [];
+    }
   });
+
+  // Subscribe to Firebase Realtime Database for saved jobs
+  useEffect(() => {
+    const user = db.getCurrentUser();
+    const uid = user?.id || user?.uid;
+    if (!uid) return;
+
+    const unsubscribe = realtimeDb.subscribeToSavedJobs(uid, (remoteSaved) => {
+      if (remoteSaved) {
+        setSavedJobIds(Object.keys(remoteSaved));
+      }
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -297,16 +325,24 @@ export default function Jobs() {
 
   const handleToggleBookmark = (jobId, e) => {
     if (e) e.stopPropagation();
+    const nextSaved = !savedJobIds.includes(jobId);
     let updated;
-    if (savedJobIds.includes(jobId)) {
+    if (nextSaved) {
+      updated = [...savedJobIds, jobId];
+      triggerToast('Job bookmarked to your profile and synced to database!');
+    } else {
       updated = savedJobIds.filter(id => id !== jobId);
       triggerToast('Job removed from saved bookmarks.');
-    } else {
-      updated = [...savedJobIds, jobId];
-      triggerToast('Job bookmarked to your profile!');
     }
     setSavedJobIds(updated);
     localStorage.setItem('nexora_saved_jobs', JSON.stringify(updated));
+
+    // Realtime Database persistence
+    const user = db.getCurrentUser();
+    const uid = user?.id || user?.uid;
+    if (uid) {
+      realtimeDb.toggleSavedJob(uid, jobId, nextSaved);
+    }
   };
 
   const handleOpenApplyModal = (job, e) => {
@@ -336,8 +372,23 @@ export default function Jobs() {
       stageIndex: 0,
       atsScore: 92,
       nextStep: 'Application dispatched to hiring team. Automated ATS screening underway.',
-      candidateName: `${applyForm.firstName} ${applyForm.lastName}`,
-      email: applyForm.email
+      candidateName: `${applyForm.firstName} ${applyForm.lastName}`.trim() || 'Applicant',
+      email: applyForm.email,
+      phone: applyForm.phone,
+      education: applyForm.education,
+      resumeName: applyForm.resumeName,
+      portfolioLink: applyForm.portfolioLink,
+      coverNote: applyForm.coverNote,
+      jobDetails: {
+        location: applyingJob.location,
+        salary: applyingJob.salary,
+        type: applyingJob.type,
+        batch: applyingJob.batch,
+        tags: applyingJob.tags,
+        desc: applyingJob.desc,
+        responsibilities: applyingJob.responsibilities,
+        requirements: applyingJob.requirements
+      }
     };
 
     const updated = [newApp, ...applications.filter(a => a.jobId !== applyingJob.id)];
@@ -495,12 +546,14 @@ export default function Jobs() {
               {applications.map((app) => (
                 <div 
                   key={app.id} 
-                  className="glass-panel p-lg flex flex-col gap-md"
+                  onClick={() => setSelectedTrackerApp(app)}
+                  className="glass-panel p-lg flex flex-col gap-md transition-all hover:scale-[1.005] hover:border-primary cursor-pointer"
                   style={{
                     padding: '20px',
                     borderRadius: '16px',
                     border: '1px solid var(--border-color)',
-                    background: 'var(--card-bg)'
+                    background: 'var(--card-bg)',
+                    cursor: 'pointer'
                   }}
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
@@ -542,11 +595,16 @@ export default function Jobs() {
                     })}
                   </div>
 
-                  {/* Next Step Banner */}
-                  <div className="glass-panel p-sm flex items-center gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
-                    <Sparkles size={15} className="text-primary shrink-0" />
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      <strong>Next Step:</strong> {app.nextStep}
+                  {/* Next Step Banner & View Prompt */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
+                    <div className="glass-panel p-sm flex items-center gap-sm flex-1" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
+                      <Sparkles size={15} className="text-primary shrink-0" />
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        <strong>Next Step:</strong> {app.nextStep}
+                      </span>
+                    </div>
+                    <span className="text-primary flex items-center gap-xs font-600 shrink-0" style={{ fontSize: '0.78rem', padding: '4px 8px' }}>
+                      View Details & Status <ArrowRight size={13} />
                     </span>
                   </div>
                 </div>
@@ -676,8 +734,8 @@ export default function Jobs() {
               </div>
             );
           })}
-        </div>
-      )}
+          </div>
+        )}
 
       {/* ── SLIDE-OUT DETAIL MODAL ── */}
       {selectedJob && (
@@ -916,6 +974,165 @@ export default function Jobs() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── APPLICATION TRACKER DETAIL & STATUS DOSSIER MODAL ── */}
+      {selectedTrackerApp && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
+          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setSelectedTrackerApp(null)}
+        >
+          <div 
+            className="glass-panel flex flex-col gap-md max-w-2xl w-full animate-scale-up"
+            style={{ 
+              padding: '2rem', 
+              background: 'var(--bg-card)', 
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)', 
+              maxHeight: '90vh', 
+              overflowY: 'auto',
+              borderRadius: 'var(--radius-lg)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-start pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div>
+                <div className="flex items-center gap-xs text-primary font-600 mb-xs" style={{ fontSize: '0.78rem' }}>
+                  <Briefcase size={14} /> OFFICIAL APPLICATION RECORD • {selectedTrackerApp.company}
+                </div>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800 }}>{selectedTrackerApp.title}</h2>
+                <div className="flex flex-wrap items-center gap-sm mt-xs text-muted" style={{ fontSize: '0.82rem' }}>
+                  <span>Applied: {selectedTrackerApp.appliedDate}</span>
+                  <span>•</span>
+                  <span>Candidate: <strong>{selectedTrackerApp.candidateName}</strong></span>
+                  <span>•</span>
+                  <span>ID: <code style={{ fontSize: '0.75rem' }}>{selectedTrackerApp.id}</code></span>
+                </div>
+              </div>
+              <button 
+                className="btn-icon-tactile" 
+                onClick={() => setSelectedTrackerApp(null)}
+                style={{ borderRadius: '50%', padding: '6px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Pipeline Stage Timeline */}
+            <div className="glass-panel p-md flex flex-col gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-md)' }}>
+              <div className="flex justify-between items-center">
+                <span className="font-700" style={{ fontSize: '0.88rem' }}>Current Hiring Pipeline Status</span>
+                <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', fontWeight: 700, fontSize: '0.8rem', padding: '4px 12px', borderRadius: 'var(--radius-full)' }}>
+                  {selectedTrackerApp.status}
+                </span>
+              </div>
+
+              {/* Visual Multi-Stage Progress Indicator */}
+              <div className="grid grid-cols-4 gap-xs pt-xs">
+                {stages.map((stageName, sIdx) => {
+                  const isComplete = sIdx <= selectedTrackerApp.stageIndex;
+                  const isCurrent = sIdx === selectedTrackerApp.stageIndex;
+                  return (
+                    <div key={stageName} className="flex flex-col gap-xs">
+                      <div 
+                        style={{
+                          height: 8,
+                          borderRadius: 4,
+                          background: isComplete ? 'var(--primary)' : 'var(--border-color)'
+                        }} 
+                      />
+                      <div className="flex items-center gap-xs mt-xs">
+                        {isComplete && <Check size={12} className="text-primary" />}
+                        <span style={{ fontSize: '0.72rem', fontWeight: isCurrent ? 700 : 500, color: isComplete ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                          {stageName}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-xs mt-xs text-muted" style={{ fontSize: '0.8rem' }}>
+                <Sparkles size={14} className="text-primary" />
+                <span>{selectedTrackerApp.nextStep}</span>
+              </div>
+            </div>
+
+            {/* Candidate Submission Dossier */}
+            <div className="flex flex-col gap-xs">
+              <h4 style={{ fontSize: '0.92rem', fontWeight: 700 }}>Candidate Profile & Documents</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm" style={{ fontSize: '0.82rem' }}>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Contact Email</span>
+                  <span className="font-600">{selectedTrackerApp.email || currentUser.email || 'candidate@nexora.ai'}</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Phone Number</span>
+                  <span className="font-600">{selectedTrackerApp.phone || currentUser.phone || '+1 (555) 382-9012'}</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>ATS Optimization Score</span>
+                  <span className="font-600 text-primary">{selectedTrackerApp.atsScore || 92} / 100 Match</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Attached Resume</span>
+                  <div className="flex items-center gap-xs font-600">
+                    <FileText size={14} className="text-primary" />
+                    <span>{selectedTrackerApp.resumeName || 'Resume_ATS_Ready.pdf'}</span>
+                  </div>
+                </div>
+              </div>
+              {selectedTrackerApp.coverNote && (
+                <div className="p-sm glass-panel mt-xs" style={{ background: 'var(--card-bg)', fontSize: '0.82rem' }}>
+                  <span className="text-muted block mb-xs" style={{ fontSize: '0.72rem' }}>Submitted Candidate Note</span>
+                  <p className="text-muted" style={{ margin: 0, fontStyle: 'italic' }}>"{selectedTrackerApp.coverNote}"</p>
+                </div>
+              )}
+            </div>
+
+            {/* Role Snapshot & Requirements */}
+            {(() => {
+              const jobDetails = selectedTrackerApp.jobDetails || allJobs.find(j => j.id === selectedTrackerApp.jobId) || {};
+              return (
+                <div className="flex flex-col gap-xs pt-xs" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: 700 }}>Job Snapshot & Requirements</h4>
+                  {jobDetails.location && (
+                    <div className="flex flex-wrap gap-md text-muted mb-xs" style={{ fontSize: '0.8rem' }}>
+                      <span className="flex items-center gap-xs"><MapPin size={13} /> {jobDetails.location}</span>
+                      <span className="flex items-center gap-xs"><DollarSign size={13} /> {jobDetails.salary}</span>
+                      <span className="flex items-center gap-xs"><Briefcase size={13} /> {jobDetails.type}</span>
+                    </div>
+                  )}
+                  {jobDetails.desc && (
+                    <p className="text-muted" style={{ fontSize: '0.82rem', margin: 0 }}>{jobDetails.desc}</p>
+                  )}
+                  {jobDetails.responsibilities && jobDetails.responsibilities.length > 0 && (
+                    <div className="mt-xs">
+                      <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>Key Deliverables:</span>
+                      <ul className="flex flex-col gap-xs pl-md mt-xs" style={{ fontSize: '0.8rem' }}>
+                        {jobDetails.responsibilities.slice(0, 2).map((resp, i) => (
+                          <li key={i} className="text-muted">{resp}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Modal Actions */}
+            <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setSelectedTrackerApp(null)}
+                style={{ width: 'auto', padding: '8px 18px', fontSize: '0.84rem' }}
+              >
+                Close Dossier
+              </button>
+            </div>
           </div>
         </div>
       )}

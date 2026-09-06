@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Compass, Search, Filter, Plus, Edit2, Trash2, CheckCircle2, X, Sparkles } from 'lucide-react';
+import { Search, Plus, Trash2, X, Sparkles } from 'lucide-react';
 
 export default function ManagePaths() {
   const [paths, setPaths] = useState([

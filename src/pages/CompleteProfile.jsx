@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Book, Briefcase, GraduationCap, ArrowRight, Sparkles, CheckCircle2, Target, Cpu } from 'lucide-react';
+import { User, Book, Briefcase, GraduationCap, ArrowRight, ArrowLeft, Sparkles, CheckCircle2, Target, Cpu } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
-import CountryCodePicker from '../components/CountryCodePicker';
 import IconInput from '../components/IconInput';
-import { useCountryCodes } from '../hooks/useCountryCodes';
 import db from '../services/db';
 import { useToast } from '../contexts/ToastContext';
+import { getRoadmapForJob } from '../utils/roadmapData';
 
 const domains = [
   'Artificial Intelligence', 'Web Development', 'Cloud Computing', 'Cybersecurity',
   'Data Science', 'UI/UX Design', 'Mobile App Development', 'Game Development',
   'Blockchain', 'Digital Marketing', 'Business Analytics',
+];
+
+const featuredDomains = [
+  'Artificial Intelligence', 'Web Development', 'Cloud Computing',
+  'Cybersecurity', 'Data Science', 'Mobile App Development'
 ];
 
 const jobs = [
@@ -22,271 +26,336 @@ const jobs = [
   'QA Engineer', 'Mobile App Developer',
 ];
 
+const educationLevels = [
+  'B.Tech / B.E. Computer Science',
+  'B.S. / B.Sc Information Technology',
+  'Master of Science (M.S. / M.Tech)',
+  'Self-Taught Software Engineer',
+  'Coding Bootcamp Graduate',
+  'High School / Associate Degree',
+  'Other Engineering Discipline'
+];
+
 export default function CompleteProfile() {
   const navigate = useNavigate();
   const toast = useToast();
-  const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '',
-    phone: '', education: '', domain: '', dreamJob: ''
+  const [stage, setStage] = useState(1);
+  const [formData, setFormData] = useState(() => {
+    const cur = db.getCurrentUser() || {};
+    return {
+      firstName: cur.firstName || '',
+      lastName: cur.lastName || '',
+      email: cur.email || '',
+      phone: cur.phone || '',
+      education: cur.education || 'B.Tech / B.E. Computer Science',
+      domain: cur.domain || 'Web Development',
+      dreamJob: cur.dreamJob || 'Full Stack Engineer'
+    };
   });
 
-  const {
-    countryCode,
-    setCountryCode,
-    showCountryMenu,
-    setShowCountryMenu,
-    searchCountry,
-    setSearchCountry,
-    filteredCountries,
-    countryCodes,
-  } = useCountryCodes();
+  const matchedRoadmap = useMemo(() => {
+    return getRoadmapForJob(formData.dreamJob || 'Full Stack Engineer');
+  }, [formData.dreamJob]);
+
+  const handleStage1Continue = (e) => {
+    e.preventDefault();
+    if (!formData.firstName.trim()) {
+      toast.error('Please enter your first name.');
+      return;
+    }
+    if (!formData.lastName.trim()) {
+      toast.error('Please enter your last name.');
+      return;
+    }
+    setStage(2);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const matchedDomain = getRoadmapForJob(formData.dreamJob);
+    const trackId = matchedDomain?.id || 'fullstack';
+
+    // Persist active roadmap course for all workstations
+    localStorage.setItem('nexora_active_course', trackId);
+
     db.updateUserProfile({
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
-      phone: formData.phone ? `${countryCode} ${formData.phone}` : '',
+      phone: formData.phone,
       education: formData.education,
       domain: formData.domain,
       dreamJob: formData.dreamJob,
+      selectedTrack: trackId,
       profileCompleted: true
     });
-    toast.success('Profile calibrated! Welcome to your NEXORA engineering workstation.');
+
+    // Notify all workstation listeners
+    window.dispatchEvent(new Event('user_session_changed'));
+
+    toast.success(`Profile calibrated! Assigned ${matchedDomain?.title || formData.dreamJob} roadmap.`);
     navigate('/dashboard');
   };
 
-  // Dynamic right-side AI profile calibration showcase
+  // Executive right-hand showcase
   const profileShowcase = (
-    <div className="flex flex-col animate-fade-in w-full">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="minimal-badge" style={{ color: 'var(--minimal-indigo)', borderColor: 'rgba(99, 102, 241, 0.25)' }}>
-          <Sparkles size={12} className="text-minimal-indigo" />
-          <span>AI CAREER ENGINE</span>
+    <div className="flex flex-col animate-fade-in w-full text-left" style={{ color: '#f4f4f5' }}>
+      <div className="flex items-center gap-2 mb-4">
+        <span 
+          className="minimal-badge" 
+          style={{ 
+            color: '#a5b4fc', 
+            background: 'rgba(99, 102, 241, 0.12)', 
+            borderColor: 'rgba(99, 102, 241, 0.28)', 
+            padding: '3px 10px' 
+          }}
+        >
+          <Sparkles size={12} className="text-indigo-400" />
+          <span>CAREER TRAJECTORY PREVIEW</span>
         </span>
-        <span className="text-muted" style={{ fontSize: '0.75rem' }}>· Real-Time Calibration</span>
+        <span style={{ color: 'rgba(244, 244, 245, 0.5)', fontSize: '0.75rem' }}>· Step {stage} of 2</span>
       </div>
 
       <h2 
-        className="text-gradient"
-        style={{ fontSize: '2.15rem', fontWeight: 800, lineHeight: 1.22, letterSpacing: '-0.5px', marginBottom: '12px' }}
-      >
-        Precision Tailored Trajectory.
-      </h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', lineHeight: 1.6, marginBottom: '24px' }}>
-        NEXORA analyzes your domain focus and target career role to dynamically synthesize daily technical sprints and interview assessments.
-      </p>
-
-      {/* Trajectory Blueprint Terminal Card */}
-      <div 
-        className="glass-panel skeuo-convex" 
         style={{ 
-          borderRadius: '18px', 
-          padding: '22px', 
-          background: 'var(--skeuo-surface-card)',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 18px 45px rgba(0, 0, 0, 0.22)'
+          fontSize: '1.95rem', 
+          fontWeight: 800, 
+          lineHeight: 1.28, 
+          letterSpacing: '-0.6px', 
+          marginBottom: '12px',
+          background: 'linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
         }}
       >
-        <div className="flex justify-between items-center pb-3 mb-3.5" style={{ borderBottom: '1px solid var(--border-color)' }}>
-          <div className="flex items-center gap-2">
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-            <span className="text-muted font-mono" style={{ fontSize: '0.74rem', marginLeft: '6px' }}>
-              nexora://engine/profile-synthesis
-            </span>
-          </div>
-          <span className="minimal-badge font-mono" style={{ fontSize: '0.68rem', color: 'var(--minimal-emerald)' }}>
-            ● SYNC ACTIVE
+        Precision Engineering Blueprint.
+      </h2>
+      <p style={{ color: 'rgba(244, 244, 245, 0.72)', fontSize: '0.92rem', lineHeight: 1.65, marginBottom: '24px' }}>
+        NEXORA synthesizes your technical focus into autonomous daily coding sprints, system design challenges, and voice interview telemetry.
+      </p>
+
+      {/* Trajectory Preview Card */}
+      <div 
+        className="rounded-2xl p-5 mb-5" 
+        style={{ 
+          background: 'radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.15) 0%, rgba(18, 18, 22, 0.75) 80%)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+        }}
+      >
+        <div className="flex items-center justify-between text-xs font-mono mb-3" style={{ color: 'rgba(244, 244, 245, 0.6)' }}>
+          <span>CALIBRATED TRACK</span>
+          <span className="minimal-badge text-[10px]" style={{ color: '#34d399', background: 'rgba(16, 185, 129, 0.12)', borderColor: 'rgba(16, 185, 129, 0.28)' }}>
+            OPTIMAL MATCH
           </span>
         </div>
 
-        {/* Selected Trajectory Preview */}
-        <div className="p-3 rounded-xl mb-3" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
-          <div className="flex justify-between items-center mb-1">
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-              Target Role Alignment
-            </span>
-            <span className="minimal-badge" style={{ fontSize: '0.68rem', color: 'var(--minimal-indigo)' }}>
-              98% Match
-            </span>
+        <div className="p-3.5 rounded-xl mb-3.5" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Target size={15} className="text-indigo-400" />
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(244, 244, 245, 0.6)' }}>Target Role</span>
           </div>
-          <p style={{ fontSize: '0.95rem', fontWeight: 700, margin: '2px 0 0 0', color: 'var(--text-main)' }}>
+          <p className="font-extrabold text-base m-0" style={{ color: '#ffffff' }}>
             {formData.dreamJob || 'Full Stack Engineer'}
           </p>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
-            Specialization: <strong className="text-primary">{formData.domain || 'Web Development'}</strong>
+          <p className="text-xs m-0 mt-0.5" style={{ color: 'rgba(244, 244, 245, 0.65)' }}>
+            Focus: {formData.domain || 'Software Engineering'}
           </p>
         </div>
 
-        {/* Dynamic Provisioning Milestones */}
-        <div className="flex flex-col gap-2 mb-4">
-          <div className="flex items-center justify-between p-2 px-3 rounded-lg" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-minimal-emerald" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                FAANG Diagnostic Assessment Engine
-              </span>
+        {/* Milestone Steps */}
+        <div className="flex flex-col gap-2">
+          {(matchedRoadmap.coreSteps || []).slice(0, 3).map((step, idx) => (
+            <div 
+              key={step.id || idx}
+              className="flex items-center justify-between p-2.5 px-3 rounded-lg"
+              style={{ background: idx === 0 ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className={idx === 0 ? "text-indigo-400" : "text-zinc-500"} />
+                <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>
+                  {step.title}
+                </span>
+              </div>
+              <span className="font-mono text-[11px]" style={{ color: 'rgba(244, 244, 245, 0.55)' }}>Sprint {idx + 1}</span>
             </div>
-            <span className="font-mono text-minimal-emerald" style={{ fontSize: '0.72rem' }}>READY</span>
-          </div>
-
-          <div className="flex items-center justify-between p-2 px-3 rounded-lg" style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
-            <div className="flex items-center gap-2">
-              <Target size={15} className="text-minimal-indigo" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                Calibrated Milestone Roadmaps
-              </span>
-            </div>
-            <span className="font-mono text-minimal-indigo" style={{ fontSize: '0.72rem' }}>STAGED</span>
-          </div>
-
-          <div className="flex items-center justify-between p-2 px-3 rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <Cpu size={15} className="text-muted" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-muted)' }}>
-                AI Mentor Workstation Persona
-              </span>
-            </div>
-            <span className="font-mono text-muted" style={{ fontSize: '0.72rem' }}>AWAITING</span>
-          </div>
+          ))}
         </div>
+      </div>
 
-        <div className="flex items-center justify-between pt-2 text-xs text-muted" style={{ borderTop: '1px solid var(--border-color)' }}>
-          <span>NEXORA Calibration Core</span>
-          <span className="font-mono">Adaptive AI v2.5</span>
-        </div>
+      <div className="flex items-center justify-between text-xs px-1" style={{ color: 'rgba(244, 244, 245, 0.5)' }}>
+        <span>Instant Sandbox Provisioning</span>
+        <span>Confidential Candidate Data</span>
       </div>
     </div>
   );
 
   return (
     <AuthLayout
-      headline="Personalize Your Trajectory."
-      subtext="Calibrate your domain focus and target career goals to unlock tailored curriculum roadmaps, AI mock interviews, and sandbox projects."
-      badgeText="ENGINEERING ONBOARDING"
-      badgeSub="· Step 1 of 1"
-      maxWidth="560px"
+      headline="Personalize Your Career Trajectory."
+      subtext="Calibrate your domain focus and target career goals to unlock tailored curriculum roadmaps and AI mock interviews."
+      badgeText="EXECUTIVE ONBOARDING"
+      badgeSub={`· Stage ${stage} of 2`}
+      maxWidth="500px"
       customShowcase={profileShowcase}
     >
       <div className="w-full">
-        <div className="mb-5 text-left">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2.5" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--minimal-indigo)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-            <Sparkles size={12} />
-            <span>Profile Calibration</span>
+        
+        {/* Step Progress Stepper */}
+        <div className="flex items-center gap-3 mb-6 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <div className="flex items-center gap-2">
+            <span 
+              className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+              style={{
+                background: stage === 1 ? 'var(--minimal-indigo, #6366f1)' : 'rgba(99, 102, 241, 0.25)',
+                color: '#ffffff'
+              }}
+            >
+              1
+            </span>
+            <span className={`text-xs font-semibold ${stage === 1 ? 'text-main' : 'text-muted'}`}>
+              Identity &amp; Background
+            </span>
           </div>
-          <h1 className="text-gradient" style={{ fontSize: '2.1rem', fontWeight: 800, marginBottom: '6px', letterSpacing: '-0.5px' }}>
-            Complete Profile
-          </h1>
-          <p className="text-muted" style={{ fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
-            Configure your technical background so NEXORA can tailor your career station.
-          </p>
+
+          <div className="flex-1 h-[1px]" style={{ background: 'var(--border-color)' }} />
+
+          <div className="flex items-center gap-2">
+            <span 
+              className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+              style={{
+                background: stage === 2 ? 'var(--minimal-indigo, #6366f1)' : 'rgba(255, 255, 255, 0.08)',
+                color: stage === 2 ? '#ffffff' : 'var(--text-muted)'
+              }}
+            >
+              2
+            </span>
+            <span className={`text-xs font-semibold ${stage === 2 ? 'text-main' : 'text-muted'}`}>
+              Career Trajectory
+            </span>
+          </div>
         </div>
 
-        {/* 2-Column Responsive Grid Form */}
-        <form onSubmit={handleSubmit} className="w-full">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            {/* First Name */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>First Name <span className="text-secondary">*</span></label>
-              <IconInput
-                icon={<User size={18} />}
-                type="text"
-                placeholder="e.g. Alex"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-              />
+        {/* ── STAGE 1: Candidate Identity & Education ── */}
+        {stage === 1 && (
+          <form onSubmit={handleStage1Continue} className="w-full flex flex-col gap-4 animate-fade-in">
+            <div className="mb-2">
+              <h1 className="text-gradient text-3xl font-extrabold tracking-tight mb-2">
+                Candidate Profile
+              </h1>
+              <p className="text-muted text-sm leading-relaxed">
+                Enter your identity details to calibrate your personalized workspace.
+              </p>
             </div>
 
-            {/* Last Name */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Last Name <span className="text-secondary">*</span></label>
-              <IconInput
-                icon={<User size={18} />}
-                type="text"
-                placeholder="e.g. Johnson"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            {/* Email Address */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Email Address <span className="text-secondary">*</span></label>
-              <IconInput
-                icon={<Mail size={18} />}
-                type="email"
-                placeholder="alex.johnson@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Phone Number <span className="text-secondary">*</span></label>
-              <div className="flex w-full gap-2" style={{ width: '100%' }}>
-                <CountryCodePicker
-                  countryCode={countryCode}
-                  setCountryCode={setCountryCode}
-                  showCountryMenu={showCountryMenu}
-                  setShowCountryMenu={setShowCountryMenu}
-                  searchCountry={searchCountry}
-                  setSearchCountry={setSearchCountry}
-                  filteredCountries={filteredCountries}
-                  countryCodes={countryCodes}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* First Name */}
+              <div className="input-group mb-0">
+                <label className="input-label mb-1.5 font-medium text-xs tracking-wide">First Name</label>
+                <IconInput
+                  icon={<User size={17} />}
+                  type="text"
+                  placeholder="Rachel"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  required
                 />
-                <input
-                  type="tel"
-                  maxLength={countryCodes.find(c => c.code === countryCode)?.maxLength || 15}
-                  className="input-field flex-1 min-w-0"
-                  style={{ flex: 1, minWidth: 0 }}
-                  placeholder="234 567 8900"
-                  value={formData.phone}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^0-9]/g, '');
-                    setFormData({ ...formData, phone: val });
-                  }}
+              </div>
+
+              {/* Last Name */}
+              <div className="input-group mb-0">
+                <label className="input-label mb-1.5 font-medium text-xs tracking-wide">Last Name</label>
+                <IconInput
+                  icon={<User size={17} />}
+                  type="text"
+                  placeholder="Foster"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
                 />
               </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             {/* Highest Education */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Highest Education</label>
-              <IconInput
-                icon={<GraduationCap size={18} />}
-                type="text"
-                placeholder="e.g. B.Tech Computer Science"
-                value={formData.education}
-                onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-              />
+            <div className="input-group mb-2">
+              <label className="input-label mb-1.5 font-medium text-xs tracking-wide">Academic Foundation / Education</label>
+              <div style={{ position: 'relative' }}>
+                <GraduationCap size={17} className="text-muted" style={{ position: 'absolute', top: 14, left: 14 }} />
+                <select
+                  id="profile-education-select"
+                  className="input-field cursor-pointer"
+                  style={{ paddingLeft: '2.75rem', width: '100%', appearance: 'none', borderRadius: 'var(--radius-md)' }}
+                  value={formData.education}
+                  onChange={(e) => setFormData({ ...formData, education: e.target.value })}
+                >
+                  {educationLevels.map((lvl, i) => (
+                    <option key={i} value={lvl}>{lvl}</option>
+                  ))}
+                </select>
+                <div style={{ position: 'absolute', top: 16, right: 14, pointerEvents: 'none' }}>
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
-            {/* Domain of Interest */}
-            <div className="input-group mb-0">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Domain Focus <span className="text-secondary">*</span></label>
+            <button
+              type="submit"
+              className="btn btn-primary w-full flex items-center justify-center gap-2 mt-3 cursor-pointer"
+              style={{ padding: '13px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
+            >
+              <span>Continue to Career Trajectory</span>
+              <ArrowRight size={17} />
+            </button>
+          </form>
+        )}
+
+        {/* ── STAGE 2: Domain Focus & Target Role ── */}
+        {stage === 2 && (
+          <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 animate-fade-in">
+            <div className="mb-1">
+              <h1 className="text-gradient text-3xl font-extrabold tracking-tight mb-2">
+                Career Calibration
+              </h1>
+              <p className="text-muted text-sm leading-relaxed">
+                Select your primary specialization and target career role.
+              </p>
+            </div>
+
+            {/* Quick-Select Domain Chips */}
+            <div>
+              <label className="input-label mb-2 block font-medium text-xs tracking-wide">Primary Domain Focus</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-2.5">
+                {featuredDomains.map((dom) => (
+                  <button
+                    key={dom}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, domain: dom })}
+                    className="p-2.5 px-3 rounded-xl text-xs font-semibold text-left transition-all cursor-pointer truncate"
+                    style={{
+                      background: formData.domain === dom ? 'rgba(99, 102, 241, 0.15)' : 'var(--input-bg)',
+                      border: formData.domain === dom ? '1px solid var(--primary)' : '1px solid var(--border-color)',
+                      color: formData.domain === dom ? 'var(--primary)' : 'var(--text-muted)',
+                      boxShadow: formData.domain === dom ? '0 0 12px rgba(99, 102, 241, 0.2)' : 'none'
+                    }}
+                  >
+                    {dom}
+                  </button>
+                ))}
+              </div>
+
+              {/* All Domains Dropdown */}
               <div style={{ position: 'relative' }}>
-                <Book size={18} className="text-muted" style={{ position: 'absolute', top: 13, left: 14 }} />
+                <Book size={17} className="text-muted" style={{ position: 'absolute', top: 14, left: 14 }} />
                 <select
-                  className="input-field"
-                  style={{ paddingLeft: '2.6rem', width: '100%', appearance: 'none', borderRadius: 'var(--radius-md)' }}
+                  id="profile-domain-select"
+                  className="input-field cursor-pointer"
+                  style={{ paddingLeft: '2.75rem', width: '100%', appearance: 'none', borderRadius: 'var(--radius-md)' }}
                   value={formData.domain}
                   onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
                   required
                 >
-                  <option value="" disabled>Select a domain</option>
                   {domains.map((d, i) => <option key={i} value={d}>{d}</option>)}
                 </select>
                 <div style={{ position: 'absolute', top: 16, right: 14, pointerEvents: 'none' }}>
@@ -296,45 +365,55 @@ export default function CompleteProfile() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Dream Job Role (Full width) */}
-          <div className="input-group mb-5">
-            <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Target Dream Job / Role <span className="text-secondary">*</span></label>
-            <div style={{ position: 'relative' }}>
-              <Briefcase size={18} className="text-muted" style={{ position: 'absolute', top: 13, left: 14 }} />
-              <select
-                className="input-field"
-                style={{ paddingLeft: '2.6rem', width: '100%', appearance: 'none', borderRadius: 'var(--radius-md)' }}
-                value={formData.dreamJob}
-                onChange={(e) => setFormData({ ...formData, dreamJob: e.target.value })}
-                required
-              >
-                <option value="" disabled>Select your target role</option>
-                {jobs.map((j, i) => <option key={i} value={j}>{j}</option>)}
-              </select>
-              <div style={{ position: 'absolute', top: 16, right: 14, pointerEvents: 'none' }}>
-                <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                  <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            {/* Target Dream Job */}
+            <div>
+              <label className="input-label mb-2 block font-medium text-xs tracking-wide">Target Role / Career Objective</label>
+              <div style={{ position: 'relative' }}>
+                <Briefcase size={17} className="text-muted" style={{ position: 'absolute', top: 14, left: 14 }} />
+                <select
+                  id="profile-dreamjob-select"
+                  className="input-field cursor-pointer"
+                  style={{ paddingLeft: '2.75rem', width: '100%', appearance: 'none', borderRadius: 'var(--radius-md)' }}
+                  value={formData.dreamJob}
+                  onChange={(e) => setFormData({ ...formData, dreamJob: e.target.value })}
+                  required
+                >
+                  {jobs.map((j, i) => <option key={i} value={j}>{j}</option>)}
+                </select>
+                <div style={{ position: 'absolute', top: 16, right: 14, pointerEvents: 'none' }}>
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary w-full flex items-center justify-center gap-2"
-            style={{ padding: '13px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
-          >
-            <span>Calibrate Trajectory &amp; Launch</span>
-            <ArrowRight size={18} />
-          </button>
+            {/* Navigation Actions */}
+            <div className="flex items-center gap-3 mt-2 w-full">
+              <button
+                type="button"
+                onClick={() => setStage(1)}
+                className="btn btn-secondary flex items-center justify-center gap-1.5 cursor-pointer"
+                style={{ width: 'auto', flexShrink: 0, padding: '13px 22px', borderRadius: 'var(--radius-md)' }}
+              >
+                <ArrowLeft size={16} />
+                <span>Back</span>
+              </button>
 
-          <div className="mt-4 pt-3 flex items-center justify-between text-xs text-muted" style={{ borderTop: '1px solid var(--border-color)' }}>
-            <span>⚡ Instant Sandbox Provisioning</span>
-            <span>🔒 Confidential Profile Data</span>
-          </div>
-        </form>
+              <button 
+                type="submit" 
+                id="complete-profile-submit-btn"
+                className="btn btn-primary flex-1 flex items-center justify-center gap-2 cursor-pointer"
+                style={{ width: 'auto', minWidth: 0, padding: '13px 20px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
+              >
+                <span>Calibrate &amp; Launch</span>
+                <ArrowRight size={17} />
+              </button>
+            </div>
+          </form>
+        )}
+
       </div>
     </AuthLayout>
   );

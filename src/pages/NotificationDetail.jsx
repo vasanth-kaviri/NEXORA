@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Bell, ArrowLeft, Send, Sparkles, 
+  ArrowLeft, Send, Sparkles, 
   Bot, ArrowUpRight
 } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
@@ -24,73 +24,57 @@ function getAdvisorInsight(type) {
 export default function NotificationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [notification, setNotification] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const chatBottomRef = useRef(null);
 
-  useEffect(() => {
-    // Look up from Database service
+  const [notification] = useState(() => {
     let found = db.getNotificationById(id);
-    
-    // Fallback if accessed via numeric id like '1', '2', '3'
     if (!found) {
       const allNotifs = db.getNotifications();
       if (id === '1') found = allNotifs.find(n => n.type === 'resume') || allNotifs[0];
       else if (id === '2') found = allNotifs.find(n => n.type === 'achievement') || allNotifs[1];
       else if (id === '3') found = allNotifs.find(n => n.type === 'reminder') || allNotifs[2];
-      else found = allNotifs[0];
+      else found = allNotifs[0] || null;
     }
+    return found;
+  });
 
-    if (found) {
-      setNotification(found);
-      db.markNotificationAsRead(found.id);
-
-      // Initialize chat thread
-      const initialChat = [
-        {
-          id: 'm1',
-          sender: 'system',
-          text: `📢 Alert: ${found.title}\n\n${found.message}`,
-          time: found.time,
-          isAlertCard: true
-        },
-        {
-          id: 'm2',
-          sender: 'assistant',
-          text: getAdvisorInsight(found.type),
-          time: 'Just now',
-          actionButton: {
-            label: found.actionLabel || 'Proceed to Destination',
-            path: found.actionPath || '/dashboard',
-            details: found.actionDetails || 'Tap to navigate directly'
-          }
+  const [messages, setMessages] = useState(() => {
+    const found = db.getNotificationById(id);
+    if (!found) return [];
+    return [
+      {
+        id: 'm1',
+        sender: 'system',
+        text: `📢 Alert: ${found.title}\n\n${found.message}`,
+        time: found.time,
+        isAlertCard: true
+      },
+      {
+        id: 'm2',
+        sender: 'assistant',
+        text: getAdvisorInsight(found.type),
+        time: 'Just now',
+        actionButton: {
+          label: found.actionLabel || 'Proceed to Destination',
+          path: found.actionPath || '/dashboard',
+          details: found.actionDetails || 'Tap to navigate directly'
         }
-      ];
+      }
+    ];
+  });
 
-      setMessages(initialChat);
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const chatBottomRef = useRef(null);
+
+  useEffect(() => {
+    if (notification?.id) {
+      db.markNotificationAsRead(notification.id);
     }
-  }, [id]);
+  }, [notification?.id]);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
-
-  function getAdvisorInsight(type, title) {
-    switch (type) {
-      case 'resume':
-        return "I've completed your comprehensive resume audit. Quantifiable results and domain-specific keywords make the difference between an interview invite and an automated rejection. Click the button below to view your interactive breakdown:";
-      case 'reminder':
-        return "I've set up your interactive mock interview environment with live feedback. Make sure you are in a quiet room with good lighting and your audio input active:";
-      case 'achievement':
-        return "Congratulations on hitting this milestone! Consistent habit formation is the single highest predictor of landing top-tier tech roles. Claim your rewards below:";
-      case 'roadmap':
-        return "Your learning trajectory has advanced to the next level. We have unlocked new targeted resources and practice assessments in your roadmap:";
-      default:
-        return "I am here to help you take direct action on this notification. Choose an option below or ask me any question:";
-    }
-  }
 
   // Handle Dynamic Redirection based on Notification Type
   const handleDirectAction = (targetPath) => {
@@ -104,7 +88,7 @@ export default function NotificationDetail() {
 
     const userText = input.trim();
     const userMsg = {
-      id: 'usr_' + Date.now(),
+      id: 'usr_' + (messages.length + 1),
       sender: 'user',
       text: userText,
       time: 'Just now'

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Compass, Target, Rocket, ArrowRight, Sparkles, 
-  Code2, Cpu, Cloud, Shield, Smartphone, CheckCircle2,
-  DollarSign, Clock, Users, Award, Zap, ChevronRight
+  ArrowRight, Sparkles, 
+  Code2, Cpu, Cloud, Shield, Smartphone,
+  DollarSign, Clock, Users
 } from 'lucide-react';
+import { NexoraIcon } from '../components/brand/NexoraLogo';
 import db from '../services/db';
 
 const careerTracks = [
@@ -85,9 +86,7 @@ export default function Onboarding() {
       {/* ── Top Bar ── */}
       <div className="flex justify-between items-center py-xs" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="flex items-center gap-xs">
-          <div className="brand-logo-hex skeuo-convex" style={{ width: 32, height: 32 }}>
-            <Sparkles size={16} className="text-primary" />
-          </div>
+          <NexoraIcon size={32} withGlow />
           <span className="font-bold text-gradient" style={{ fontSize: '1.1rem', letterSpacing: '-0.3px' }}>NEXORA PRO</span>
         </div>
 

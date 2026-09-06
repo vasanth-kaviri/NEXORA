@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { 
-  Users, Code, MessageSquare, Search, Filter, CheckCircle2, 
-  Sparkles, ExternalLink, X, UserPlus, Radio, Code2, Globe, 
-  Award, BookOpen, Send, UserCheck, Mic, MicOff, Play, ArrowLeft,
-  Share2, Terminal, Check, Clock, Plus
+  Users, MessageSquare, Search, CheckCircle2, 
+  Sparkles, X, UserPlus, Radio, Code2, 
+  Send, Mic, MicOff, Play, ArrowLeft
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -243,7 +242,7 @@ export default function PeerLearning() {
     if (!chatInput.trim()) return;
     setRoomChatMessages(prev => [
       ...prev,
-      { user: currentUser.firstName || 'Alex', text: chatInput.trim(), time: 'Just now' }
+      { user: currentUser.firstName || 'Student', text: chatInput.trim(), time: 'Just now' }
     ]);
     setChatInput('');
   };
@@ -364,7 +363,7 @@ export default function PeerLearning() {
                       {(currentUser.firstName || 'A').charAt(0)}
                     </div>
                     <div>
-                      <strong style={{ fontSize: '0.82rem' }}>{currentUser.firstName || 'Alex'} (You)</strong>
+                      <strong style={{ fontSize: '0.82rem' }}>{currentUser.firstName || 'Student'} (You)</strong>
                       <p className="text-muted" style={{ margin: 0, fontSize: '0.7rem' }}>Host • Coding</p>
                     </div>
                   </div>
@@ -518,7 +517,7 @@ export default function PeerLearning() {
                     {roomChatMessages.map((msg, i) => (
                       <div key={i} className="glass-panel p-xs rounded" style={{ background: 'var(--input-bg)' }}>
                         <div className="flex justify-between items-center mb-1">
-                          <strong style={{ fontSize: '0.78rem', color: msg.user === (currentUser.firstName || 'Alex') ? 'var(--primary)' : 'var(--text-main)' }}>
+                          <strong style={{ fontSize: '0.78rem', color: msg.user === (currentUser.firstName || 'Student') ? 'var(--primary)' : 'var(--text-main)' }}>
                             {msg.user}
                           </strong>
                           <span className="text-muted" style={{ fontSize: '0.68rem' }}>{msg.time}</span>

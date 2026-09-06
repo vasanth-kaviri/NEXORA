@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BrainCircuit, ArrowRight, CheckCircle2, RotateCcw, Sparkles, Award, 
-  Layers, Compass, TrendingUp, BarChart2, ShieldCheck, ChevronRight 
+  BrainCircuit, ArrowRight, CheckCircle2, RotateCcw, Sparkles
 } from 'lucide-react';
-import db from '../services/db';
 
 export default function Assessments() {
   const navigate = useNavigate();
-  const currentUser = db.getCurrentUser() || {};
 
   // 10 Real-World Diagnostic Questions
   const diagnosticQuestions = [

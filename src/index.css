@@ -2,27 +2,30 @@
 
 
 :root {
-  /* LIGHT MODE (Gallery Minimalist Paper & Titanium) */
-  --bg-main: #fafafa;
+  /* LIGHT MODE (Elevated Slate Canvas & Pure White Luxury Cards) */
+  --bg-main: #f1f5f9;
   --bg-card: #ffffff;
-  --bg-card-glass: rgba(255, 255, 255, 0.85);
+  --bg-card-glass: rgba(255, 255, 255, 0.92);
 
   --primary: #18181b;
   /* Sleek Titanium Black */
   --primary-rgb: 24, 24, 27;
-  --primary-glow: rgba(0, 0, 0, 0.12);
-  --secondary: #71717a;
-  /* Muted Zinc */
-  --secondary-rgb: 113, 113, 122;
+  --primary-glow: rgba(15, 23, 42, 0.10);
+  --secondary: #64748b;
+  /* Muted Slate */
+  --secondary-rgb: 100, 116, 139;
   --accent: #2563eb;
   /* Minimalist Cobalt */
   --accent-rgb: 37, 99, 235;
 
-  --text-main: #09090b;
-  /* Carbon Black */
-  --text-muted: #71717a;
-  /* Neutral Graphite */
-  --border-color: rgba(0, 0, 0, 0.08);
+  --text-main: #0f172a;
+  /* Deep Slate 900 */
+  --text-muted: #64748b;
+  /* Neutral Slate 500 */
+  --border-color: #e2e8f0;
+  /* Crisp Slate 200 */
+  --border-subtle: #cbd5e1;
+  /* Slate 300 */
   --success: #10b981;
   --warning: #f59e0b;
 
@@ -33,9 +36,9 @@
   --minimal-emerald: #059669;
   --minimal-violet: #7c3aed;
   --minimal-rose: #e11d48;
-  --minimal-zinc: #52525b;
+  --minimal-zinc: #475569;
   --minimal-card: #ffffff;
-  --minimal-card-hover: #fcfcfd;
+  --minimal-card-hover: #f8fafc;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -56,18 +59,18 @@
   --font-family: 'Inter', sans-serif;
 
   /* SKEUOMORPHIC LIGHT TOKENS */
-  --skeuo-highlight: rgba(255, 255, 255, 0.95);
-  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.7);
-  --skeuo-shadow-rim: rgba(0, 0, 0, 0.06);
-  --skeuo-shadow-deep: rgba(0, 0, 0, 0.08);
-  --skeuo-surface-grad: linear-gradient(180deg, #ffffff 0%, #fafafa 50%, #f4f4f5 100%);
-  --skeuo-surface-card: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-  --skeuo-recessed-bg: #f4f4f5;
-  --skeuo-recessed-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 0 rgba(255, 255, 255, 0.9);
-  --skeuo-btn-lip: #09090b;
-  --skeuo-btn-sec-lip: rgba(113, 113, 122, 0.3);
+  --skeuo-highlight: #ffffff;
+  --skeuo-highlight-subtle: rgba(255, 255, 255, 0.85);
+  --skeuo-shadow-rim: rgba(15, 23, 42, 0.06);
+  --skeuo-shadow-deep: rgba(15, 23, 42, 0.08);
+  --skeuo-surface-grad: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --skeuo-surface-card: #ffffff;
+  --skeuo-recessed-bg: #e2e8f0;
+  --skeuo-recessed-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.06), inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.9);
+  --skeuo-btn-lip: #0f172a;
+  --skeuo-btn-sec-lip: rgba(100, 116, 139, 0.3);
   --skeuo-bevel-light: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
-  --skeuo-bevel-dark: 0 -1px 0 rgba(0, 0, 0, 0.05) inset;
+  --skeuo-bevel-dark: 0 -1px 0 rgba(15, 23, 42, 0.06) inset;
 }
 
 html.dark {
@@ -126,10 +129,10 @@ html.dark {
   --skeuo-bevel-dark: 0 -1px 0 rgba(0, 0, 0, 0.5) inset;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 }
 
 html {
@@ -183,9 +186,9 @@ button {
   border-radius: var(--radius-lg);
   box-shadow:
     inset 0 1px 0 var(--skeuo-highlight-subtle),
-    inset 0 -1px 0 var(--skeuo-shadow-rim),
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    0 10px 28px -4px var(--skeuo-shadow-deep);
+    0 1px 3px 0 rgba(15, 23, 42, 0.06),
+    0 4px 6px -1px rgba(15, 23, 42, 0.04),
+    0 10px 24px -4px rgba(15, 23, 42, 0.06);
   transition: 
     transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), 
     box-shadow 0.28s ease, 
@@ -1073,4 +1076,39 @@ a[aria-label]:hover {
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.45);
+}
+
+/* ─── Skeleton Shimmer Tokens (Light & Dark Compatible) ───────────── */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-box {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 37%, #e2e8f0 63%);
+  background-size: 300% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+html.dark .skeleton-box {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 37%, rgba(255, 255, 255, 0.05) 63%);
+  background-size: 300% 100%;
+}
+
+.skeleton-text {
+  height: 14px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  height: 22px;
+  margin-bottom: 12px;
+  border-radius: 6px;
 }

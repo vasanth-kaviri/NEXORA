@@ -21,5 +21,12 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const rtdb = getDatabase(app);
 const auth = getAuth(app);
 
+export const isFirebaseConfigured = () => {
+  return Boolean(
+    import.meta.env.VITE_FIREBASE_API_KEY &&
+    import.meta.env.VITE_FIREBASE_DATABASE_URL
+  );
+};
+
 export { app, rtdb, auth, firebaseConfig };
 export default rtdb;

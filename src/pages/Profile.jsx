@@ -7,10 +7,12 @@ import {
   Moon, Sun, Share2, LogOut, Award, Edit2, Save, X, Menu, 
   Bell, Shield, HelpCircle, Info, Globe, ChevronRight, CheckCircle2,
   Sparkles, Flame, Target, Trophy, Code2, ExternalLink,
-  Camera, Upload, Plus, Trash2, Briefcase, GraduationCap,
-  RefreshCw, Check, Star, Layers, Cpu
+  Camera, Upload, Plus, Trash2, Briefcase,
+  RefreshCw, Cpu
 } from 'lucide-react';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
+import { getRoadmapForJob } from '../utils/roadmapData';
 
 export default function Profile() {
   const { theme, toggleTheme } = useTheme();
@@ -40,17 +42,18 @@ export default function Profile() {
   const [user, setUser] = useState(() => {
     const current = db.getCurrentUser() || {};
     return {
-      firstName: current.firstName || 'Alex',
-      lastName: current.lastName || 'Johnson',
-      dreamJob: current.dreamJob || 'AI & Machine Learning Engineer',
-      email: current.email || 'alex.johnson.dev@gmail.com',
-      phone: current.phone || '+1 234 567 8900',
-      education: current.education || 'B.S. Computer Science',
-      domain: current.domain || 'Artificial Intelligence & Distributed Systems',
-      avatar: current.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-      level: current.level || 5,
-      streak: current.streak || 7,
-      careerMatch: current.careerMatch || 94,
+      id: current.id || current.uid || null,
+      firstName: current.firstName || 'Explorer',
+      lastName: current.lastName || '',
+      dreamJob: current.dreamJob || 'Software Engineer',
+      email: current.email || 'user@nexora.ai',
+      phone: current.phone || '',
+      education: current.education || 'Computer Science / Engineering',
+      domain: current.domain || 'Software Development & Architecture',
+      avatar: current.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${current.email || 'explorer'}`,
+      level: current.level || 1,
+      streak: current.streak || 1,
+      careerMatch: current.careerMatch || 88,
     };
   });
 
@@ -196,7 +199,7 @@ export default function Profile() {
 
   // Update Avatar in DB & state
   const updateAvatar = (avatarUrl) => {
-    const updated = db.updateUserProfile({ avatar: avatarUrl });
+    db.updateUserProfile({ avatar: avatarUrl });
     setUser(prev => ({ ...prev, avatar: avatarUrl }));
     setEditForm(prev => ({ ...prev, avatar: avatarUrl }));
   };
@@ -226,32 +229,64 @@ export default function Profile() {
     };
   }, []);
 
-  // When switching tabs in avatar modal, manage camera
+  // When switching tabs in avatar modal, manage camera asynchronously
   useEffect(() => {
+    let timer;
     if (isAvatarModalOpen && avatarTab === 'camera') {
-      startCamera();
+      timer = setTimeout(() => {
+        startCamera();
+      }, 50);
     } else {
-      stopCamera();
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          track.enabled = false;
+        });
+        cameraStreamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      timer = setTimeout(() => {
+        setCameraActive(false);
+      }, 0);
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [isAvatarModalOpen, avatarTab]);
 
-  // Sync with DB session
+  // Sync with DB session and Firebase Realtime Database
   useEffect(() => {
     const handleSession = () => {
       const current = db.getCurrentUser();
       if (current) {
         setUser(prev => ({
           ...prev,
-          firstName: current.firstName || prev.firstName,
-          lastName: current.lastName || prev.lastName,
-          dreamJob: current.dreamJob || prev.dreamJob,
-          email: current.email || prev.email,
-          avatar: current.avatar || prev.avatar,
+          ...current
         }));
       }
     };
     window.addEventListener('user_session_changed', handleSession);
-    return () => window.removeEventListener('user_session_changed', handleSession);
+
+    const currentUser = db.getCurrentUser();
+    const uid = currentUser?.id || currentUser?.uid;
+    let unsubscribe = null;
+    if (uid) {
+      unsubscribe = realtimeDb.subscribeToUserProfile(uid, (remoteProfile) => {
+        if (remoteProfile) {
+          setUser(prev => ({ ...prev, ...remoteProfile }));
+          if (remoteProfile.experiences) setExperiences(remoteProfile.experiences);
+          if (remoteProfile.skills) setSkills(remoteProfile.skills);
+          if (remoteProfile.certifications) setCertifications(remoteProfile.certifications);
+        }
+      });
+    }
+
+    return () => {
+      window.removeEventListener('user_session_changed', handleSession);
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleShare = () => {
@@ -264,17 +299,29 @@ export default function Profile() {
   };
 
   const handleSave = () => {
-    const updated = db.updateUserProfile({
+    const matchedRoadmap = getRoadmapForJob(editForm.dreamJob);
+    const trackId = matchedRoadmap?.id || 'fullstack';
+    localStorage.setItem('nexora_active_course', trackId);
+
+    const updates = {
       firstName: editForm.firstName,
       lastName: editForm.lastName,
       dreamJob: editForm.dreamJob,
       phone: editForm.phone,
       education: editForm.education,
-      domain: editForm.domain
-    });
-    setUser(prev => ({ ...prev, ...updated }));
+      domain: editForm.domain,
+      bio: editForm.bio,
+      selectedTrack: trackId
+    };
+    const updated = db.updateUserProfile(updates);
+    const uid = updated.id || updated.uid;
+    if (uid) {
+      realtimeDb.updateUserProfile(uid, updates);
+    }
+    setUser(updated);
     setIsEditing(false);
-    toast.success('Profile information successfully saved!');
+    window.dispatchEvent(new Event('user_session_changed'));
+    toast.success('Profile details saved and synchronized in real time!');
   };
 
   // Add Work Experience

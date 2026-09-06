@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Video, ExternalLink, Search, Plus, Trash2, X, Sparkles } from 'lucide-react';
+import { Search, Plus, Trash2, X, Sparkles } from 'lucide-react';
 
 export default function ManageResources() {
   const [resources, setResources] = useState([

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
-  GraduationCap, MapPin, Star, Search, Filter, Globe, Building2, 
-  BookOpen, ExternalLink, X, Award, DollarSign, Calendar, ChevronRight, CheckCircle2,
-  Compass, ShieldCheck, School, Library
+  GraduationCap, MapPin, Star, Search, Building2, 
+  ExternalLink, X, ChevronRight,
+  ShieldCheck, School, Library
 } from 'lucide-react';
 import db from '../services/db';
 

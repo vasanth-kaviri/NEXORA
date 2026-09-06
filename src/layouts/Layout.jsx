@@ -1,11 +1,12 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Home, Compass, User, Bell, ArrowLeft, Rocket, 
+  Home, Compass, Bell, ArrowLeft, Rocket, 
   FolderKanban, Trophy, BookOpen, Bot, Settings, 
-  Sun, Moon, ChevronRight, Sparkles, Menu, X, Search, Info
+  Sun, Moon, ChevronRight, Menu, X, Info
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { NexoraIcon } from '../components/brand/NexoraLogo';
 import db from '../services/db';
 import './Layout.css';
 
@@ -14,8 +15,20 @@ export default function Layout() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [currentUser, setCurrentUser] = useState({ firstName: 'Alex', dreamJob: 'Machine Learning Engineer', level: 5 });
+  const [unreadCount, setUnreadCount] = useState(() => {
+    try {
+      const notifs = db.getNotifications();
+      return notifs.filter(n => n.unread).length;
+    } catch {
+      return 0;
+    }
+  });
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    const user = db.getCurrentUser();
+    return user || { firstName: 'Explorer', dreamJob: 'Software Engineer', level: 1 };
+  });
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Pages that shouldn't show global navigation shell (auth, onboarding, splash, chatbot standalone)
@@ -23,16 +36,15 @@ export default function Layout() {
   const isAuthPage = authPaths.includes(location.pathname);
   const isChatbot = location.pathname === '/chatbot';
 
-  const refreshData = () => {
-    const user = db.getCurrentUser();
-    if (user) setCurrentUser(user);
-    const notifs = db.getNotifications();
-    const unread = notifs.filter(n => n.unread).length;
-    setUnreadCount(unread);
-  };
-
   useEffect(() => {
-    refreshData();
+    const refreshData = () => {
+      const user = db.getCurrentUser();
+      if (user) setCurrentUser(user);
+      const notifs = db.getNotifications();
+      const unread = notifs.filter(n => n.unread).length;
+      setUnreadCount(unread);
+    };
+
     window.addEventListener('notifications_updated', refreshData);
     window.addEventListener('user_session_changed', refreshData);
     return () => {
@@ -43,7 +55,10 @@ export default function Layout() {
 
   // Close mobile drawer on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    const timer = setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   if (isAuthPage) {
@@ -98,9 +113,7 @@ export default function Layout() {
       {/* ── Desktop & Tablet Sidebar (Sticky & Stationary) ── */}
       <aside className="nexus-sidebar sticky top-0 h-screen">
         <div className="sidebar-brand" onClick={() => navigate('/dashboard')}>
-          <div className="brand-logo-hex skeuo-convex">
-            <Sparkles size={19} className="text-primary" />
-          </div>
+          <NexoraIcon size={38} withGlow interactive />
           <div className="brand-info">
             <span className="brand-title text-gradient">NEXORA</span>
             <span className="brand-badge">PRO EDITION</span>
@@ -246,7 +259,7 @@ export default function Layout() {
             <div className="mobile-drawer-panel glass-panel" onClick={(e) => e.stopPropagation()}>
               <div className="mobile-drawer-header">
                 <div className="flex items-center gap-xs">
-                  <Sparkles size={18} className="text-primary" />
+                  <NexoraIcon size={28} />
                   <span className="font-bold text-gradient">NEXORA PRO</span>
                 </div>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="btn-icon-tactile">

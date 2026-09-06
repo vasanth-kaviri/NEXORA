@@ -145,7 +145,7 @@ export const firebaseAuth = {
   async logout() {
     try {
       await signOut(auth);
-    } catch (e) {}
+    } catch {}
     localStorage.removeItem('nexora_session');
     window.dispatchEvent(new Event('user_session_changed'));
   }

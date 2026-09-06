@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Zap, Sparkles, 
-  HelpCircle, Timer, BookOpen, ChevronRight, Check, Layers, Clock
+  CheckCircle2, XCircle, ArrowRight, RotateCcw, Award, Sparkles, 
+  Timer
 } from 'lucide-react';
 import db from '../services/db';
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { firebaseAuth } from '../services/firebaseAuth';
-import { PlusCircle, UserCheck, ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 
 export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
@@ -9,29 +9,13 @@ export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
   const toast = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [isCustomAccount, setIsCustomAccount] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customEmail, setCustomEmail] = useState('');
-
-  const googleAccounts = [
-    {
-      name: 'Alex Johnson',
-      email: 'alex.johnson.dev@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-      role: 'Machine Learning Engineer'
-    },
-    {
-      name: 'Priya Sharma',
-      email: 'priya.sharma.tech@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150',
-      role: 'Full Stack Developer'
-    }
-  ];
 
   const finishLogin = (user) => {
     setIsConnecting(false);
     setShowAccountModal(false);
-    toast.success(`Welcome, ${user.firstName}! Signed in with Google.`);
+    toast.success(`Welcome, ${user.firstName || 'Student'}! Signed in with Google.`);
     if (onSuccess) {
       onSuccess(user);
     } else {
@@ -41,29 +25,37 @@ export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
 
   const handleGoogleClick = async () => {
     setIsConnecting(true);
-    // 1. Try Firebase Google Popup first
-    const res = await firebaseAuth.loginWithGoogle();
-    if (res.success && res.user) {
-      finishLogin(res.user);
-      return;
+    try {
+      // 1. Try Firebase Google Popup first
+      const res = await firebaseAuth.loginWithGoogle();
+      if (res.success && res.user) {
+        finishLogin(res.user);
+        return;
+      }
+
+      // 2. Firebase returned but no user — fallback to manual identity prompt
+      setIsConnecting(false);
+      setShowAccountModal(true);
+    } catch (err) {
+      setIsConnecting(false);
+      // Detect popup-blocked error codes from Firebase Auth
+      const isPopupBlocked =
+        err?.code === 'auth/popup-blocked' ||
+        err?.code === 'auth/cancelled-popup-request' ||
+        err?.message?.toLowerCase().includes('popup');
+
+      if (isPopupBlocked) {
+        toast.error(
+          'Google popup was blocked by your browser. Please allow popups for this site, or use the form below to sign in manually.',
+          { duration: 6000 }
+        );
+      } else {
+        toast.error('Google sign-in failed. Please try again or use email/password.');
+      }
+
+      // Still open the manual fallback so the user isn't stuck
+      setShowAccountModal(true);
     }
-
-    // 2. If popup is blocked, open the Google identity modal
-    setIsConnecting(false);
-    setShowAccountModal(true);
-  };
-
-  const handleSelectAccount = (account) => {
-    setIsConnecting(true);
-    setTimeout(() => {
-      const user = firebaseAuth.loginWithCustomGoogle({
-        email: account.email,
-        name: account.name,
-        avatar: account.avatar,
-        role: account.role
-      });
-      finishLogin(user);
-    }, 400);
   };
 
   const handleCreateCustomGoogle = (e) => {
@@ -152,8 +144,8 @@ export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
                   <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                 </svg>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Google Account</h3>
-                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>Choose or enter your account to continue</p>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>Google Identity Sign In</h3>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>Authenticate with your Google credentials</p>
                 </div>
               </div>
               <button 
@@ -165,94 +157,49 @@ export default function GoogleAuthButton({ mode = 'signin', onSuccess }) {
               </button>
             </div>
 
-            {!isCustomAccount ? (
-              <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
-                  {googleAccounts.map((acc) => (
-                    <div
-                      key={acc.email}
-                      onClick={() => handleSelectAccount(acc)}
-                      className="interactive"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 14px',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-color)',
-                        background: 'var(--input-bg)',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <img
-                        src={acc.avatar}
-                        alt={acc.name}
-                        style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>{acc.name}</p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{acc.email}</p>
-                      </div>
-                      <UserCheck size={16} className="text-minimal-emerald" />
-                    </div>
-                  ))}
-                </div>
+            <form onSubmit={handleCreateCustomGoogle} className="flex flex-col gap-3 mb-3">
+              <div className="input-group mb-0">
+                <label className="input-label" style={{ fontSize: '0.78rem' }}>Your Full Name</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="e.g. Rachel Foster"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="input-group mb-0">
+                <label className="input-label" style={{ fontSize: '0.78rem' }}>Google Email Address</label>
+                <input
+                  type="email"
+                  className="input-field"
+                  placeholder="name@gmail.com"
+                  value={customEmail}
+                  onChange={(e) => setCustomEmail(e.target.value)}
+                  required
+                />
+              </div>
 
+              <div className="flex gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsCustomAccount(true)}
-                  className="btn btn-secondary w-full flex items-center justify-center gap-2 mb-3"
-                  style={{ fontSize: '0.84rem', padding: '10px' }}
+                  onClick={() => setShowAccountModal(false)}
+                  className="btn btn-secondary flex-1"
+                  style={{ fontSize: '0.82rem' }}
                 >
-                  <PlusCircle size={15} />
-                  <span>Use Another Google Account</span>
+                  Cancel
                 </button>
-              </>
-            ) : (
-              <form onSubmit={handleCreateCustomGoogle} className="flex flex-col gap-3 mb-3">
-                <div className="input-group mb-0">
-                  <label className="input-label" style={{ fontSize: '0.78rem' }}>Your Full Name</label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="e.g. Alex Rivera"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="input-group mb-0">
-                  <label className="input-label" style={{ fontSize: '0.78rem' }}>Google Email Address</label>
-                  <input
-                    type="email"
-                    className="input-field"
-                    placeholder="name@gmail.com"
-                    value={customEmail}
-                    onChange={(e) => setCustomEmail(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsCustomAccount(false)}
-                    className="btn btn-secondary flex-1"
-                    style={{ fontSize: '0.82rem' }}
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary flex-1 flex items-center justify-center gap-1"
-                    style={{ fontSize: '0.82rem' }}
-                  >
-                    <span>Authenticate</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
-              </form>
-            )}
+                <button
+                  type="submit"
+                  className="btn btn-primary flex-1 flex items-center justify-center gap-1"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  <span>Authenticate</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            </form>
 
             <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center', margin: 0 }}>
               Encrypted Firebase session. Profile synced automatically with Realtime Database.

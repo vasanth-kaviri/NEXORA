@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  GraduationCap, DollarSign, Calendar, Search, Filter, CheckCircle2, 
-  Sparkles, ExternalLink, X, FileText, Send, Award, AlertCircle, Bookmark,
-  Globe, Clock, User, Mail, Phone, Building, Check, ChevronRight
+  GraduationCap, DollarSign, Calendar, Search, CheckCircle2, 
+  Sparkles, X, Send, Globe, Clock, Check, ArrowRight
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -172,20 +171,19 @@ export default function Scholarships() {
   const [selectedScholarship, setSelectedScholarship] = useState(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [selectedTrackerApp, setSelectedTrackerApp] = useState(null);
 
   // Comprehensive Form State
   const [applicationForm, setApplicationForm] = useState({
-    firstName: currentUser.firstName || 'Alex',
-    lastName: currentUser.lastName || 'Johnson',
-    email: currentUser.email || 'alex.developer@example.com',
-    phone: currentUser.phone || '+91 98765 43210',
-    country: currentUser.country || 'India',
-    institution: currentUser.university || 'Indian Institute of Technology (IIT) Madras',
-    degreeLevel: currentUser.education || 'Undergraduate B.Tech Computer Science (3rd Year)',
-    gpa: '8.8 / 10.0 (Equivalent to 3.7 GPA)',
-    annualIncome: 'Below ₹8,00,000 / $10,000 (Eligible for Full Aid)',
-    statementText: 'I am dedicated to leveraging computer science and artificial intelligence to solve real-world societal problems. This grant will accelerate my research in distributed systems and open-source tooling.',
-    transcriptAttached: true
+    firstName: currentUser.firstName || 'Explorer',
+    lastName: currentUser.lastName || '',
+    email: currentUser.email || 'user@nexora.ai',
+    phone: currentUser.phone || '',
+    education: currentUser.education || 'Computer Science & Engineering',
+    gpa: '3.8 / 4.0 (First Class with Distinction)',
+    annualIncome: 'Eligible for Need/Merit Aid',
+    statementText: '',
+    transcriptAttached: false
   });
 
   // Tracked Applications
@@ -193,23 +191,37 @@ export default function Scholarships() {
     try {
       const saved = localStorage.getItem('nexora_scholarship_tracker');
       if (saved) return JSON.parse(saved);
-    } catch {}
-
-    return [
-      {
-        id: 'sch_app_1',
-        scholarshipId: 'sch_google_01',
-        title: 'Google Generation Scholarship (APAC & Global)',
-        organization: 'Google',
-        amount: '₹2,50,000 / $10,000',
-        submittedDate: 'Aug 29, 2026',
-        status: 'Under Committee Review',
-        stageIndex: 2,
-        stages: ['Application Submitted', 'Eligibility Audited', 'Committee Review', 'Disbursement Approval'],
-        candidateName: 'Alex Johnson',
-        notes: 'Documents verified. Interview invitation scheduled for late September.'
-      }
-    ];
+      return [
+        {
+          id: 'sch_app_google_seed',
+          scholarshipId: 'sch_google_01',
+          title: 'Google Generation Scholarship (APAC & Global)',
+          organization: 'Google',
+          amount: '₹2,50,000 / $10,000',
+          submittedDate: 'Sep 01, 2026',
+          status: 'Eligibility Audited - Forwarded to Committee',
+          stageIndex: 1,
+          stages: ['Application Submitted', 'Eligibility Audited', 'Committee Review', 'Disbursement Approval'],
+          candidateName: `${currentUser.firstName || 'Scholar'} ${currentUser.lastName || ''}`.trim() || 'Scholarship Applicant',
+          email: currentUser.email || 'scholar@nexora.ai',
+          phone: '+1 (555) 382-9012',
+          education: 'B.Tech in Computer Science & Engineering',
+          gpa: '3.8 / 4.0 (First Class with Distinction)',
+          country: 'India',
+          notes: 'Academic transcripts and diversity statements verified. Formal selection panel review underway.',
+          scholarshipDetails: {
+            deadline: 'Nov 15, 2026',
+            targetDegree: 'Undergraduate & Masters',
+            tags: ['Women in Tech', 'Computer Science', 'Leadership'],
+            desc: 'Established to help aspiring students pursuing computer science degrees excel in technology and become active leaders in the field.',
+            eligibilityRules: 'Enrolled in full-time CS or related program, strong academic track record, commitment to diversity in tech.',
+            documents: ['Resume / CV', 'Official Academic Transcripts', 'Responses to 2 Short Essay Questions']
+          }
+        }
+      ];
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -252,8 +264,23 @@ export default function Scholarships() {
       status: 'Application Submitted',
       stageIndex: 0,
       stages: ['Application Submitted', 'Eligibility Audited', 'Committee Review', 'Disbursement Approval'],
-      candidateName: `${applicationForm.firstName} ${applicationForm.lastName}`,
-      notes: 'Application officially queued in admissions portal. Verification in progress.'
+      candidateName: `${applicationForm.firstName} ${applicationForm.lastName}`.trim() || 'Scholarship Applicant',
+      email: applicationForm.email,
+      phone: applicationForm.phone,
+      education: applicationForm.education,
+      gpa: applicationForm.gpa,
+      country: selectedCountry,
+      statementText: applicationForm.statementText,
+      transcriptAttached: applicationForm.transcriptAttached,
+      notes: 'Application officially queued in admissions portal. Verification in progress.',
+      scholarshipDetails: {
+        deadline: selectedScholarship.deadline,
+        targetDegree: selectedScholarship.targetDegree,
+        tags: selectedScholarship.tags,
+        desc: selectedScholarship.desc,
+        eligibilityRules: selectedScholarship.eligibilityRules,
+        documents: selectedScholarship.documents
+      }
     };
 
     const updated = [newApp, ...appliedTracker.filter(a => a.scholarshipId !== selectedScholarship.id)];
@@ -430,12 +457,14 @@ export default function Scholarships() {
               {appliedTracker.map((app) => (
                 <div 
                   key={app.id} 
-                  className="glass-panel p-lg flex flex-col gap-md"
+                  onClick={() => setSelectedTrackerApp(app)}
+                  className="glass-panel p-lg flex flex-col gap-md transition-all hover:scale-[1.005] hover:border-warning cursor-pointer"
                   style={{
                     padding: '20px',
                     borderRadius: '16px',
                     border: '1px solid var(--border-color)',
-                    background: 'var(--card-bg)'
+                    background: 'var(--card-bg)',
+                    cursor: 'pointer'
                   }}
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
@@ -472,11 +501,16 @@ export default function Scholarships() {
                     })}
                   </div>
 
-                  {/* Feedback Notes Banner */}
-                  <div className="glass-panel p-sm flex items-center gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
-                    <Sparkles size={15} className="text-warning shrink-0" />
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      <strong>Status Update:</strong> {app.notes}
+                  {/* Feedback Notes Banner & View Action */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs">
+                    <div className="glass-panel p-sm flex items-center gap-sm flex-1" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-sm)' }}>
+                      <Sparkles size={15} className="text-warning shrink-0" />
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        <strong>Status Update:</strong> {app.notes}
+                      </span>
+                    </div>
+                    <span className="text-warning flex items-center gap-xs font-600 shrink-0" style={{ fontSize: '0.78rem', padding: '4px 8px' }}>
+                      View Details & Status <ArrowRight size={13} />
                     </span>
                   </div>
                 </div>
@@ -814,6 +848,164 @@ export default function Scholarships() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ── SCHOLARSHIP APPLICATION TRACKER DETAIL & STATUS MODAL ── */}
+      {selectedTrackerApp && createPortal(
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in"
+          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setSelectedTrackerApp(null)}
+        >
+          <div 
+            className="glass-panel flex flex-col gap-md max-w-2xl w-full animate-scale-up"
+            style={{ 
+              padding: '2rem', 
+              background: 'var(--bg-card)', 
+              boxShadow: '0 20px 50px rgba(0,0,0,0.5)', 
+              maxHeight: '90vh', 
+              overflowY: 'auto',
+              borderRadius: 'var(--radius-lg)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-start pb-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div>
+                <div className="flex items-center gap-xs text-warning font-600 mb-xs" style={{ fontSize: '0.78rem' }}>
+                  <GraduationCap size={14} /> OFFICIAL GRANT RECORD • {selectedTrackerApp.organization}
+                </div>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800 }}>{selectedTrackerApp.title}</h2>
+                <div className="flex flex-wrap items-center gap-sm mt-xs text-muted" style={{ fontSize: '0.82rem' }}>
+                  <span>Submitted: {selectedTrackerApp.submittedDate}</span>
+                  <span>•</span>
+                  <span>Award: <strong className="text-success">{selectedTrackerApp.amount}</strong></span>
+                  <span>•</span>
+                  <span>Candidate: <strong>{selectedTrackerApp.candidateName}</strong></span>
+                </div>
+              </div>
+              <button 
+                className="btn-icon-tactile" 
+                onClick={() => setSelectedTrackerApp(null)}
+                style={{ borderRadius: '50%', padding: '6px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Pipeline Stage Timeline */}
+            <div className="glass-panel p-md flex flex-col gap-sm" style={{ background: 'var(--input-bg)', borderRadius: 'var(--radius-md)' }}>
+              <div className="flex justify-between items-center">
+                <span className="font-700" style={{ fontSize: '0.88rem' }}>Grant Adjudication Status</span>
+                <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success)', fontWeight: 700, fontSize: '0.8rem', padding: '4px 12px', borderRadius: 'var(--radius-full)' }}>
+                  {selectedTrackerApp.status}
+                </span>
+              </div>
+
+              {/* Visual 4-Stage Progress */}
+              <div className="grid grid-cols-4 gap-xs pt-xs">
+                {selectedTrackerApp.stages.map((stageName, sIdx) => {
+                  const isComplete = sIdx <= selectedTrackerApp.stageIndex;
+                  const isCurrent = sIdx === selectedTrackerApp.stageIndex;
+                  return (
+                    <div key={stageName} className="flex flex-col gap-xs">
+                      <div 
+                        style={{
+                          height: 8,
+                          borderRadius: 4,
+                          background: isComplete ? 'var(--warning)' : 'var(--border-color)'
+                        }} 
+                      />
+                      <div className="flex items-center gap-xs mt-xs">
+                        {isComplete && <Check size={12} className="text-warning" />}
+                        <span style={{ fontSize: '0.72rem', fontWeight: isCurrent ? 700 : 500, color: isComplete ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                          {stageName}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-xs mt-xs text-muted" style={{ fontSize: '0.8rem' }}>
+                <Sparkles size={14} className="text-warning" />
+                <span>{selectedTrackerApp.notes}</span>
+              </div>
+            </div>
+
+            {/* Applicant Profile & Submitted Dossier */}
+            <div className="flex flex-col gap-xs">
+              <h4 style={{ fontSize: '0.92rem', fontWeight: 700 }}>Applicant Dossier & Academic Credentials</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm" style={{ fontSize: '0.82rem' }}>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Registered Scholar</span>
+                  <span className="font-600">{selectedTrackerApp.candidateName}</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Contact Email</span>
+                  <span className="font-600">{selectedTrackerApp.email || currentUser.email || 'scholar@nexora.ai'}</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Academic Degree</span>
+                  <span className="font-600">{selectedTrackerApp.education || 'B.Tech in Computer Science'}</span>
+                </div>
+                <div className="p-sm glass-panel" style={{ background: 'var(--card-bg)' }}>
+                  <span className="text-muted block" style={{ fontSize: '0.72rem' }}>Reported GPA & Country</span>
+                  <span className="font-600">{selectedTrackerApp.gpa || '3.8 / 4.0'} • {selectedTrackerApp.country || 'Global'}</span>
+                </div>
+              </div>
+
+              {selectedTrackerApp.statementText && (
+                <div className="p-sm glass-panel mt-xs" style={{ background: 'var(--card-bg)', fontSize: '0.82rem' }}>
+                  <span className="text-muted block mb-xs" style={{ fontSize: '0.72rem' }}>Submitted Statement of Purpose</span>
+                  <p className="text-muted" style={{ margin: 0, fontStyle: 'italic', lineHeight: 1.5 }}>"{selectedTrackerApp.statementText}"</p>
+                </div>
+              )}
+            </div>
+
+            {/* Official Grant Criteria & Documents */}
+            {(() => {
+              const sch = selectedTrackerApp.scholarshipDetails || scholarshipList.find(s => s.id === selectedTrackerApp.scholarshipId) || {};
+              return (
+                <div className="flex flex-col gap-xs pt-xs" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: 700 }}>Eligibility Rules & Required Audit Documents</h4>
+                  {sch.desc && <p className="text-muted" style={{ fontSize: '0.82rem', margin: 0 }}>{sch.desc}</p>}
+                  {sch.eligibilityRules && (
+                    <div className="mt-xs">
+                      <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>Eligibility Criteria:</span>
+                      <p className="text-muted" style={{ fontSize: '0.8rem', margin: '4px 0 0 0' }}>{sch.eligibilityRules}</p>
+                    </div>
+                  )}
+                  {sch.documents && sch.documents.length > 0 && (
+                    <div className="mt-xs">
+                      <span className="text-muted font-600" style={{ fontSize: '0.78rem' }}>Submitted Documents Checklist:</span>
+                      <ul className="flex flex-col gap-xs pl-md mt-xs" style={{ fontSize: '0.8rem' }}>
+                        {sch.documents.map((doc, i) => (
+                          <li key={i} className="text-muted flex items-center gap-xs">
+                            <CheckCircle2 size={13} className="text-success" />
+                            <span>{doc} (Verified)</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Actions */}
+            <div className="flex justify-end gap-sm pt-sm" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setSelectedTrackerApp(null)}
+                style={{ width: 'auto', padding: '8px 18px', fontSize: '0.84rem' }}
+              >
+                Close Dossier
+              </button>
+            </div>
           </div>
         </div>,
         document.body

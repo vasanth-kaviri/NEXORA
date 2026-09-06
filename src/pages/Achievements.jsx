@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { 
   Award, Zap, Star, ShieldCheck, Trophy, Sparkles, Flame, CheckCircle2, Lock 
 } from 'lucide-react';
@@ -6,10 +5,10 @@ import db from '../services/db';
 
 export default function Achievements() {
   const currentUser = db.getCurrentUser() || {};
-  const currentXp = currentUser.xp || 1200;
-  const currentStreak = currentUser.streak || 5;
-  const tasksDone = currentUser.tasksCompleted || 4;
-  const interviewsDone = currentUser.interviewsCompleted || 1;
+  const currentXp = currentUser.xp || 100;
+  const currentStreak = currentUser.streak || 1;
+  const tasksDone = currentUser.tasksCompleted || 0;
+  const interviewsDone = currentUser.interviewsCompleted || 0;
 
   const badges = [
     {

@@ -1,8 +1,9 @@
 import { 
-  Compass, Video, FileText, Users, Shield, Award, Sparkles, 
+  Compass, Video, FileText, Users, Shield, Award, 
   Cpu, Lock, Globe, ArrowRight, Bot, CheckCircle2, Heart 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { NexoraIcon } from '../components/brand/NexoraLogo';
 import SocialTicker from '../components/SocialTicker';
 
 export default function About() {
@@ -21,21 +22,11 @@ export default function About() {
           padding: '3rem 2rem'
         }}
       >
-        <div 
-          className="brand-logo-hex skeuo-convex mb-md"
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 22,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-            boxShadow: '0 8px 24px var(--primary-glow)'
-          }}
-        >
-          <Sparkles size={36} className="text-white" />
-        </div>
+        <NexoraIcon 
+          size={76} 
+          withGlow 
+          className="mb-md transition-transform duration-300 hover:scale-105" 
+        />
 
         <span 
           className="badge mb-sm"
@@ -323,7 +314,7 @@ export default function About() {
         </p>
         <div className="flex justify-center gap-md mt-xs">
           <button 
-            onClick={() => alert('NEXORA Terms of Service: By using NEXORA, you agree to respect academic integrity, collaborate constructively, and utilize AI career recommendations ethically.')} 
+            onClick={() => navigate('/terms')} 
             className="text-primary interactive hover:underline" 
             style={{ fontSize: '0.8rem', background: 'none', border: 'none', cursor: 'pointer' }}
           >

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, Zap } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
 import CountryCodePicker from '../components/CountryCodePicker';
 import IconInput from '../components/IconInput';
@@ -10,12 +10,37 @@ import db from '../services/db';
 import { firebaseAuth } from '../services/firebaseAuth';
 import { useToast } from '../contexts/ToastContext';
 
+// ── Branded Custom Validation ────────────────────────────────────────────────
+function validateLoginForm(formData, contactType) {
+  const errors = {};
+
+  if (!formData.contact.trim()) {
+    errors.contact =
+      contactType === 'email'
+        ? 'Email address is required.'
+        : 'Phone number is required.';
+  } else if (contactType === 'email' && !formData.contact.includes('@')) {
+    errors.contact = 'Please enter a valid email address (e.g. you@example.com).';
+  } else if (contactType === 'phone' && formData.contact.length < 7) {
+    errors.contact = 'Please enter a valid phone number.';
+  }
+
+  if (!formData.password) {
+    errors.password = 'Password is required.';
+  } else if (formData.password.length < 6) {
+    errors.password = 'Password must be at least 6 characters.';
+  }
+
+  return errors;
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const toast = useToast();
   const [formData, setFormData] = useState({ contact: '', password: '' });
   const [contactType, setContactType] = useState('email');
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const {
     countryCode,
@@ -30,74 +55,59 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!formData.contact) {
-      toast.error('Please enter your email or phone number.');
+
+    // Run branded custom validation first
+    const validationErrors = validateLoginForm(formData, contactType);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
-    if (!formData.password) {
-      toast.error('Please enter your password.');
-      return;
-    }
+    setErrors({});
 
     setIsLoading(true);
-    // Connect to Firebase Auth & local DB
-    if (contactType === 'email') {
-      await firebaseAuth.loginWithEmail(formData.contact, formData.password);
-    } else {
-      db.login(formData.contact, formData.password);
-    }
-
-    setTimeout(() => {
-      setIsLoading(false);
-      const currentUser = db.getCurrentUser();
-      toast.success('Successfully authenticated! Welcome back.');
-      if (!currentUser?.profileCompleted) {
-        navigate('/complete-profile');
+    try {
+      if (contactType === 'email') {
+        await firebaseAuth.loginWithEmail(formData.contact, formData.password);
       } else {
-        navigate('/dashboard');
+        db.login(formData.contact, formData.password);
       }
-    }, 600);
-  };
 
-  const handleQuickDemoFill = () => {
-    setContactType('email');
-    setFormData({
-      contact: 'alex.johnson.dev@gmail.com',
-      password: 'password123'
-    });
-    toast.info('Filled demo credentials (Alex Johnson). Click "Log in".');
+      setTimeout(() => {
+        setIsLoading(false);
+        const currentUser = db.getCurrentUser();
+        toast.success('Successfully authenticated! Welcome back.');
+        if (!currentUser?.profileCompleted) {
+          navigate('/complete-profile');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 600);
+    } catch {
+      setIsLoading(false);
+      toast.error('Login failed. Please check your credentials and try again.');
+    }
   };
 
   return (
     <AuthLayout
       headline="Welcome Back to NEXORA."
-      subtext="Your calibrated workstation for hands-on systems architecture, daily coding sprints, and FAANG career readiness."
+      subtext="Your calibrated workstation for systems architecture, daily engineering sprints, and FAANG career trajectory."
       badgeText="NEXORA CAREER PLATFORM"
-      badgeSub="· Verified Curriculum"
-      maxWidth="480px"
+      badgeSub="· Verified Trajectory"
+      maxWidth="440px"
     >
       <div className="w-full">
-        <div className="flex justify-between items-center mb-1">
-          <h1 className="text-gradient" style={{ fontSize: '2.1rem', fontWeight: 800, letterSpacing: '-0.5px', margin: 0 }}>
+        <div className="mb-6">
+          <h1 className="text-gradient text-3xl font-extrabold tracking-tight mb-2">
             Welcome Back
           </h1>
-          <button
-            type="button"
-            onClick={handleQuickDemoFill}
-            className="minimal-badge cursor-pointer hover:scale-105 transition-transform"
-            style={{ color: 'var(--minimal-indigo)', fontSize: '0.74rem', padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' }}
-            title="1-click fill with student test credentials"
-          >
-            <Zap size={12} />
-            <span>Demo Fill</span>
-          </button>
+          <p className="text-muted text-sm leading-relaxed">
+            Sign in to continue calibrating your engineering trajectory.
+          </p>
         </div>
-        <p className="text-muted" style={{ marginBottom: '20px', fontSize: '0.9rem' }}>
-          Log in to continue your technical trajectory with NEXORA.
-        </p>
 
-        {/* Google Authentication with Real Firebase + Custom Account support */}
-        <div style={{ marginBottom: '18px' }}>
+        {/* Google Authentication */}
+        <div className="mb-5">
           <GoogleAuthButton mode="signin" onSuccess={() => {
             const currentUser = db.getCurrentUser();
             if (!currentUser?.profileCompleted) {
@@ -108,46 +118,59 @@ export default function Login() {
           }} />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>or log in with credentials</span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1 h-[1px]" style={{ background: 'var(--border-color)' }} />
+          <span className="text-[11px] text-muted uppercase tracking-widest font-medium">or continue with</span>
+          <div className="flex-1 h-[1px]" style={{ background: 'var(--border-color)' }} />
         </div>
 
-        <form onSubmit={handleLogin} className="w-full">
+        {/* Contact Type Segmented Pill Toggle */}
+        <div className="flex p-1 rounded-xl mb-5" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
+          <button
+            type="button"
+            onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); setErrors({}); }}
+            className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+            style={{
+              background: contactType === 'email' ? 'var(--minimal-indigo, #6366f1)' : 'transparent',
+              color: contactType === 'email' ? '#ffffff' : 'var(--text-muted)',
+              boxShadow: contactType === 'email' ? '0 2px 10px rgba(99, 102, 241, 0.35)' : 'none'
+            }}
+          >
+            Email Address
+          </button>
+          <button
+            type="button"
+            onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setErrors({}); setShowCountryMenu(false); }}
+            className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+            style={{
+              background: contactType === 'phone' ? 'var(--minimal-indigo, #6366f1)' : 'transparent',
+              color: contactType === 'phone' ? '#ffffff' : 'var(--text-muted)',
+              boxShadow: contactType === 'phone' ? '0 2px 10px rgba(99, 102, 241, 0.35)' : 'none'
+            }}
+          >
+            Phone Number
+          </button>
+        </div>
 
-          {/* Contact Input Toggle */}
-          <div className="input-group">
-            <div className="flex justify-between items-center mb-1">
-              <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Contact Details</label>
-              <div className="flex gap-2">
-                <span
-                  onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); }}
-                  style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'email' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-                >
-                  Email
-                </span>
-                <span style={{ color: 'var(--text-muted)' }}>|</span>
-                <span
-                  onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setShowCountryMenu(false); }}
-                  style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'phone' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-                >
-                  Phone
-                </span>
-              </div>
-            </div>
+        <form onSubmit={handleLogin} noValidate className="w-full flex flex-col gap-4">
+
+          {/* Contact Input */}
+          <div className="input-group mb-0">
+            <label className="input-label mb-1.5 font-medium text-xs tracking-wide">
+              {contactType === 'email' ? 'Email Address' : 'Phone Number'}
+            </label>
 
             {contactType === 'email' ? (
               <IconInput
-                icon={<Mail size={18} />}
+                icon={<Mail size={17} />}
                 type="email"
-                placeholder="student@example.com"
+                placeholder="name@company.com"
                 value={formData.contact}
+                error={!!errors.contact}
                 onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                required
               />
             ) : (
-              <div className="flex w-full gap-2" style={{ width: '100%' }}>
+              <div className="flex w-full gap-2">
                 <CountryCodePicker
                   countryCode={countryCode}
                   setCountryCode={setCountryCode}
@@ -162,46 +185,58 @@ export default function Login() {
                   type="tel"
                   maxLength={countryCodes.find(c => c.code === countryCode)?.maxLength || 15}
                   className="input-field flex-1 min-w-0"
-                  style={{ flex: 1, minWidth: 0 }}
+                  style={{ flex: 1, minWidth: 0, borderColor: errors.contact ? 'var(--secondary)' : '' }}
                   placeholder="234 567 8900"
                   value={formData.contact}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, '');
                     setFormData({ ...formData, contact: val });
                   }}
-                  required
                 />
               </div>
             )}
+
+            {errors.contact && (
+              <span role="alert" className="text-secondary text-xs font-medium block mt-1.5">
+                {errors.contact}
+              </span>
+            )}
           </div>
 
-          {/* Password */}
-          <div className="input-group mb-2">
-            <div className="flex justify-between items-center mb-1">
-              <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Password</label>
+          {/* Password Input */}
+          <div className="input-group mb-1">
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="input-label mb-0 font-medium text-xs tracking-wide">Password</label>
               <span
                 onClick={() => navigate('/forgot-password')}
-                className="text-primary interactive hover:underline"
-                style={{ fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}
+                className="text-xs text-muted hover:text-primary transition-colors cursor-pointer font-medium"
               >
                 Forgot password?
               </span>
             </div>
             <IconInput
-              icon={<Lock size={18} />}
+              icon={<Lock size={17} />}
               type="password"
-              placeholder="Enter your password"
+              showToggle
+              placeholder="Enter your account password"
               value={formData.password}
+              error={!!errors.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
             />
+            {errors.password && (
+              <span role="alert" className="text-secondary text-xs font-medium block mt-1.5">
+                {errors.password}
+              </span>
+            )}
           </div>
 
-          <button 
-            type="submit" 
+          {/* Submit Action */}
+          <button
+            type="submit"
+            id="login-submit-btn"
             disabled={isLoading}
-            className="btn btn-primary w-full flex items-center justify-center gap-2 mt-4"
-            style={{ padding: '12px', fontSize: '0.92rem', borderRadius: 'var(--radius-md)' }}
+            className="btn btn-primary w-full flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            style={{ padding: '13px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
           >
             {isLoading ? (
               <>
@@ -210,26 +245,21 @@ export default function Login() {
               </>
             ) : (
               <>
-                <span>Log in</span>
+                <span>Sign in</span>
                 <ArrowRight size={17} />
               </>
             )}
           </button>
-
-          <div className="mt-4 pt-3 flex items-center justify-between text-xs text-muted" style={{ borderTop: '1px solid var(--border-color)' }}>
-            <span>🔒 TLS 1.3 Encryption</span>
-            <span>⚡ Instant Session Sync</span>
-          </div>
         </form>
 
-        <div className="text-center mt-4">
-          <p className="text-muted" style={{ fontSize: '0.88rem' }}>
+        <div className="text-center mt-6 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+          <p className="text-muted text-xs sm:text-sm">
             Don't have an account?{' '}
             <span
               onClick={() => navigate('/signup')}
-              className="text-primary font-semibold interactive cursor-pointer hover:underline"
+              className="text-primary font-semibold cursor-pointer hover:underline"
             >
-              Create account
+              Create an account
             </span>
           </p>
         </div>

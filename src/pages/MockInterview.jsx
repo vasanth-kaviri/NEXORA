@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Video, VideoOff, Mic, MicOff, StopCircle, Play, Volume2, VolumeX, 
-  RotateCcw, CheckCircle2, AlertCircle, Sparkles, Award, ShieldCheck, 
+  Video, VideoOff, Mic, StopCircle, Play, Volume2, VolumeX, 
+  RotateCcw, CheckCircle2, Sparkles, Award, 
   UserCheck, ArrowRight, ArrowLeft, RefreshCw, BarChart2, Eye, BrainCircuit,
-  MessageSquare, Layers, Monitor, MonitorOff, Calendar, AlertTriangle, Check, Info
+  MessageSquare, Layers, Monitor, Calendar, AlertTriangle
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -31,9 +31,7 @@ export default function MockInterview() {
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
   const [webcamActive, setWebcamActive] = useState(false);
-  const [cameraError, setCameraError] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [screenShareError, setScreenShareError] = useState(false);
   
   // Proctoring & Attention States
   const [eyeContactAlert, setEyeContactAlert] = useState(false);
@@ -180,22 +178,55 @@ export default function MockInterview() {
     };
   }, [sessionStarted, interviewCompleted]);
 
-  // Webcam initialization
+  // Webcam initialization and stream lifecycle
   const startWebcam = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } }, 
+        audio: true 
+      });
       cameraStreamRef.current = stream;
+      setWebcamActive(true);
       if (userVideoRef.current) {
         userVideoRef.current.srcObject = stream;
+        userVideoRef.current.play?.().catch(() => {});
       }
-      setWebcamActive(true);
-      setCameraError(false);
+      triggerToast('Candidate live camera feed active.');
     } catch (err) {
       console.warn('Webcam stream permission denied or unavailable:', err);
-      setCameraError(true);
       setWebcamActive(false);
+      triggerToast('Camera access unavailable. Simulated proctoring active.');
     }
   };
+
+  const handleToggleWebcam = async () => {
+    if (webcamActive) {
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          track.enabled = false;
+        });
+        cameraStreamRef.current = null;
+      }
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = null;
+      }
+      setWebcamActive(false);
+      triggerToast('Camera paused. Proctoring standby.');
+    } else {
+      await startWebcam();
+    }
+  };
+
+  // Guarantee webcam stream attaches to video element whenever DOM mounts or state changes
+  useEffect(() => {
+    if (sessionStarted && webcamActive && userVideoRef.current && cameraStreamRef.current) {
+      if (userVideoRef.current.srcObject !== cameraStreamRef.current) {
+        userVideoRef.current.srcObject = cameraStreamRef.current;
+      }
+      userVideoRef.current.play?.().catch(e => console.log('Video play caught:', e));
+    }
+  }, [sessionStarted, webcamActive]);
 
   // Screen share initialization
   const handleToggleScreenShare = async () => {
@@ -219,7 +250,6 @@ export default function MockInterview() {
         screenVideoRef.current.srcObject = stream;
       }
       setIsScreenSharing(true);
-      setScreenShareError(false);
       triggerToast('Live Screen Share Active: Interviewer can observe your IDE & architecture.');
 
       // Auto-stop when user stops via browser bar
@@ -229,7 +259,6 @@ export default function MockInterview() {
       };
     } catch (err) {
       console.warn('Screen share cancelled or denied:', err);
-      setScreenShareError(true);
     }
   };
 
@@ -302,17 +331,6 @@ export default function MockInterview() {
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  // Handle Question Changes
-  useEffect(() => {
-    if (sessionStarted && !interviewCompleted) {
-      speakQuestion(currentQuestion.q);
-      setCurrentAnswerText(userAnswers[currentQuestion.id] || '');
-      setRecordSeconds(0);
-      setIsRecording(false);
-      stopSpeechRecognition();
-    }
-  }, [currentQIndex, sessionStarted]);
-
   const handleStartSession = () => {
     setSessionStarted(true);
     setInterviewCompleted(false);
@@ -320,8 +338,23 @@ export default function MockInterview() {
     setUserAnswers({});
     setPerQuestionFeedback({});
     setAlertCount(0);
+    setCurrentAnswerText('');
+    setRecordSeconds(0);
+    setIsRecording(false);
     startWebcam();
+    speakQuestion(currentBank[0].q);
     triggerToast('Proctored Session Commenced: 20 MNC Questions Active');
+  };
+
+  const handlePrevQuestion = () => {
+    if (currentQIndex <= 0) return;
+    const prevIndex = currentQIndex - 1;
+    setCurrentQIndex(prevIndex);
+    setCurrentAnswerText(userAnswers[currentBank[prevIndex].id] || '');
+    setRecordSeconds(0);
+    setIsRecording(false);
+    stopSpeechRecognition();
+    speakQuestion(currentBank[prevIndex].q);
   };
 
   const handleToggleRecording = () => {
@@ -446,8 +479,14 @@ export default function MockInterview() {
       setIsEvaluating(false);
 
       if (currentQIndex < currentBank.length - 1) {
-        setCurrentQIndex(prev => prev + 1);
-        triggerToast(`Answer evaluated (Score: ${feedback.overallScore}/100). Loading Question ${currentQIndex + 2} of 20.`);
+        const nextIndex = currentQIndex + 1;
+        setCurrentQIndex(nextIndex);
+        setCurrentAnswerText(userAnswers[currentBank[nextIndex].id] || '');
+        setRecordSeconds(0);
+        setIsRecording(false);
+        stopSpeechRecognition();
+        speakQuestion(currentBank[nextIndex].q);
+        triggerToast(`Answer evaluated (Score: ${feedback.overallScore}/100). Loading Question ${nextIndex + 1} of 20.`);
       } else {
         handleCompleteInterview();
       }
@@ -752,12 +791,19 @@ export default function MockInterview() {
                   }} 
                 />
 
-                {/* Simulated Camera Fallback if blocked */}
+                {/* Simulated Camera Fallback if blocked or off */}
                 {!webcamActive && (
                   <div className="flex flex-col items-center justify-center text-center p-md h-full" style={{ background: '#111' }}>
                     <UserCheck size={36} className="text-muted mb-xs" />
-                    <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Simulated Proctored Camera Active</span>
-                    <span className="text-muted" style={{ fontSize: '0.72rem' }}>Identity Verified: {currentUser.firstName || 'Candidate'}</span>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Proctored Camera Offline</span>
+                    <span className="text-muted mb-xs" style={{ fontSize: '0.72rem' }}>Identity Verified: {currentUser.firstName || 'Candidate'}</span>
+                    <button 
+                      onClick={handleToggleWebcam} 
+                      className="btn btn-primary flex items-center gap-xs" 
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', width: 'auto', marginTop: '6px' }}
+                    >
+                      <Video size={13} /> Enable Live Camera
+                    </button>
                   </div>
                 )}
 
@@ -779,7 +825,7 @@ export default function MockInterview() {
                   }}
                 >
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-                  <span>Verified Identity • {currentUser.firstName || 'Alex'}</span>
+                  <span>Verified Identity • {currentUser.firstName || 'Candidate'}</span>
                 </div>
 
                 {/* Eye Contact Indicator */}
@@ -906,6 +952,16 @@ export default function MockInterview() {
                 >
                   {isRecording ? <StopCircle size={15} /> : <Mic size={15} />}
                   <span>{isRecording ? `Recording (${formatTime(recordSeconds)})` : 'Answer with Voice'}</span>
+                </button>
+
+                {/* Camera Toggle Button */}
+                <button
+                  onClick={handleToggleWebcam}
+                  className={`skeuo-pill ${webcamActive ? 'active' : ''}`}
+                  style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                >
+                  {webcamActive ? <Video size={14} className="text-success" /> : <VideoOff size={14} className="text-danger" />}
+                  <span>{webcamActive ? 'Camera On' : 'Turn Camera On'}</span>
                 </button>
 
                 {/* Screen Share Button */}
@@ -1190,7 +1246,7 @@ export default function MockInterview() {
               <button 
                 className="btn btn-secondary"
                 disabled={currentQIndex === 0}
-                onClick={() => setCurrentQIndex(prev => prev - 1)}
+                onClick={handlePrevQuestion}
                 style={{ width: 'auto', padding: '8px 16px', fontSize: '0.84rem' }}
               >
                 <ArrowLeft size={16} /> Previous

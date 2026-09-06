@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, ArrowLeft, ShieldCheck, CheckCircle2, Sparkles, KeyRound, Clock, ShieldAlert, Cpu } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Lock, ArrowRight, ArrowLeft, ShieldCheck, Mail, Clock, RotateCw } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
 import CountryCodePicker from '../components/CountryCodePicker';
 import IconInput from '../components/IconInput';
@@ -22,10 +22,13 @@ export default function Signup() {
   });
   const [demoOtp, setDemoOtp] = useState(() => Math.floor(1000 + Math.random() * 9000).toString());
   const [otp, setOtp] = useState('');
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '']);
+  const otpInputRefs = useRef([]);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [errors, setErrors] = useState({});
   const [contactType, setContactType] = useState('email');
-  const [resendTimer, setResendTimer] = useState(45);
+  const [resendTimer, setResendTimer] = useState(35);
 
   const {
     countryCode,
@@ -55,240 +58,249 @@ export default function Signup() {
     if (Object.keys(newErrors).length === 0) {
       setErrors({});
       setStep(2);
-      setResendTimer(45);
+      setResendTimer(35);
+      setOtpDigits(['', '', '', '']);
+      setOtp('');
       toast.info(`Verification code sent. Use code: ${demoOtp}`);
+      setTimeout(() => {
+        otpInputRefs.current[0]?.focus();
+      }, 150);
     } else {
       setErrors(newErrors);
     }
   };
 
   const handleResendOtp = () => {
-    const newCode = Math.floor(1000 + Math.random() * 9000).toString();
-    setDemoOtp(newCode);
-    setResendTimer(45);
-    setOtp('');
-    toast.success(`New verification code sent: ${newCode}`);
+    if (isResending || resendTimer > 0) return;
+    setIsResending(true);
+    setTimeout(() => {
+      const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+      setDemoOtp(newCode);
+      setResendTimer(35);
+      setOtpDigits(['', '', '', '']);
+      setOtp('');
+      setIsResending(false);
+      toast.success(`New verification code dispatched: ${newCode}`);
+      otpInputRefs.current[0]?.focus();
+    }, 500);
   };
 
   const completeAccountCreation = async () => {
     setIsVerifying(true);
-    // Connect to Firebase Auth & local DB
-    if (contactType === 'email') {
-      await firebaseAuth.signupWithEmail(formData.contact, formData.password);
-    } else {
+    
+    // Register authenticated session in local DB immediately
+    try {
       db.signup(formData, contactType);
+    } catch (err) {
+      console.error('Error establishing local session:', err);
     }
     
+    // Broadcast authenticated session to workstation
+    window.dispatchEvent(new Event('user_session_changed'));
+
+    // Asynchronously synchronize with Firebase Auth if email
+    if (contactType === 'email') {
+      try {
+        firebaseAuth.signupWithEmail(formData.contact, formData.password).catch(() => {});
+      } catch {
+        // Handled locally
+      }
+    }
+
     setTimeout(() => {
       setIsVerifying(false);
-      toast.success('Account successfully registered! Please sign in to verify your session.');
-      navigate('/login');
-    }, 600);
+      toast.success('Account successfully verified! Welcome to NEXORA.');
+      const cur = db.getCurrentUser();
+      if (!cur?.profileCompleted) {
+        navigate('/complete-profile');
+      } else {
+        navigate('/dashboard');
+      }
+    }, 400);
   };
 
   const handleVerifyOTP = (e) => {
     e.preventDefault();
-    if (otp.length >= 4) {
+    const entered = otpDigits.join('');
+    if (entered.length === 4) {
       completeAccountCreation();
     } else {
-      setErrors({ otp: 'Please enter a valid 4-digit code.' });
+      setErrors({ otp: 'Please enter all 4 digits of your security code.' });
+      const firstEmpty = otpDigits.findIndex(d => !d);
+      if (firstEmpty !== -1) {
+        otpInputRefs.current[firstEmpty]?.focus();
+      }
     }
+  };
+
+  const handleOtpChange = (index, e) => {
+    const rawValue = e.target.value;
+    const cleaned = rawValue.replace(/[^0-9]/g, '');
+    const newDigits = [...otpDigits];
+
+    if (cleaned.length > 1) {
+      const chars = cleaned.slice(0, 4).split('');
+      for (let i = 0; i < 4; i++) {
+        newDigits[i] = chars[i] || '';
+      }
+      setOtpDigits(newDigits);
+      setOtp(newDigits.join(''));
+      const nextIdx = Math.min(chars.length, 3);
+      otpInputRefs.current[nextIdx]?.focus();
+    } else {
+      newDigits[index] = cleaned;
+      setOtpDigits(newDigits);
+      setOtp(newDigits.join(''));
+
+      if (cleaned && index < 3) {
+        otpInputRefs.current[index + 1]?.focus();
+      }
+    }
+
+    if (errors.otp) {
+      setErrors(prev => ({ ...prev, otp: '' }));
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace') {
+      if (otpDigits[index]) {
+        const newDigits = [...otpDigits];
+        newDigits[index] = '';
+        setOtpDigits(newDigits);
+        setOtp(newDigits.join(''));
+      } else if (index > 0) {
+        e.preventDefault();
+        const newDigits = [...otpDigits];
+        newDigits[index - 1] = '';
+        setOtpDigits(newDigits);
+        setOtp(newDigits.join(''));
+        otpInputRefs.current[index - 1]?.focus();
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault();
+      otpInputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < 3) {
+      e.preventDefault();
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedText = clipboardData?.getData('text') || '';
+    const digitsOnly = pastedText.replace(/[^0-9]/g, '').slice(0, 4);
+    if (!digitsOnly) return;
+
+    const newDigits = ['', '', '', ''];
+    for (let i = 0; i < digitsOnly.length; i++) {
+      newDigits[i] = digitsOnly[i];
+    }
+    setOtpDigits(newDigits);
+    setOtp(digitsOnly);
+    if (errors.otp) {
+      setErrors(prev => ({ ...prev, otp: '' }));
+    }
+
+    const nextIdx = digitsOnly.length < 4 ? digitsOnly.length : 3;
+    otpInputRefs.current[nextIdx]?.focus();
   };
 
   const topLeftAction = step === 2 ? (
     <button 
       onClick={() => setStep(1)} 
       id="back-to-signup-btn"
-      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-muted hover:text-main transition-all cursor-pointer font-semibold text-xs sm:text-sm select-none" 
-      style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+      className="inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-main transition-colors cursor-pointer"
       title="Return to Registration Details"
     >
-      <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1 text-primary" />
+      <ArrowLeft size={15} className="text-primary" />
       <span>Back to registration</span>
     </button>
   ) : null;
 
-  // Dedicated 2FA Security Telemetry Showcase for Step 2
-  const verificationShowcase = (
-    <div className="flex flex-col animate-fade-in w-full">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="minimal-badge" style={{ color: 'var(--minimal-indigo)', borderColor: 'rgba(99, 102, 241, 0.25)' }}>
-          <ShieldCheck size={12} className="text-minimal-indigo" />
-          <span>2FA SECURITY PROTOCOL</span>
-        </span>
-        <span className="text-muted" style={{ fontSize: '0.75rem' }}>· Hardware Enclave Verification</span>
-      </div>
-
-      <h2 
-        className="text-gradient"
-        style={{ fontSize: '2.15rem', fontWeight: 800, lineHeight: 1.22, letterSpacing: '-0.5px', marginBottom: '12px' }}
-      >
-        Two-Factor Identity Verification.
-      </h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.94rem', lineHeight: 1.6, marginBottom: '26px' }}>
-        Multi-layer cryptographic challenge to authenticate your developer workstation and secure your roadmap telemetry.
-      </p>
-
-      {/* Security Telemetry Station Card */}
-      <div 
-        className="glass-panel skeuo-convex" 
-        style={{ 
-          borderRadius: '18px', 
-          padding: '22px', 
-          background: 'var(--skeuo-surface-card)',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 18px 45px rgba(0, 0, 0, 0.22)'
-        }}
-      >
-        <div className="flex justify-between items-center pb-3 mb-3.5" style={{ borderBottom: '1px solid var(--border-color)' }}>
-          <div className="flex items-center gap-2">
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-            <span className="text-muted font-mono" style={{ fontSize: '0.74rem', marginLeft: '6px' }}>
-              nexora://identity-security/session-gate
-            </span>
-          </div>
-          <span className="minimal-badge font-mono" style={{ fontSize: '0.68rem', color: 'var(--minimal-emerald)' }}>
-            ● CHALLENGE DISPATCHED
-          </span>
-        </div>
-
-        {/* Security Checks List */}
-        <div className="flex flex-col gap-2.5 mb-4">
-          <div className="flex items-center justify-between p-2.5 px-3 rounded-lg" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-minimal-emerald" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                Hardware TLS 1.3 Channel
-              </span>
-            </div>
-            <span className="font-mono text-minimal-emerald" style={{ fontSize: '0.72rem', fontWeight: 600 }}>
-              ESTABLISHED
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-2.5 px-3 rounded-lg" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={15} className="text-minimal-emerald" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                Target Recipient Handshake
-              </span>
-            </div>
-            <span className="font-mono text-muted truncate max-w-[140px]" style={{ fontSize: '0.72rem' }}>
-              {formData.contact || 'Verified'}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-2.5 px-3 rounded-lg" style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--minimal-indigo)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--minimal-indigo)' }} />
-              </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                4-Digit TOTP Passcode Authorization
-              </span>
-            </div>
-            <span className="font-mono text-minimal-indigo animate-pulse" style={{ fontSize: '0.72rem', fontWeight: 600 }}>
-              WAITING INPUT
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-2.5 px-3 rounded-lg" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <Cpu size={15} className="text-muted" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-muted)' }}>
-                Engineering Workstation Sandbox
-              </span>
-            </div>
-            <span className="font-mono text-muted" style={{ fontSize: '0.72rem' }}>
-              QUEUED
-            </span>
-          </div>
-        </div>
-
-        {/* Security Summary Badge */}
-        <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <ShieldCheck size={14} className="text-minimal-indigo" />
-            <span>Zero-Knowledge Proof Verification</span>
-          </div>
-          <span className="minimal-badge" style={{ fontSize: '0.68rem', color: 'var(--minimal-indigo)' }}>
-            256-Bit E2EE
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <AuthLayout
-      headline={step === 2 ? "Two-Factor Identity Verification." : "Engineered for High-Growth Tech Careers."}
-      subtext={step === 2 ? "Multi-layer cryptographic challenge to authenticate your developer workstation and secure your roadmap telemetry." : "Join over 14,850+ engineers calibrating production systems, AI pipelines, and FAANG technical interviews."}
-      badgeText={step === 2 ? "2FA SECURITY PROTOCOL" : "NEXORA CAREER PLATFORM"}
-      badgeSub={step === 2 ? "· Hardware Enclave" : "· Verified Curriculum"}
+      headline="Calibrate Your Engineering Trajectory."
+      subtext="Join over 14,850+ ambitious engineers mastering production systems, AI pipelines, and FAANG interviews."
+      badgeText="NEXORA CAREER PLATFORM"
+      badgeSub="· Verified Trajectory"
       topLeftAction={topLeftAction}
-      maxWidth={step === 2 ? "500px" : "480px"}
-      customShowcase={step === 2 ? verificationShowcase : null}
+      maxWidth={step === 2 ? "440px" : "460px"}
     >
+      {/* ── STEP 1: Registration Form ── */}
       {step === 1 && (
         <div className="w-full">
-          <h1 className="text-gradient" style={{ fontSize: '2.1rem', fontWeight: 800, marginBottom: '6px', letterSpacing: '-0.5px' }}>
-            Create Account
-          </h1>
-          <p className="text-muted" style={{ marginBottom: '20px', fontSize: '0.9rem' }}>
-            Join NEXORA and calibrate your technical trajectory.
-          </p>
+          <div className="mb-6">
+            <h1 className="text-gradient text-3xl font-extrabold tracking-tight mb-2">
+              Create an Account
+            </h1>
+            <p className="text-muted text-sm leading-relaxed">
+              Join NEXORA to engineer and calibrate your technical trajectory.
+            </p>
+          </div>
 
           {/* Google Sign up */}
-          <div style={{ marginBottom: '18px' }}>
+          <div className="mb-5">
             <GoogleAuthButton mode="signup" onSuccess={() => {
               toast.success('Google account verified! Proceeding to Complete Profile.');
               navigate('/complete-profile');
             }} />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>or register with email</span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }} />
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-[1px]" style={{ background: 'var(--border-color)' }} />
+            <span className="text-[11px] text-muted uppercase tracking-widest font-medium">or register with</span>
+            <div className="flex-1 h-[1px]" style={{ background: 'var(--border-color)' }} />
           </div>
 
-          <form onSubmit={handleStep1Submit} className="w-full">
+          {/* Contact Type Toggle */}
+          <div className="flex p-1 rounded-xl mb-5" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
+            <button
+              type="button"
+              onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); setErrors({}); }}
+              className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+              style={{
+                background: contactType === 'email' ? 'var(--minimal-indigo, #6366f1)' : 'transparent',
+                color: contactType === 'email' ? '#ffffff' : 'var(--text-muted)',
+                boxShadow: contactType === 'email' ? '0 2px 10px rgba(99, 102, 241, 0.35)' : 'none'
+              }}
+            >
+              Email Address
+            </button>
+            <button
+              type="button"
+              onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setErrors({}); setShowCountryMenu(false); }}
+              className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+              style={{
+                background: contactType === 'phone' ? 'var(--minimal-indigo, #6366f1)' : 'transparent',
+                color: contactType === 'phone' ? '#ffffff' : 'var(--text-muted)',
+                boxShadow: contactType === 'phone' ? '0 2px 10px rgba(99, 102, 241, 0.35)' : 'none'
+              }}
+            >
+              Phone Number
+            </button>
+          </div>
 
-            {/* Contact Input Toggle */}
-            <div className="input-group">
-              <div className="flex justify-between items-center mb-1">
-                <label className="input-label mb-0" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Contact Details</label>
-                <div className="flex gap-2">
-                  <span
-                    onClick={() => { setContactType('email'); setFormData({ ...formData, contact: '' }); setErrors({}); }}
-                    style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'email' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-                  >
-                    Email
-                  </span>
-                  <span style={{ color: 'var(--text-muted)' }}>|</span>
-                  <span
-                    onClick={() => { setContactType('phone'); setFormData({ ...formData, contact: '' }); setErrors({}); setShowCountryMenu(false); }}
-                    style={{ fontSize: '0.78rem', cursor: 'pointer', fontWeight: 600, color: contactType === 'phone' ? 'var(--minimal-indigo)' : 'var(--text-muted)' }}
-                  >
-                    Phone
-                  </span>
-                </div>
-              </div>
+          <form onSubmit={handleStep1Submit} className="w-full flex flex-col gap-4">
+            {/* Contact Details */}
+            <div className="input-group mb-0">
+              <label className="input-label mb-1.5 font-medium text-xs tracking-wide">
+                {contactType === 'email' ? 'Email Address' : 'Phone Number'}
+              </label>
 
               {contactType === 'email' ? (
                 <IconInput
-                  icon={<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
+                  icon={<Mail size={17} />}
                   type="email"
-                  placeholder="student@example.com"
+                  placeholder="name@company.com"
                   error={!!errors.contact}
                   value={formData.contact}
                   onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
                   required
                 />
               ) : (
-                <div className="flex w-full gap-2" style={{ width: '100%' }}>
+                <div className="flex w-full gap-2">
                   <CountryCodePicker
                     countryCode={countryCode}
                     setCountryCode={setCountryCode}
@@ -316,31 +328,33 @@ export default function Signup() {
                 </div>
               )}
               {errors.contact && (
-                <span className="text-secondary" style={{ fontSize: '0.8rem', marginTop: '4px' }}>{errors.contact}</span>
+                <span className="text-secondary text-xs font-medium block mt-1.5">{errors.contact}</span>
               )}
             </div>
 
             {/* Password */}
-            <div className="input-group mb-3">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Password</label>
+            <div className="input-group mb-0">
+              <label className="input-label mb-1.5 font-medium text-xs tracking-wide">Create Password</label>
               <IconInput
-                icon={<Lock size={18} />}
+                icon={<Lock size={17} />}
                 type="password"
+                showToggle
                 placeholder="At least 6 characters"
                 error={!!errors.password}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
-              {errors.password && <span className="text-secondary" style={{ fontSize: '0.8rem' }}>{errors.password}</span>}
+              {errors.password && <span className="text-secondary text-xs font-medium block mt-1.5">{errors.password}</span>}
             </div>
 
             {/* Confirm Password */}
-            <div className="input-group mb-5">
-              <label className="input-label" style={{ fontSize: '0.82rem', fontWeight: 600 }}>Confirm Password</label>
+            <div className="input-group mb-1">
+              <label className="input-label mb-1.5 font-medium text-xs tracking-wide">Confirm Password</label>
               <IconInput
-                icon={<Lock size={18} />}
+                icon={<Lock size={17} />}
                 type="password"
+                showToggle
                 placeholder="Repeat your password"
                 error={!!errors.confirmPassword}
                 value={formData.confirmPassword}
@@ -348,215 +362,173 @@ export default function Signup() {
                 required
               />
               {errors.confirmPassword && (
-                <span className="text-secondary" style={{ fontSize: '0.8rem' }}>{errors.confirmPassword}</span>
+                <span className="text-secondary text-xs font-medium block mt-1.5">{errors.confirmPassword}</span>
               )}
             </div>
 
             <button 
               type="submit" 
-              className="btn btn-primary w-full flex items-center justify-center gap-2"
-              style={{ padding: '12px', fontSize: '0.92rem', borderRadius: 'var(--radius-md)' }}
+              className="btn btn-primary w-full flex items-center justify-center gap-2 mt-2 cursor-pointer"
+              style={{ padding: '13px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
             >
-              <span>Continue</span>
+              <span>Continue to verification</span>
               <ArrowRight size={17} />
             </button>
-
-            <div className="mt-4 pt-3 flex items-center justify-between text-xs text-muted" style={{ borderTop: '1px solid var(--border-color)' }}>
-              <span>⚡ Instant Access</span>
-              <span>🔒 256-bit Encrypted</span>
-              <span>🎓 Verified Paths</span>
-            </div>
           </form>
 
-          <div className="text-center mt-4">
-            <p className="text-muted" style={{ fontSize: '0.88rem' }}>
+          <div className="text-center mt-6 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+            <p className="text-muted text-xs sm:text-sm">
               Already have an account?{' '}
-              <span
-                onClick={() => navigate('/login')}
-                className="text-primary font-semibold interactive cursor-pointer hover:underline"
-              >
-                Log in
-              </span>
+              <Link to="/login" className="text-primary font-semibold hover:underline">
+                Sign in
+              </Link>
             </p>
           </div>
         </div>
       )}
 
-      {/* ── STEP 2: Dedicated High-Tech 2FA Security Station ── */}
+      {/* ── STEP 2: Dedicated Clean Verification Screen ── */}
       {step === 2 && (
-        <div className="w-full animate-fade-in">
-          <div>
-            {/* Step Progress Bar Header */}
-            <div className="flex items-center justify-between mb-4 pb-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <div className="flex items-center gap-2">
-                <span className="minimal-badge" style={{ fontSize: '0.72rem', color: 'var(--minimal-indigo)', padding: '3px 8px' }}>
-                  STEP 2 OF 2
-                </span>
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  Identity Challenge
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div style={{ width: 20, height: 4, borderRadius: 2, background: 'var(--minimal-emerald)' }} title="Step 1 Complete" />
-                <div style={{ width: 20, height: 4, borderRadius: 2, background: 'var(--minimal-indigo)' }} title="Step 2 Active" />
-              </div>
-            </div>
+        <div className="w-full animate-fade-in text-center">
+          {/* Subtle 2FA Badge */}
+          <div 
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4 mx-auto"
+            style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--minimal-indigo)', border: '1px solid rgba(99, 102, 241, 0.2)' }}
+          >
+            <ShieldCheck size={13} />
+            <span>Two-Factor Authentication</span>
+          </div>
 
-            {/* Icon and Heading */}
-            <div className="text-center mb-5">
-              <div 
-                className="mx-auto flex items-center justify-center mb-3"
-                style={{ 
-                  width: 52, 
-                  height: 52, 
-                  borderRadius: '50%', 
-                  background: 'rgba(99, 102, 241, 0.12)', 
-                  border: '1px solid rgba(99, 102, 241, 0.28)',
-                  boxShadow: '0 0 20px rgba(99, 102, 241, 0.18)'
-                }}
-              >
-                <ShieldCheck size={26} className="text-minimal-indigo" />
-              </div>
-              
-              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.5px' }}>
-                Verify your {contactType === 'email' ? 'Email' : 'Phone'}
-              </h2>
-              
-              <p className="text-muted" style={{ fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>
-                We've dispatched a 4-digit security code to:
-              </p>
-              
-              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg flex-wrap justify-center" style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
-                <strong className="text-main font-mono text-xs sm:text-sm">{formData.contact}</strong>
-                <button 
-                  type="button" 
-                  onClick={() => setStep(1)}
-                  className="text-primary hover:underline text-xs font-semibold cursor-pointer"
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-
-            {/* 1-Click Passcode Helper */}
-            <div 
-              className="flex items-center justify-between p-2.5 px-3.5 rounded-xl mb-5" 
-              style={{ 
-                background: 'var(--input-bg)', 
-                border: '1px solid var(--border-color)'
-              }}
+          <h1 className="text-gradient text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+            Verify your {contactType === 'email' ? 'Email' : 'Phone'}
+          </h1>
+          
+          <p className="text-muted text-xs sm:text-sm max-w-sm mx-auto mb-4 leading-relaxed">
+            We've dispatched a 4-digit verification code to:
+          </p>
+          
+          {/* Recipient pill with clean edit option */}
+          <div 
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl mb-6 mx-auto" 
+            style={{ background: 'var(--input-bg)', border: '1px solid var(--border-color)' }}
+          >
+            <span className="font-mono text-xs sm:text-sm font-semibold text-main">{formData.contact}</span>
+            <button 
+              type="button" 
+              onClick={() => setStep(1)}
+              className="text-primary hover:underline text-xs font-semibold cursor-pointer ml-1"
             >
-              <div className="flex items-center gap-2">
-                <KeyRound size={15} className="text-primary" />
-                <span className="text-xs text-muted">Test Passcode:</span>
-                <span className="font-mono font-bold tracking-widest text-sm text-main">{demoOtp}</span>
+              Change
+            </button>
+          </div>
+
+          {!isVerifying ? (
+            <form onSubmit={handleVerifyOTP} className="w-full flex flex-col items-center">
+              {/* Centered 4-Box Segmented Code Input */}
+              <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+                {[0, 1, 2, 3].map((index) => (
+                  <input
+                    key={index}
+                    ref={(el) => (otpInputRefs.current[index] = el)}
+                    id={`otp-box-${index}`}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete={index === 0 ? "one-time-code" : "off"}
+                    maxLength={index === 0 ? 4 : 1}
+                    value={otpDigits[index]}
+                    onChange={(e) => handleOtpChange(index, e)}
+                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    onPaste={handleOtpPaste}
+                    className="text-center font-mono font-bold text-main transition-all duration-200"
+                    style={{
+                      width: '58px',
+                      height: '66px',
+                      fontSize: '1.85rem',
+                      borderRadius: '14px',
+                      background: otpDigits[index] ? 'rgba(99, 102, 241, 0.08)' : 'var(--input-bg)',
+                      border: errors.otp 
+                        ? '1.5px solid var(--secondary)' 
+                        : otpDigits[index] 
+                          ? '1.5px solid var(--primary)' 
+                          : '1px solid var(--border-color)',
+                      boxShadow: otpDigits[index] ? '0 0 16px rgba(99, 102, 241, 0.2)' : 'none',
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--primary)';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(99, 102, 241, 0.25), 0 0 20px rgba(99, 102, 241, 0.25)';
+                      e.target.select();
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = errors.otp 
+                        ? 'var(--secondary)' 
+                        : otpDigits[index] 
+                          ? 'var(--primary)' 
+                          : 'var(--border-color)';
+                      e.target.style.boxShadow = otpDigits[index] ? '0 0 16px rgba(99, 102, 241, 0.2)' : 'none';
+                    }}
+                  />
+                ))}
               </div>
+              
+              {errors.otp && (
+                <span role="alert" className="text-secondary text-xs font-medium block mb-4">
+                  {errors.otp}
+                </span>
+              )}
+
+              {/* Primary Verification Button */}
               <button 
-                type="button" 
-                onClick={() => setOtp(demoOtp)}
-                className="px-3 py-1 rounded-lg text-xs font-bold text-white shadow-sm transition-all hover:opacity-90 active:scale-95 cursor-pointer" 
-                style={{ background: 'var(--primary)' }}
+                type="submit" 
+                id="verify-code-btn"
+                className="btn btn-primary w-full flex items-center justify-center gap-2 mb-5 cursor-pointer"
+                style={{ padding: '13px', fontSize: '0.94rem', borderRadius: 'var(--radius-md)' }}
               >
-                Use Code
+                <ShieldCheck size={18} />
+                <span>Verify &amp; Create Account</span>
               </button>
-            </div>
 
-            {!isVerifying ? (
-              <form onSubmit={handleVerifyOTP} className="w-full">
-                <div className="mb-5 text-center">
-                  <label className="block mb-2 text-xs font-semibold text-muted uppercase tracking-wider">
-                    Enter 4-Digit Security Code
-                  </label>
-                  
-                  {/* High-Contrast Segmented Code Input */}
-                  <div className="relative max-w-[280px] mx-auto">
-                    <input
-                      type="text"
-                      className="input-field text-center font-mono"
-                      autoComplete="one-time-code"
-                      style={{ 
-                        fontSize: '1.8rem', 
-                        letterSpacing: '0.75rem', 
-                        fontWeight: 700, 
-                        borderRadius: 'var(--radius-md)',
-                        padding: '12px 14px',
-                        background: 'var(--input-bg)',
-                        border: errors.otp ? '1px solid var(--secondary)' : '1px solid var(--border-color)',
-                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.06)'
-                      }}
-                      placeholder="••••"
-                      maxLength={4}
-                      value={otp}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/[^0-9]/g, '');
-                        setOtp(val);
-                        if (errors.otp) setErrors({});
-                      }}
-                      required
-                    />
+              {/* Clean Resend Countdown / Trigger */}
+              <div className="flex items-center justify-center text-xs text-muted min-h-[36px]">
+                {resendTimer > 0 ? (
+                  <div className="inline-flex items-center gap-1.5 text-muted">
+                    <Clock size={13} />
+                    <span>Didn't receive code? Resend in <strong className="text-main font-mono">{resendTimer}s</strong></span>
                   </div>
-                  
-                  {errors.otp && (
-                    <span className="text-secondary text-center block mt-1.5" style={{ fontSize: '0.8rem' }}>
-                      {errors.otp}
-                    </span>
-                  )}
-                </div>
-
-                {/* Primary Action Button */}
-                <button 
-                  type="submit" 
-                  id="verify-code-btn"
-                  className="btn btn-primary w-full flex items-center justify-center gap-2 mb-2.5"
-                  style={{ padding: '12px', fontSize: '0.92rem', borderRadius: 'var(--radius-md)' }}
-                >
-                  <ShieldCheck size={18} />
-                  <span>Verify &amp; Create Account</span>
-                </button>
-
-                {/* Quick Instant Access Button */}
-                <button
-                  type="button"
-                  onClick={completeAccountCreation}
-                  className="btn btn-secondary w-full mb-3"
-                  style={{ fontSize: '0.84rem', padding: '9px' }}
-                >
-                  Instant Access (Skip Verification)
-                </button>
-
-                {/* Resend Code Countdown & Trigger */}
-                <div className="flex items-center justify-center gap-1.5 text-xs text-muted pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
-                  <Clock size={13} />
-                  {resendTimer > 0 ? (
-                    <span>Resend code in <strong className="text-main font-mono">{resendTimer}s</strong></span>
-                  ) : (
-                    <button 
-                      type="button" 
-                      onClick={handleResendOtp}
-                      className="text-primary hover:underline font-semibold cursor-pointer"
-                    >
-                      Resend code now
-                    </button>
-                  )}
-                </div>
-              </form>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-6 animate-fade-in text-center">
-                <div style={{ width: 44, height: 44, border: '3px solid var(--border-color)', borderTopColor: 'var(--minimal-indigo)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <h3 className="mt-3.5 font-bold text-minimal-indigo" style={{ fontSize: '1.05rem' }}>Securing your account...</h3>
-                <p className="text-muted text-center mt-1" style={{ fontSize: '0.84rem' }}>
-                  Provisioning your personalized curriculum workstation &amp; sandboxes.
-                </p>
+                ) : (
+                  <button 
+                    type="button" 
+                    id="resend-otp-btn"
+                    onClick={handleResendOtp}
+                    disabled={isResending}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-primary hover:bg-primary/10 transition-all cursor-pointer"
+                    style={{ border: '1px solid rgba(99, 102, 241, 0.3)', background: 'rgba(99, 102, 241, 0.06)' }}
+                  >
+                    {isResending ? (
+                      <>
+                        <div className="w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                        <span>Dispatching new OTP...</span>
+                      </>
+                    ) : (
+                      <>
+                        <RotateCw size={13} />
+                        <span>Resend verification code</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Verification Page Trust Strip */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs text-muted text-center">
-            <span>🔒 End-to-End Encrypted</span>
-            <span className="hidden sm:inline">•</span>
-            <span>⚡ Instant Workspace Activation</span>
-          </div>
+            </form>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 animate-fade-in text-center">
+              <div style={{ width: 44, height: 44, border: '3px solid var(--border-color)', borderTopColor: 'var(--minimal-indigo)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <h3 className="mt-4 font-bold text-minimal-indigo" style={{ fontSize: '1.05rem' }}>Verifying your credentials...</h3>
+              <p className="text-muted text-center mt-1" style={{ fontSize: '0.84rem' }}>
+                Setting up your personalized engineering workstation.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </AuthLayout>

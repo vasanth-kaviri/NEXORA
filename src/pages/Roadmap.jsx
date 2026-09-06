@@ -1,7 +1,7 @@
 import { 
-  Check, Clock, Lock, Sparkles, Layers, BookOpen, 
-  ArrowRight, Compass, CheckCircle2, ChevronRight, Filter,
-  Terminal, ExternalLink, Code2, Award, Zap, RefreshCw
+  Check, Clock, Lock, Sparkles, BookOpen, 
+  ArrowRight, Compass, CheckCircle2, ChevronRight,
+  ExternalLink, Code2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -9,38 +9,96 @@ import { getRoadmapForJob, ROADMAP_DOMAINS } from '../utils/roadmapData';
 import { getResourcesForStep } from '../utils/resourceData';
 import { useToast } from '../contexts/ToastContext';
 import db from '../services/db';
+import realtimeDb from '../services/realtimeDb';
+
+// Helper to resolve active domain from user's calibrated dreamJob first, then saved course
+function getActiveRoadmapDomain() {
+  const user = db.getCurrentUser();
+  if (user?.dreamJob) {
+    const domain = getRoadmapForJob(user.dreamJob);
+    if (domain) return domain;
+  }
+  const savedCourseId = localStorage.getItem('nexora_active_course');
+  if (savedCourseId && ROADMAP_DOMAINS[savedCourseId]) {
+    return ROADMAP_DOMAINS[savedCourseId];
+  }
+  return getRoadmapForJob('Full Stack Engineer');
+}
 
 export default function Roadmap() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [currentUser, setCurrentUser] = useState({ firstName: 'Alex', dreamJob: 'Machine Learning Engineer' });
   const [activeTab, setActiveTab] = useState('core'); // 'core' | 'subset'
-  const [roadmapData, setRoadmapData] = useState(null);
-  const [stepStates, setStepStates] = useState({});
-  const [selectedStep, setSelectedStep] = useState(null);
-  const [stepResources, setStepResources] = useState([]);
+  const [currentUser, setCurrentUser] = useState(() => db.getCurrentUser());
+  const [roadmapData, setRoadmapData] = useState(() => getActiveRoadmapDomain());
 
+  const [stepStates, setStepStates] = useState(() => {
+    try {
+      const domain = getActiveRoadmapDomain();
+      const saved = JSON.parse(localStorage.getItem(`nexora_roadmap_prog_${domain.id}`) || '{}');
+      return saved;
+    } catch {
+      return {};
+    }
+  });
+
+  const [selectedStep, setSelectedStep] = useState(() => {
+    const domain = getActiveRoadmapDomain();
+    return domain.coreSteps?.[0] || null;
+  });
+
+  const [stepResources, setStepResources] = useState(() => {
+    const domain = getActiveRoadmapDomain();
+    const firstStep = domain.coreSteps?.[0];
+    return firstStep ? getResourcesForStep(firstStep) : [];
+  });
+
+  // Synchronize roadmap whenever user changes dreamJob in CompleteProfile or Profile
+  useEffect(() => {
+    const handleSync = () => {
+      const user = db.getCurrentUser();
+      setCurrentUser(user);
+      const activeDomain = getActiveRoadmapDomain();
+      if (activeDomain && (activeDomain.id !== roadmapData?.id || activeDomain.title !== roadmapData?.title)) {
+        setRoadmapData(activeDomain);
+        try {
+          const savedProgress = JSON.parse(localStorage.getItem(`nexora_roadmap_prog_${activeDomain.id}`) || '{}');
+          setStepStates(savedProgress);
+        } catch {
+          setStepStates({});
+        }
+        const firstStep = activeDomain.coreSteps?.[0] || null;
+        setSelectedStep(firstStep);
+        setStepResources(firstStep ? getResourcesForStep(firstStep) : []);
+        setActiveTab('core');
+      }
+    };
+
+    window.addEventListener('user_session_changed', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('user_session_changed', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, [roadmapData?.id, roadmapData?.title]);
+
+  // Subscribe to Firebase Realtime Database for roadmap milestones
   useEffect(() => {
     const user = db.getCurrentUser();
-    setCurrentUser(user);
-    const domain = getRoadmapForJob(user.dreamJob);
-    setRoadmapData(domain);
+    const uid = user?.id || user?.uid;
+    if (!uid || !roadmapData?.id) return;
 
-    // Load saved step progress from localStorage
-    try {
-      const savedProgress = JSON.parse(localStorage.getItem(`nexora_roadmap_prog_${domain.id}`) || '{}');
-      setStepStates(savedProgress);
-    } catch {
-      setStepStates({});
-    }
+    const unsubscribe = realtimeDb.subscribeToRoadmap(uid, roadmapData.id, (remoteSteps) => {
+      if (remoteSteps && Object.keys(remoteSteps).length > 0) {
+        setStepStates(prev => ({ ...prev, ...remoteSteps }));
+      }
+    });
 
-    // Default select first step
-    if (domain.coreSteps && domain.coreSteps.length > 0) {
-      setSelectedStep(domain.coreSteps[0]);
-      setStepResources(getResourcesForStep(domain.coreSteps[0]));
-    }
-  }, []);
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [roadmapData?.id]);
 
   const handleJobChange = (domainKey) => {
     const domain = ROADMAP_DOMAINS[domainKey];
@@ -55,6 +113,15 @@ export default function Roadmap() {
       const firstStep = domain.coreSteps?.[0] || null;
       setSelectedStep(firstStep);
       setStepResources(getResourcesForStep(firstStep));
+
+      // Persist active course across the platform and notify subscribers
+      localStorage.setItem('nexora_active_course', domain.id);
+      db.updateUserProfile({
+        dreamJob: domain.title,
+        selectedTrack: domain.id
+      });
+      window.dispatchEvent(new Event('user_session_changed'));
+
       toast.info(`Switched trajectory to ${domain.title}`);
     }
   };
@@ -90,6 +157,14 @@ export default function Roadmap() {
     setStepStates(newStates);
     if (roadmapData) {
       localStorage.setItem(`nexora_roadmap_prog_${roadmapData.id}`, JSON.stringify(newStates));
+      window.dispatchEvent(new Event('user_session_changed'));
+    }
+
+    // Persist to Firebase Realtime Database
+    const user = db.getCurrentUser();
+    const uid = user?.id || user?.uid;
+    if (uid && roadmapData?.id) {
+      realtimeDb.setRoadmapStep(uid, roadmapData.id, stepId, nextStatus);
     }
   };
 
@@ -97,7 +172,7 @@ export default function Roadmap() {
 
   const activeSteps = activeTab === 'core' 
     ? (roadmapData.coreSteps || []) 
-    : (roadmapData.subsets || []);
+    : (roadmapData.subset?.steps || roadmapData.subsets || []);
 
   // Compute completion percent
   const completedStepsCount = activeSteps.filter(s => getStepStatus(s.id) === 'completed').length;
@@ -110,11 +185,17 @@ export default function Roadmap() {
       <header className="glass-panel skeuo-convex" style={{ padding: '18px 24px', borderRadius: 'var(--radius-lg)' }}>
         <div className="flex justify-between items-center flex-wrap gap-md">
           <div>
-            <div className="flex items-center gap-xs mb-xs">
+            <div className="flex items-center gap-xs mb-xs flex-wrap">
               <Compass size={18} className="text-primary" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--primary)' }}>
                 DYNAMIC CAREER WORKSTATION
               </span>
+              {currentUser?.dreamJob && (
+                <span className="minimal-badge" style={{ fontSize: '0.72rem', color: 'var(--minimal-indigo)', borderColor: 'rgba(99, 102, 241, 0.25)' }}>
+                  <Sparkles size={11} className="text-minimal-indigo" />
+                  <span>Calibrated for: {currentUser.dreamJob}</span>
+                </span>
+              )}
             </div>
             <h1 style={{ fontSize: '1.55rem', fontWeight: 800, margin: '2px 0', letterSpacing: '-0.4px' }}>
               {roadmapData.title} Track
@@ -169,14 +250,15 @@ export default function Roadmap() {
               <button 
                 onClick={() => {
                   setActiveTab('subset');
-                  const firstSubset = roadmapData.subsets?.[0];
+                  const subsetSteps = roadmapData.subset?.steps || roadmapData.subsets || [];
+                  const firstSubset = subsetSteps[0] || null;
                   setSelectedStep(firstSubset);
-                  setStepResources(getResourcesForStep(firstSubset));
+                  setStepResources(firstSubset ? getResourcesForStep(firstSubset) : []);
                 }}
                 className={`btn-tactile ${activeTab === 'subset' ? 'btn-primary' : 'btn-ghost'}`}
                 style={{ padding: '5px 14px', fontSize: '0.78rem', borderRadius: 'var(--radius-full)' }}
               >
-                Electives ({roadmapData.subsets?.length || 0})
+                Electives ({roadmapData.subset?.steps?.length || roadmapData.subsets?.length || 0})
               </button>
             </div>
           </div>
@@ -446,6 +528,6 @@ export default function Roadmap() {
 
       </div>
 
-    </div>
-  );
+  </div>
+);
 }

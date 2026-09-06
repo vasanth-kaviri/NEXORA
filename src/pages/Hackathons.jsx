@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import {
   Trophy, Calendar, Clock, Users, MapPin,
-  ArrowUpRight, Sparkles, Flame, Zap, Globe,
-  Lock, Star, CheckCircle2, ExternalLink, Code2,
+  Flame, Zap, Star, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import db from '../services/db';
 
@@ -143,13 +141,41 @@ const hackathons = [
 function HackathonCard({ hack, delay }) {
   const toast = useToast();
   const [hovered, setHovered] = useState(false);
-  const [registered, setRegistered] = useState(false);
+  const [registered, setRegistered] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('nexora_registered_hackathons') || '[]');
+      return saved.some(h => h.name === hack.name);
+    } catch {
+      return false;
+    }
+  });
   const status = statusConfig[hack.status];
   const isEnded = hack.status === 'Ended';
 
   const handleRegister = (e) => {
     e.stopPropagation();
     setRegistered(true);
+
+    try {
+      const saved = JSON.parse(localStorage.getItem('nexora_registered_hackathons') || '[]');
+      if (!saved.some(h => h.name === hack.name)) {
+        const updated = [
+          {
+            name: hack.name,
+            host: hack.host,
+            deadline: hack.deadline,
+            prize: hack.prize,
+            location: hack.location,
+            registeredAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          },
+          ...saved
+        ];
+        localStorage.setItem('nexora_registered_hackathons', JSON.stringify(updated));
+        window.dispatchEvent(new Event('user_session_changed'));
+      }
+    } catch (err) {
+      console.warn('Failed to save registered hackathon:', err);
+    }
 
     // Reward XP in profile
     const currentUser = db.getCurrentUser() || {};
