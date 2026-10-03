@@ -7,8 +7,9 @@ const assessmentService = {
    */
   async submitAssessment(payload) {
     try {
-      const response = await apiClient.post('/assessments/submit', payload);
-      if (response.data && response.data.success) {
+      const response = await apiClient.post('/api/v1/assessments/submit', payload);
+      const resData = response.data?.data || response.data;
+      if (response.success || resData?.success) {
         // Also update local cache for instant UI continuity
         const currentUser = db.getCurrentUser() || {};
         const score = payload.correctAnswers * 15;
@@ -16,11 +17,11 @@ const assessmentService = {
           xp: (currentUser.xp || 1200) + score,
           quizScore: payload.percentage,
         });
-        return response.data.data;
+        return resData?.assessment || resData;
       }
     } catch (err) {
-      console.warn('[assessmentService] Backend submit fallback to local:', err?.message || err);
-      // Offline fallback
+      console.warn('[assessmentService] Backend submit notice:', err?.message || err);
+      // Continuity fallback
       const currentUser = db.getCurrentUser() || {};
       const score = payload.correctAnswers * 15;
       db.updateUserProfile({
@@ -36,11 +37,12 @@ const assessmentService = {
    */
   async getMyAssessments(type) {
     try {
-      const response = await apiClient.get('/assessments/my-history', {
+      const response = await apiClient.get('/api/v1/assessments/my-history', {
         params: type ? { type } : {},
       });
-      if (response.data && response.data.success) {
-        return response.data.data;
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData?.assessments ? resData : { assessments: resData };
       }
     } catch (err) {
       console.warn('[assessmentService] Failed to fetch assessment history:', err?.message || err);
@@ -53,9 +55,10 @@ const assessmentService = {
    */
   async getSkillGapAnalysis() {
     try {
-      const response = await apiClient.get('/assessments/skill-gap');
-      if (response.data && response.data.success) {
-        return response.data.data;
+      const response = await apiClient.get('/api/v1/assessments/skill-gap');
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData;
       }
     } catch (err) {
       console.warn('[assessmentService] Failed to fetch skill gap analysis:', err?.message || err);

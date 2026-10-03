@@ -5,6 +5,7 @@
  */
 
 import realtimeDb from './realtimeDb';
+import apiClient from './apiClient';
 
 const DB_KEYS = {
   USERS: 'nexora_db_users',
@@ -21,42 +22,20 @@ class DatabaseService {
   }
 
   init() {
-    // Ensure data structures exist
+    // Ensure clean data structures exist with zero demo users
     const rawUsers = localStorage.getItem(DB_KEYS.USERS);
     if (!rawUsers) {
-      const initialUsers = [
-        {
-          id: 'usr_demo_1',
-          email: 'alex.tester@nexora.io',
-          password: 'Password123!',
-          phone: '+1 555-0199',
-          firstName: 'alex.tester',
-          lastName: 'Dev',
-          dreamJob: 'Software Engineer',
-          authProvider: 'local',
-          createdAt: new Date().toISOString(),
-          level: 1,
-          streak: 1,
-          careerMatch: 85,
-          profileCompleted: true
-        }
-      ];
-      localStorage.setItem(DB_KEYS.USERS, JSON.stringify(initialUsers));
+      localStorage.setItem(DB_KEYS.USERS, JSON.stringify([]));
     } else {
       try {
         const users = JSON.parse(rawUsers);
-        let modified = false;
-        users.forEach(u => {
-          if (!u.password) {
-            u.password = 'Password123!';
-            modified = true;
-          }
-        });
-        if (modified) {
-          localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+        // Clean out any legacy demo test users
+        const cleaned = users.filter(u => u.email !== 'alex.tester@nexora.io' && u.id !== 'usr_demo_1');
+        if (cleaned.length !== users.length) {
+          localStorage.setItem(DB_KEYS.USERS, JSON.stringify(cleaned));
         }
       } catch {
-        // Ignore parse error
+        localStorage.setItem(DB_KEYS.USERS, JSON.stringify([]));
       }
     }
     if (!localStorage.getItem(DB_KEYS.NOTIFICATIONS)) {
@@ -113,7 +92,11 @@ class DatabaseService {
       const session = localStorage.getItem('nexora_admin_session');
       if (session) {
         const parsed = JSON.parse(session);
-        return Boolean(parsed?.authenticated);
+        // Enforce 8-hour session lifetime (28,800,000 ms)
+        if (parsed?.authenticated && parsed.timestamp && (Date.now() - parsed.timestamp < 28800000)) {
+          return true;
+        }
+        localStorage.removeItem('nexora_admin_session');
       }
     } catch {
       return false;
@@ -284,6 +267,14 @@ class DatabaseService {
     if (uid) {
       realtimeDb.updateUserProfile(uid, updated);
     }
+
+    // Enterprise background synchronization to MongoDB Atlas
+    try {
+      apiClient.put('/api/v1/users/me', updates).catch(() => {});
+    } catch {
+      // Non-blocking sync
+    }
+
     return updated;
   }
 

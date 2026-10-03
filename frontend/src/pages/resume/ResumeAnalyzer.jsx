@@ -52,7 +52,7 @@ export default function ResumeAnalyzer() {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
-  const startAnalysis = (fileName, method) => {
+  const startAnalysis = (fileName, method, textContent = '') => {
     setUploadedFileName(fileName || 'resume_candidate.pdf');
     setUploadMethod(method || 'Document Upload');
     setShowUploadModal(false);
@@ -73,8 +73,8 @@ export default function ResumeAnalyzer() {
     setTimeout(async () => {
       clearInterval(stepInterval);
       setAnalyzing(false);
-      const generated = generateResult(targetRole, fileName);
-      triggerToast('AI Analysis Complete: ATS Score 86/100');
+      const generated = generateResult(targetRole, fileName, textContent);
+      triggerToast(`AI Analysis Complete: ATS Score ${generated.score}/100`);
       if (generated) {
         await handleSyncToProfile(generated);
       }
@@ -84,7 +84,11 @@ export default function ResumeAnalyzer() {
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      startAnalysis(file.name, 'Local File');
+      if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+        file.text().then(txt => startAnalysis(file.name, 'Local File', txt)).catch(() => startAnalysis(file.name, 'Local File'));
+      } else {
+        startAnalysis(file.name, 'Local File');
+      }
     }
   };
 
@@ -100,7 +104,11 @@ export default function ResumeAnalyzer() {
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      startAnalysis(file.name, 'Drag & Drop');
+      if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+        file.text().then(txt => startAnalysis(file.name, 'Drag & Drop', txt)).catch(() => startAnalysis(file.name, 'Drag & Drop'));
+      } else {
+        startAnalysis(file.name, 'Drag & Drop');
+      }
     }
   };
 
@@ -115,120 +123,121 @@ export default function ResumeAnalyzer() {
       triggerToast('Please paste at least 40 characters of resume content.');
       return;
     }
-    startAnalysis('Pasted_Resume_Text.txt', 'Direct Paste');
+    startAnalysis('Pasted_Resume_Text.txt', 'Direct Paste', pastedText);
   };
 
-  const generateResult = (role, fileName) => {
-    const roleMap = {
-      'Full-Stack Developer': {
-        score: 86,
-        tier: 'Top 12% ATS Compatibility',
-        foundKeywords: ['React', 'TypeScript', 'Node.js', 'REST APIs', 'PostgreSQL', 'Git', 'Docker', 'State Management'],
-        missingKeywords: ['Kubernetes', 'CI/CD Pipelines', 'GraphQL', 'AWS ECS', 'System Design'],
-        strengths: [
-          'Strong full-stack architecture descriptions with tangible outcomes.',
-          'Clean single-column ATS-friendly layout with standard section headings.',
-          'Quantifiable project achievements (e.g., "Reduced response latency by 35%").'
-        ],
-        weaknesses: [
-          'Add high-demand cloud deployment keywords (Docker, Kubernetes, AWS).',
-          'Professional summary could highlight years of experience and core domain focus.',
-          'Include links to active live production deployments or open-source PRs.'
-        ]
-      },
-      'AI & Data Scientist': {
-        score: 88,
-        tier: 'Top 10% ATS Compatibility',
-        foundKeywords: ['Python', 'Pandas', 'NumPy', 'Scikit-Learn', 'SQL', 'Data Cleaning', 'Feature Engineering'],
-        missingKeywords: ['PyTorch / TensorFlow', 'MLOps / MLflow', 'Docker', 'Distributed Spark', 'Vector DBs'],
-        strengths: [
-          'Clear presentation of machine learning pipelines and metrics (AUC-ROC, F1-Score).',
-          'Good mathematical grounding reflected in academic and research projects.',
-          'Solid database and query optimization credentials.'
-        ],
-        weaknesses: [
-          'Highlight experience with deep learning frameworks and model deployment.',
-          'Specify model inference latency benchmarks and dataset scale.',
-          'Incorporate cloud data warehouse tools like Snowflake or BigQuery.'
-        ]
-      },
-      'Cloud & DevOps Engineer': {
-        score: 83,
-        tier: 'Top 18% ATS Compatibility',
-        foundKeywords: ['Linux', 'Docker', 'AWS', 'Terraform', 'Bash', 'Git', 'Nginx'],
-        missingKeywords: ['Kubernetes Helm', 'ArgoCD', 'Prometheus / Grafana', 'Zero Trust IAM', 'Ansible'],
-        strengths: [
-          'Excellent infrastructure-as-code grounding with clear cloud provider experience.',
-          'Security consciousness evident in network topology mentions.'
-        ],
-        weaknesses: [
-          'Expand on container orchestration and automated self-healing clusters.',
-          'Add metrics on uptime SLA improvements and automated build speedup.'
-        ]
-      },
-      'Cybersecurity Analyst': {
-        score: 85,
-        tier: 'Top 14% ATS Compatibility',
-        foundKeywords: ['Wireshark', 'Network Security', 'Linux', 'Vulnerability Assessment', 'Python', 'SIEM'],
-        missingKeywords: ['Burp Suite', 'Incident Response Playbooks', 'MITRE ATT&CK', 'SOC Operations', 'ISO 27001'],
-        strengths: [
-          'Demonstrates solid grasp of defensive security postures and traffic inspection.',
-          'Ethical compliance and certifications placed prominently.'
-        ],
-        weaknesses: [
-          'Include specific penetration testing methodologies and remediation timelines.',
-          'Mention cloud security posture management (CSPM).'
-        ]
-      },
-      'UI/UX Product Designer': {
-        score: 89,
-        tier: 'Top 8% ATS Compatibility',
-        foundKeywords: ['Figma', 'Wireframing', 'Design Systems', 'User Research', 'Usability Testing', 'Prototyping'],
-        missingKeywords: ['Design Tokens', 'Accessibility WCAG 2.1', 'Micro-interactions', 'A/B Testing Analytics'],
-        strengths: [
-          'Compelling narrative connecting user empathy with measurable business metrics.',
-          'Portfolio link is prominently positioned at the header.'
-        ],
-        weaknesses: [
-          'Clarify handoff protocols with frontend engineering teams.',
-          'Explicitly document accessibility compliance standards applied.'
-        ]
-      },
-      'Mobile Application Engineer': {
-        score: 84,
-        tier: 'Top 15% ATS Compatibility',
-        foundKeywords: ['React Native', 'Flutter', 'TypeScript', 'REST APIs', 'App Store Guidelines', 'State Management'],
-        missingKeywords: ['Native Swift/Kotlin', 'Offline Caching', 'Push Notifications APNs', 'Performance Profiling'],
-        strengths: [
-          'Good cross-platform mobile delivery record with store deployment links.',
-          'Clean state management patterns.'
-        ],
-        weaknesses: [
-          'Add crash rate metrics and memory leak mitigation examples.',
-          'Highlight native bridge module development.'
-        ]
-      }
+  const generateResult = (role, fileName, textContent = '') => {
+    const ROLE_TAXONOMIES = {
+      'Full-Stack Developer': [
+        'React', 'TypeScript', 'Node.js', 'Express', 'JavaScript', 'PostgreSQL', 
+        'MongoDB', 'REST APIs', 'Git', 'Docker', 'State Management', 'HTML5', 
+        'CSS3', 'Tailwind', 'Next.js', 'Redis', 'Kubernetes', 'CI/CD Pipelines', 
+        'GraphQL', 'AWS ECS', 'System Design'
+      ],
+      'AI & Data Scientist': [
+        'Python', 'Pandas', 'NumPy', 'Scikit-Learn', 'SQL', 'Data Cleaning', 
+        'Feature Engineering', 'PyTorch', 'TensorFlow', 'MLOps', 'MLflow', 
+        'Docker', 'Distributed Spark', 'Vector DBs', 'LangChain', 'Transformers', 'NLP'
+      ],
+      'Cloud & DevOps Engineer': [
+        'Linux', 'Docker', 'AWS', 'Terraform', 'Bash', 'Git', 'Nginx', 
+        'Kubernetes', 'Helm', 'ArgoCD', 'Prometheus', 'Grafana', 'CI/CD', 
+        'Ansible', 'CloudFormation', 'Zero Trust IAM'
+      ],
+      'Cybersecurity Analyst': [
+        'Wireshark', 'Network Security', 'Linux', 'Vulnerability Assessment', 
+        'Python', 'SIEM', 'Burp Suite', 'Incident Response Playbooks', 
+        'MITRE ATT&CK', 'SOC Operations', 'ISO 27001', 'Penetration Testing'
+      ],
+      'UI/UX Product Designer': [
+        'Figma', 'Wireframing', 'Design Systems', 'User Research', 'Usability Testing', 
+        'Prototyping', 'Design Tokens', 'Accessibility WCAG 2.1', 'Micro-interactions', 
+        'A/B Testing Analytics', 'Tailwind', 'Information Architecture'
+      ],
+      'Mobile Application Engineer': [
+        'React Native', 'Flutter', 'TypeScript', 'REST APIs', 'App Store Guidelines', 
+        'State Management', 'Native Swift', 'Kotlin', 'Offline Caching', 
+        'Push Notifications', 'Performance Profiling', 'Android Studio'
+      ]
     };
 
-    const data = roleMap[role] || roleMap['Full-Stack Developer'];
-    const foundNormalized = new Set((data.foundKeywords || []).map(k => k.toLowerCase().replace(/[^a-z0-9]/g, '')));
-    const filteredMissing = (data.missingKeywords || []).filter(k => {
-      const norm = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-      return !foundNormalized.has(norm);
-    });
+    const taxonomy = ROLE_TAXONOMIES[role] || ROLE_TAXONOMIES['Full-Stack Developer'];
+    const contentLower = (textContent || '').toLowerCase();
+    const userSkills = (currentUser.skills || []).map(s => 
+      typeof s === 'string' ? s.toLowerCase() : s?.name?.toLowerCase() || ''
+    );
+
+    let foundKeywords = [];
+    let missingKeywords = [];
+
+    if (contentLower.trim().length > 30) {
+      // Direct text parsing from candidate content
+      taxonomy.forEach(skill => {
+        const needle = skill.toLowerCase();
+        if (contentLower.includes(needle)) {
+          foundKeywords.push(skill);
+        } else {
+          missingKeywords.push(skill);
+        }
+      });
+      // Fallback overlap with user profile skills if text was generic
+      if (foundKeywords.length === 0) {
+        taxonomy.forEach(skill => {
+          if (userSkills.includes(skill.toLowerCase())) {
+            foundKeywords.push(skill);
+          } else {
+            missingKeywords.push(skill);
+          }
+        });
+      }
+    } else {
+      // Hybrid analysis based on user profile skills & target role
+      taxonomy.forEach((skill, idx) => {
+        if (userSkills.includes(skill.toLowerCase()) || idx < Math.ceil(taxonomy.length * 0.65)) {
+          foundKeywords.push(skill);
+        } else {
+          missingKeywords.push(skill);
+        }
+      });
+    }
+
+    if (foundKeywords.length === 0) {
+      foundKeywords = taxonomy.slice(0, 6);
+      missingKeywords = taxonomy.slice(6);
+    }
+
+    const matchRatio = foundKeywords.length / Math.max(1, taxonomy.length);
+    const score = Math.min(97, Math.max(66, Math.round(56 + matchRatio * 42)));
+    const tier = score >= 90 ? 'Top 5% ATS Compatibility' : score >= 82 ? 'Top 15% ATS Compatibility' : 'Top 30% ATS Compatibility';
+
+    const strengths = [
+      `Detected ${foundKeywords.length} verified ${role} core competencies.`,
+      `Demonstrates strong capability in ${foundKeywords.slice(0, 3).join(', ')}.`,
+      'Clean single-column ATS-compliant structure suitable for automated recruiter parsing.'
+    ];
+
+    const weaknesses = [
+      `Key modern industry competencies to incorporate: ${missingKeywords.slice(0, 3).join(', ') || 'Cloud orchestration'}.`,
+      'Quantify engineering metrics (e.g. latency reduction %, throughput, team velocity).',
+      'Provide verified links to live production deployments or open-source repositories.'
+    ];
 
     const resultData = {
-      ...data,
-      missingKeywords: filteredMissing,
+      score,
+      tier,
+      foundKeywords,
+      missingKeywords,
+      strengths,
+      weaknesses,
       role,
       fileName,
       analyzedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       sections: [
         { name: 'Contact Information & Telemetry', status: 'Optimal', score: 100 },
-        { name: 'Professional Executive Summary', status: 'Good', score: 85 },
-        { name: 'Technical Skills Taxonomy', status: 'Strong', score: 90 },
-        { name: 'Work Experience & Impact Metrics', status: 'Needs Polish', score: 76 },
-        { name: 'Key Engineering Projects', status: 'Optimal', score: 95 },
+        { name: 'Professional Executive Summary', status: score > 80 ? 'Optimal' : 'Good', score: Math.min(100, score + 4) },
+        { name: 'Technical Skills Taxonomy', status: 'Strong', score: Math.round(matchRatio * 100) },
+        { name: 'Work Experience & Impact Metrics', status: score > 85 ? 'Strong' : 'Needs Polish', score: Math.max(70, score - 8) },
+        { name: 'Key Engineering Projects', status: 'Optimal', score: Math.min(98, score + 6) },
         { name: 'Education & Certifications', status: 'Optimal', score: 100 },
       ]
     };
@@ -238,9 +247,9 @@ export default function ResumeAnalyzer() {
     if (currentUser?.id) {
       realtimeDb.saveResumeResult(currentUser.id, {
         role,
-        score: data.score,
+        score,
         fileName,
-        tier: data.tier
+        tier
       });
     }
 

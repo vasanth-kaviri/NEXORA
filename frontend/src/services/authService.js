@@ -147,9 +147,14 @@ export const authService = {
         };
       }
 
+      const signupData = res.data?.data;
+      if (signupData?.debugOtp) {
+        try { sessionStorage.setItem('nexora_active_debug_otp', signupData.debugOtp); } catch {}
+      }
+
       return {
         success: true,
-        data: res.data?.data,
+        data: signupData,
         message: res.data?.message || 'Account created successfully. Please verify your contact.'
       };
     } catch (err) {
@@ -257,8 +262,13 @@ export const authService = {
         channel
       };
       const res = await apiClient.post('/api/v1/auth/resend-otp', payload);
+      const debugOtp = res.data?.data?.debugOtp;
+      if (debugOtp) {
+        try { sessionStorage.setItem('nexora_active_debug_otp', debugOtp); } catch {}
+      }
       return {
         success: res.success,
+        data: res.data?.data,
         message: res.data?.message || (res.success ? 'Verification code resent.' : res.error)
       };
     } catch (err) {

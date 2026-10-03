@@ -6,12 +6,29 @@ const peerService = {
    */
   async listRooms() {
     try {
-      const response = await apiClient.get('/peers/rooms');
-      if (response.data && response.data.success) {
-        return response.data.data.rooms || [];
+      const response = await apiClient.get('/api/v1/peers/rooms');
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.rooms || (Array.isArray(resData) ? resData : []);
       }
     } catch (err) {
       console.warn('[peerService] Failed to fetch rooms from backend:', err?.message || err);
+    }
+    return [];
+  },
+
+  /**
+   * List live registered peer students from MongoDB Atlas
+   */
+  async listPeers(params = {}) {
+    try {
+      const response = await apiClient.get('/api/v1/peers/users', { params });
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.peers || (Array.isArray(resData) ? resData : []);
+      }
+    } catch (err) {
+      console.warn('[peerService] Failed to fetch peers from backend:', err?.message || err);
     }
     return [];
   },
@@ -21,9 +38,10 @@ const peerService = {
    */
   async createRoom(payload) {
     try {
-      const response = await apiClient.post('/peers/rooms', payload);
-      if (response.data && response.data.success) {
-        return response.data.data.room;
+      const response = await apiClient.post('/api/v1/peers/rooms', payload);
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.room || resData;
       }
     } catch (err) {
       console.warn('[peerService] Failed to create room:', err?.message || err);
@@ -36,9 +54,10 @@ const peerService = {
    */
   async joinRoom(roomId) {
     try {
-      const response = await apiClient.post(`/peers/rooms/${roomId}/join`);
-      if (response.data && response.data.success) {
-        return response.data.data.room;
+      const response = await apiClient.post(`/api/v1/peers/rooms/${roomId}/join`);
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.room || resData;
       }
     } catch (err) {
       console.warn('[peerService] Failed to join room:', err?.message || err);
@@ -50,9 +69,10 @@ const peerService = {
    */
   async leaveRoom(roomId) {
     try {
-      const response = await apiClient.post(`/peers/rooms/${roomId}/leave`);
-      if (response.data && response.data.success) {
-        return response.data.data.room;
+      const response = await apiClient.post(`/api/v1/peers/rooms/${roomId}/leave`);
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.room || resData;
       }
     } catch (err) {
       console.warn('[peerService] Failed to leave room:', err?.message || err);
@@ -64,9 +84,10 @@ const peerService = {
    */
   async sendMessage(roomId, text) {
     try {
-      const response = await apiClient.post(`/peers/rooms/${roomId}/messages`, { text });
-      if (response.data && response.data.success) {
-        return response.data.data.message;
+      const response = await apiClient.post(`/api/v1/peers/rooms/${roomId}/messages`, { text });
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.message || resData;
       }
     } catch (err) {
       console.warn('[peerService] Failed to send message:', err?.message || err);

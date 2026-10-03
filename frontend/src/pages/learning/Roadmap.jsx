@@ -3,7 +3,7 @@ import {
   ArrowRight, Compass, CheckCircle2, ChevronRight,
   ExternalLink, Code2, Play, Award, Zap, RotateCcw,
   Layers, CheckSquare, Bookmark, HelpCircle, Shield,
-  AlertCircle
+  AlertCircle, X, Copy, CheckCheck, RefreshCw, FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
@@ -12,7 +12,6 @@ import { getResourcesForStep } from '../../utils/resourceData';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import db from '../../services/db';
-import realtimeDb from '../../services/realtimeDb';
 import apiClient from '../../services/apiClient';
 
 // Fallback helper to resolve active domain from user profile or saved course
@@ -36,15 +35,191 @@ function getActiveRoadmapDomain(targetRole, domain) {
   return getRoadmapForJob(effectiveRole || effectiveDomain || 'Mobile App Developer');
 }
 
+// Simple Markdown Paragraph & Inline Code/Bold Renderer
+function renderSimpleMarkdown(text) {
+  if (!text) return null;
+  const paragraphs = text.split('\n\n');
+  return paragraphs.map((para, pIdx) => {
+    const parts = para.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+    return (
+      <p key={pIdx} className="text-sm text-muted leading-relaxed m-0 mb-3 last:mb-0">
+        {parts.map((part, idx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+              <strong key={idx} className="font-semibold text-main">
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          if (part.startsWith('`') && part.endsWith('`')) {
+            return (
+              <code key={idx} className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-mono text-xs border border-indigo-500/20">
+                {part.slice(1, -1)}
+              </code>
+            );
+          }
+          return part;
+        })}
+      </p>
+    );
+  });
+}
+
+// Tokenizer & Syntax Highlighter for Code Snippets
+function renderSyntaxLine(line, language) {
+  if (!line) return <span>&nbsp;</span>;
+
+  // Comment line
+  if (line.trim().startsWith('//') || line.trim().startsWith('#')) {
+    return <span className="text-slate-500 italic">{line}</span>;
+  }
+
+  // Regex token splitter
+  const tokenRegex = /(\/\/.*$|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b(?:import|export|from|as|default|function|return|const|let|var|if|else|switch|case|break|try|catch|finally|throw|new|class|extends|implements|interface|type|public|private|protected|async|await|while|for|of|in)\b|\b(?:Promise|Array|Record|Map|Set|String|Number|Boolean|Object|any|void|string|number|boolean|true|false|null|undefined|React|useState|useEffect|useMemo|useCallback|useRef|Stack|CameraView|SQLite|Zustand|create|persist)\b|\b\d+\b|[{}()[\].,;:+\-*/=<>!&|^?%]+)/g;
+
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = tokenRegex.exec(line)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ text: line.substring(lastIndex, match.index), type: 'plain' });
+    }
+    const token = match[0];
+    let type = 'plain';
+
+    if (token.startsWith('//')) {
+      type = 'comment';
+    } else if (token.startsWith('"') || token.startsWith("'") || token.startsWith('`')) {
+      type = 'string';
+    } else if (/^\b(?:import|export|from|as|default|function|return|const|let|var|if|else|switch|case|break|try|catch|finally|throw|new|class|extends|implements|interface|type|public|private|protected|async|await|while|for|of|in)\b$/.test(token)) {
+      type = 'keyword';
+    } else if (/^\b(?:Promise|Array|Record|Map|Set|String|Number|Boolean|Object|any|void|string|number|boolean|true|false|null|undefined|React|useState|useEffect|useMemo|useCallback|useRef|Stack|CameraView|SQLite|Zustand|create|persist)\b$/.test(token)) {
+      type = 'type';
+    } else if (/^\d+$/.test(token)) {
+      type = 'number';
+    } else if (/^[{}()[\].,;:+\-*/=<>!&|^?%]+$/.test(token)) {
+      type = 'punctuation';
+    }
+
+    parts.push({ text: token, type });
+    lastIndex = tokenRegex.lastIndex;
+  }
+
+  if (lastIndex < line.length) {
+    parts.push({ text: line.substring(lastIndex), type: 'plain' });
+  }
+
+  return parts.map((p, i) => {
+    switch (p.type) {
+      case 'comment':
+        return <span key={i} className="text-slate-500 italic">{p.text}</span>;
+      case 'string':
+        return <span key={i} className="text-emerald-400">{p.text}</span>;
+      case 'keyword':
+        return <span key={i} className="text-purple-400 font-semibold">{p.text}</span>;
+      case 'type':
+        return <span key={i} className="text-cyan-300 font-medium">{p.text}</span>;
+      case 'number':
+        return <span key={i} className="text-amber-300">{p.text}</span>;
+      case 'punctuation':
+        return <span key={i} className="text-indigo-300/80">{p.text}</span>;
+      default:
+        return <span key={i} className="text-slate-200">{p.text}</span>;
+    }
+  });
+}
+
+function SyntaxCodeBlock({ codeSnippet }) {
+  const [copied, setCopied] = useState(false);
+  const code = codeSnippet?.code || '';
+  const language = codeSnippet?.language || 'typescript';
+  const title = codeSnippet?.title || 'Production Implementation Snippet';
+
+  const handleCopy = () => {
+    if (!code) return;
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const lines = code.split('\n');
+
+  return (
+    <div className="rounded-2xl border border-indigo-500/25 bg-slate-950/90 overflow-hidden shadow-2xl">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-indigo-500/20">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex gap-1.5 flex-shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+          </div>
+          <span className="text-xs font-mono font-bold text-slate-200 truncate">
+            {title}
+          </span>
+          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-400 font-extrabold border border-indigo-500/30 flex-shrink-0">
+            {language}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer shadow-sm ml-2 flex-shrink-0"
+          title="Copy code snippet"
+        >
+          {copied ? (
+            <>
+              <CheckCheck size={13} className="text-emerald-400" />
+              <span className="text-emerald-400 font-bold">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} className="text-slate-400" />
+              <span>Copy Code</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed text-slate-200 max-h-[380px] overflow-y-auto">
+        <pre className="m-0">
+          <code>
+            {lines.map((line, idx) => (
+              <div key={idx} className="table-row">
+                <span className="table-cell pr-4 text-slate-600 select-none text-right font-mono text-[11px] w-8">
+                  {idx + 1}
+                </span>
+                <span className="table-cell whitespace-pre">
+                  {renderSyntaxLine(line, language)}
+                </span>
+              </div>
+            ))}
+          </code>
+        </pre>
+      </div>
+    </div>
+  );
+}
+
 export default function Roadmap() {
   const navigate = useNavigate();
   const toast = useToast();
   const { user: authUser } = useAuth();
 
-  const [activeTab, setActiveTab] = useState('core'); // 'core' | 'subset'
+  const [activeTab, setActiveTab] = useState('core'); // 'core'
   const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'LOCKED'
   const [currentUser, setCurrentUser] = useState(() => db.getCurrentUser());
   const [isLoading, setIsLoading] = useState(false);
+
+  // Drawer state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState('concept'); // 'concept' | 'resources' | 'quiz'
+
+  // Quiz interactive state
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizScore, setQuizScore] = useState(null);
 
   // Live DAG Roadmap State from MongoDB backend
   const [roadmapData, setRoadmapData] = useState(() => {
@@ -135,6 +310,17 @@ export default function Roadmap() {
     };
   }, []);
 
+  // Keyboard shortcut listener: ESC to close drawer
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isDrawerOpen) {
+        setIsDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDrawerOpen]);
+
   // Collect flat list of all milestones across phases
   const allMilestones = useMemo(() => {
     if (!roadmapData?.phases) return [];
@@ -147,7 +333,7 @@ export default function Roadmap() {
     return list;
   }, [roadmapData]);
 
-  // Keep selected milestone reference up to date
+  // Keep selected milestone reference up to date without losing drawer state
   useEffect(() => {
     if (!selectedMilestone && allMilestones.length > 0) {
       const active = allMilestones.find(m => m.status === 'IN_PROGRESS') || allMilestones.find(m => m.status === 'AVAILABLE') || allMilestones[0];
@@ -160,6 +346,20 @@ export default function Roadmap() {
     }
   }, [allMilestones]);
 
+  // Open drawer for a milestone
+  const openMilestoneDrawer = (milestone, tab = 'concept') => {
+    if (milestone.status === 'LOCKED') {
+      toast.info('This milestone is locked. Complete the prerequisite milestones to unlock.');
+      return;
+    }
+    setSelectedMilestone(milestone);
+    setDrawerTab(tab);
+    setQuizAnswers({});
+    setQuizSubmitted(false);
+    setQuizScore(null);
+    setIsDrawerOpen(true);
+  };
+
   // Curated learning resources for currently selected milestone
   const currentResources = useMemo(() => {
     if (!selectedMilestone) return [];
@@ -168,9 +368,9 @@ export default function Roadmap() {
         id: `res_${selectedMilestone.milestoneId}_${i}`,
         title: r.title,
         url: r.url,
-        type: r.type,
+        type: r.type || 'DOCS',
         duration: '45m',
-        source: 'NEXORA Curriculum'
+        source: 'Verified Curriculum'
       }));
     }
     // Fallback to resource catalog
@@ -197,6 +397,7 @@ export default function Roadmap() {
   };
 
   // Optimistic Milestone Action Handler (Start Milestone / Mark Complete)
+  // Keeps drawer open, updates state in-place, and unlocks next sequential milestone
   const handleMilestoneAction = async (milestone, targetStatus, e) => {
     if (e) e.stopPropagation();
 
@@ -275,10 +476,20 @@ export default function Roadmap() {
       };
     });
 
+    // Update selectedMilestone locally to stay in sync inside drawer
+    setSelectedMilestone(prev => {
+      if (!prev || prev.milestoneId !== milestone.milestoneId) return prev;
+      return {
+        ...prev,
+        status: nextStatus,
+        completedAt: nextStatus === 'COMPLETED' ? new Date().toISOString() : undefined
+      };
+    });
+
     if (nextStatus === 'COMPLETED') {
       toast.success('Milestone completed! +50 XP awarded');
     } else if (nextStatus === 'IN_PROGRESS') {
-      toast.info(`Milestone started: ${milestone.title}`);
+      toast.info(`Milestone active: ${milestone.title}`);
     }
 
     // 2. Dispatch PATCH /api/v1/roadmap/milestones/:milestoneId
@@ -292,12 +503,42 @@ export default function Roadmap() {
         setRoadmapData(canonical);
         localStorage.setItem('nexora_active_roadmap', JSON.stringify(canonical));
         window.dispatchEvent(new Event('user_session_changed'));
+
+        // Refresh selected milestone with canonical server data
+        for (const p of canonical.phases) {
+          const match = p.milestones.find(m => m.milestoneId === milestone.milestoneId);
+          if (match) {
+            setSelectedMilestone({ ...match, phaseTitle: p.phaseTitle, phaseOrder: p.order });
+            break;
+          }
+        }
       }
     } catch (err) {
       console.error('[Roadmap] Milestone update failed:', err);
       // Rollback to prior snapshot
       setRoadmapData(previousRoadmap);
       toast.error('Failed to update milestone progress. Rolling back.');
+    }
+  };
+
+  // Assessment Quiz Submission Handler
+  const handleQuizSubmit = (quizList) => {
+    if (!quizList || quizList.length === 0) return;
+
+    let score = 0;
+    quizList.forEach((q, idx) => {
+      if (quizAnswers[idx] === q.correctIndex) {
+        score += 1;
+      }
+    });
+
+    setQuizScore(score);
+    setQuizSubmitted(true);
+
+    if (score === quizList.length) {
+      toast.success(`Assessment Cleared! ${score}/${quizList.length} Correct. Badge Unlocked!`);
+    } else {
+      toast.info(`Score: ${score}/${quizList.length}. Review the explanations and retry.`);
     }
   };
 
@@ -318,6 +559,46 @@ export default function Roadmap() {
 
   const activeRoleDisplay = authUser?.targetRole || currentUser?.targetRole || roadmapData.role || roadmapData.title || 'Mobile App Developer';
   const activeDomainDisplay = authUser?.domain || currentUser?.domain || roadmapData.domain || roadmapData.category || 'Mobile App Development';
+
+  // Resolved Quiz List for Drawer
+  const activeQuiz = useMemo(() => {
+    if (selectedMilestone?.quiz && selectedMilestone.quiz.length > 0) {
+      return selectedMilestone.quiz;
+    }
+    // Dynamic Fallback 3-Question Knowledge Check if not pre-seeded
+    return [
+      {
+        question: `What is the primary architectural principle governing ${selectedMilestone?.title || 'this milestone'}?`,
+        options: [
+          'Strict separation of concerns and deterministic unidirectional data flow',
+          'Writing all application code inside a single global script',
+          'Disabling automated compilation and type checks',
+          'Deploying without version control',
+        ],
+        correctIndex: 0,
+      },
+      {
+        question: `How does mastering ${selectedMilestone?.skills?.[0] || 'core competencies'} improve production reliability?`,
+        options: [
+          'Ensures reproducible builds, prevents race conditions, and eliminates memory leaks',
+          'Guarantees 100% internet bandwidth on client devices',
+          'Eliminates the need for any unit or integration tests',
+          'Bypasses operating system hardware security constraints',
+        ],
+        correctIndex: 0,
+      },
+      {
+        question: `Which industry-standard metric evaluates execution quality in ${selectedMilestone?.title || 'engineering workflows'}?`,
+        options: [
+          '99.9% crash-free sessions and sub-second interaction latencies',
+          'Maximum number of third-party external dependencies',
+          'Frequency of emergency hotfixes deployed directly to master',
+          'Total lines of unminified code generated',
+        ],
+        correctIndex: 0,
+      },
+    ];
+  }, [selectedMilestone]);
 
   return (
     <div className="workstation-container animate-fade-in flex flex-col gap-6" style={{ minHeight: '100vh', padding: '24px 20px', maxWidth: '1440px', margin: '0 auto', width: '100%' }}>
@@ -492,7 +773,7 @@ export default function Roadmap() {
                     return (
                       <div 
                         key={milestone.milestoneId}
-                        onClick={() => setSelectedMilestone(milestone)}
+                        onClick={() => openMilestoneDrawer(milestone)}
                         className={`relative group rounded-2xl p-4.5 sm:p-5 transition-all cursor-pointer border ${
                           isSelected 
                             ? 'bg-gradient-to-r from-indigo-500/10 via-card to-card border-indigo-500/60 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/30' 
@@ -585,36 +866,53 @@ export default function Roadmap() {
                               </div>
                             )}
 
-                            {/* Card Inline Action Button */}
-                            <div className="mt-3 flex items-center gap-2">
+                            {/* Card Inline Action Buttons */}
+                            <div className="mt-3.5 flex items-center gap-2 flex-wrap">
+                              {!isLocked && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openMilestoneDrawer(milestone);
+                                  }}
+                                  className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 shadow-xs transition-all"
+                                >
+                                  <BookOpen size={12} className="text-indigo-400" />
+                                  <span>Learn & Execute</span>
+                                </button>
+                              )}
+
                               {isAvailable && (
                                 <button
                                   type="button"
                                   onClick={(e) => handleMilestoneAction(milestone, 'IN_PROGRESS', e)}
-                                  className="text-[11px] font-bold px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1 shadow-sm transition-all"
+                                  className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1 shadow-sm transition-all"
                                 >
                                   <Play size={11} />
-                                  <span>Start Milestone</span>
+                                  <span>Start</span>
                                 </button>
                               )}
+
                               {isInProgress && (
                                 <button
                                   type="button"
                                   onClick={(e) => handleMilestoneAction(milestone, 'COMPLETED', e)}
-                                  className="text-[11px] font-bold px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 shadow-sm transition-all"
+                                  className="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 shadow-sm transition-all"
                                 >
                                   <Check size={11} strokeWidth={3} />
                                   <span>Mark Completed (+50 XP)</span>
                                 </button>
                               )}
-                              {isLocked && (
-                                <span className="text-[10px] font-mono text-muted/60 flex items-center gap-1">
-                                  <Lock size={10} /> Locked by prerequisite
-                                </span>
-                              )}
+
                               {isCompleted && (
                                 <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
                                   <CheckCircle2 size={11} /> Cleared
+                                </span>
+                              )}
+
+                              {isLocked && (
+                                <span className="text-[10px] font-mono text-muted/60 flex items-center gap-1">
+                                  <Lock size={10} /> Locked by prerequisite
                                 </span>
                               )}
                             </div>
@@ -673,7 +971,16 @@ export default function Roadmap() {
                 </div>
 
                 {/* Milestone Toggle Action Button */}
-                <div className="flex-shrink-0">
+                <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => openMilestoneDrawer(selectedMilestone)}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-300 border border-indigo-500/30 transition-all shadow-sm"
+                  >
+                    <BookOpen size={15} className="text-indigo-400" />
+                    <span>Open Drawer</span>
+                  </button>
+
                   {selectedMilestone.status === 'AVAILABLE' && (
                     <button
                       type="button"
@@ -692,7 +999,7 @@ export default function Roadmap() {
                       className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all"
                     >
                       <CheckCircle2 size={16} />
-                      <span>Mark as Completed (+50 XP)</span>
+                      <span>Mark Completed (+50 XP)</span>
                     </button>
                   )}
 
@@ -754,12 +1061,18 @@ export default function Roadmap() {
                       Curated Learning Checkpoints ({currentResources.length})
                     </h3>
                   </div>
-                  <span className="text-xs text-muted font-semibold">Tier-1 Curricula</span>
+                  <button
+                    type="button"
+                    onClick={() => openMilestoneDrawer(selectedMilestone, 'resources')}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+                  >
+                    View All in Drawer →
+                  </button>
                 </div>
 
                 {currentResources.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {currentResources.map((res) => (
+                    {currentResources.slice(0, 4).map((res) => (
                       <div 
                         key={res.id}
                         onClick={() => {
@@ -789,7 +1102,7 @@ export default function Roadmap() {
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-border/50 text-[11px]">
-                          <span className="text-muted font-medium">{res.source || 'NEXORA Lab'}</span>
+                          <span className="text-muted font-medium">{res.source || 'NEXORA Curriculum'}</span>
                           <span className="text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                             <span>Open</span>
                             <ExternalLink size={11} />
@@ -805,7 +1118,7 @@ export default function Roadmap() {
                 )}
               </div>
 
-              {/* Milestone Practical Challenge Lab */}
+              {/* Milestone Practical Challenge Lab Card */}
               <div className="p-5 rounded-2xl bg-input/60 border border-indigo-500/30 flex flex-col gap-3 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -820,17 +1133,17 @@ export default function Roadmap() {
                 </div>
 
                 <p className="text-xs text-muted leading-relaxed m-0">
-                  Implement a complete working feature branch testing your understanding of <strong>{selectedMilestone.skills?.slice(0, 3).join(', ') || selectedMilestone.title}</strong>. Ensure code passes unit tests and adheres to clean architecture patterns.
+                  {selectedMilestone.taskPrompt || `Implement a complete working feature branch testing your understanding of ${selectedMilestone.skills?.slice(0, 3).join(', ') || selectedMilestone.title}. Ensure code passes unit tests and adheres to clean architecture patterns.`}
                 </p>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-3 pt-2 flex-wrap">
                   <button
                     type="button"
-                    onClick={() => navigate('/projects')}
+                    onClick={() => openMilestoneDrawer(selectedMilestone, 'concept')}
                     className="btn btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5"
                   >
-                    <Play size={12} />
-                    <span>Launch Sandbox Environment</span>
+                    <BookOpen size={12} />
+                    <span>Open Learning & Execution Drawer</span>
                   </button>
                   <button
                     type="button"
@@ -854,6 +1167,496 @@ export default function Roadmap() {
         </aside>
 
       </div>
+
+      {/* ── IN-PLATFORM LEARNING & EXECUTION DRAWER (Slide-Over from Right) ── */}
+      {/* 1. Glassmorphic Backdrop */}
+      <div 
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300 ${
+          isDrawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsDrawerOpen(false)}
+      />
+
+      {/* 2. Slide-Over Drawer Container */}
+      <div 
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-card border-l border-indigo-500/30 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        }`}
+        style={{
+          backgroundColor: 'var(--bg-card)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}
+      >
+        {selectedMilestone && (
+          <div className="flex flex-col h-full overflow-hidden">
+            
+            {/* Drawer Header */}
+            <div className="p-6 border-b border-border flex flex-col gap-4 bg-gradient-to-b from-card via-card to-card/95">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="badge text-[11px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles size={11} /> Learning & Execution Drawer
+                  </span>
+                  <span className={`text-[10px] font-bold font-mono tracking-wider uppercase px-2 py-0.5 rounded-md ${
+                    selectedMilestone.status === 'COMPLETED'
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                      : selectedMilestone.status === 'IN_PROGRESS'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40'
+                        : selectedMilestone.status === 'AVAILABLE'
+                          ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30'
+                          : 'bg-input text-muted/60 border border-border/50'
+                  }`}>
+                    {selectedMilestone.status}
+                  </span>
+                  <span className="text-xs text-muted font-mono flex items-center gap-1">
+                    <Clock size={12} />
+                    {selectedMilestone.estimatedHours ? `${selectedMilestone.estimatedHours} Hours` : '20 Hours'}
+                  </span>
+                </div>
+
+                {/* Dismiss Drawer Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="p-2 rounded-xl bg-input text-muted hover:text-main hover:bg-input/80 transition-colors cursor-pointer"
+                  title="Close Drawer (Esc)"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-main m-0 leading-tight">
+                  {selectedMilestone.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-muted leading-relaxed m-0 mt-1.5">
+                  {selectedMilestone.description}
+                </p>
+              </div>
+
+              {/* 'Mark Completed' Toggle Button in Drawer Header */}
+              <div className="flex items-center justify-between gap-3 pt-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-muted">
+                  <Award size={14} className="text-indigo-400" />
+                  <span>Completion Status</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {selectedMilestone.status === 'COMPLETED' ? (
+                    <button
+                      type="button"
+                      onClick={() => handleMilestoneAction(selectedMilestone, 'IN_PROGRESS')}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/25 transition-all shadow-sm cursor-pointer"
+                    >
+                      <CheckCircle2 size={15} className="text-emerald-400" />
+                      <span>Completed (Click to Reset)</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleMilestoneAction(selectedMilestone, 'COMPLETED')}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/25 transition-all cursor-pointer"
+                    >
+                      <Check size={14} strokeWidth={3} />
+                      <span>Mark Completed (+50 XP)</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Navigation Tabs Bar */}
+              <div className="flex p-1 rounded-xl bg-input border border-border/80 gap-1">
+                {[
+                  { id: 'concept', label: 'Concept & Snippets', icon: Code2 },
+                  { id: 'resources', label: `Curated Resources (${currentResources.length})`, icon: BookOpen },
+                  { id: 'quiz', label: `Mini Assessment (${activeQuiz.length})`, icon: CheckSquare },
+                ].map(tab => {
+                  const Icon = tab.icon;
+                  const isActive = drawerTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setDrawerTab(tab.id)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
+                          : 'text-muted hover:text-main'
+                      }`}
+                    >
+                      <Icon size={14} />
+                      <span className="truncate">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Drawer Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+              
+              {/* ── TAB 1: Concept & Snippets ── */}
+              {drawerTab === 'concept' && (
+                <div className="flex flex-col gap-6 animate-fade-in">
+                  
+                  {/* Conceptual Overview */}
+                  <div className="p-5 rounded-2xl bg-input/40 border border-indigo-500/20 flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={16} className="text-indigo-400" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-main m-0">
+                        Conceptual Overview & Architecture
+                      </h3>
+                    </div>
+                    <div>
+                      {selectedMilestone.summary ? (
+                        renderSimpleMarkdown(selectedMilestone.summary)
+                      ) : (
+                        <p className="text-sm text-muted leading-relaxed m-0">
+                          {selectedMilestone.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Key Topics to Master */}
+                  {selectedMilestone.keyTopics && selectedMilestone.keyTopics.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-indigo-400" />
+                          Key Topics & Production Standards
+                        </span>
+                        <span className="text-[11px] text-muted font-mono">
+                          {selectedMilestone.keyTopics.length} Focus Areas
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-2.5">
+                        {selectedMilestone.keyTopics.map((topic, tIdx) => (
+                          <div 
+                            key={tIdx}
+                            className="p-3.5 rounded-xl bg-input/50 border border-border/80 flex items-start gap-3 shadow-xs"
+                          >
+                            <span className="w-5 h-5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5">
+                              {tIdx + 1}
+                            </span>
+                            <span className="text-xs font-medium text-main leading-relaxed">
+                              {topic}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Practical Code Snippet with Syntax Highlighting and 1-Click Copy */}
+                  {selectedMilestone.codeSnippet && selectedMilestone.codeSnippet.code ? (
+                    <div className="flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+                          <Code2 size={14} className="text-indigo-400" />
+                          Production Implementation Snippet
+                        </span>
+                      </div>
+                      <SyntaxCodeBlock codeSnippet={selectedMilestone.codeSnippet} />
+                    </div>
+                  ) : null}
+
+                  {/* Practical Mini-Project Prompt */}
+                  {selectedMilestone.taskPrompt && (
+                    <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-input/40 to-transparent border border-indigo-500/30 flex flex-col gap-3 shadow-xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Zap size={16} className="text-indigo-400" />
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-main m-0">
+                            Practical Mini-Project Challenge
+                          </h4>
+                        </div>
+                        <span className="badge text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          +50 XP Telemetry
+                        </span>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-muted leading-relaxed m-0">
+                        {selectedMilestone.taskPrompt}
+                      </p>
+
+                      <div className="flex items-center gap-3 pt-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => navigate('/projects')}
+                          className="btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5"
+                        >
+                          <Play size={12} />
+                          <span>Launch Sandbox Environment</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => navigate('/chatbot')}
+                          className="text-xs font-semibold text-muted hover:text-indigo-300 transition-colors flex items-center gap-1"
+                        >
+                          <HelpCircle size={13} />
+                          <span>Ask AI Mentor for Code Scaffold</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {/* ── TAB 2: Curated Resources ── */}
+              {drawerTab === 'resources' && (
+                <div className="flex flex-col gap-4 animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-muted m-0">
+                        Curated Learning Resources ({currentResources.length})
+                      </h3>
+                      <p className="text-[11px] text-muted m-0 mt-0.5">
+                        Direct references to official documentation and verified engineering guides.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    {currentResources.map((res, rIdx) => {
+                      const badgeColor = 
+                        res.type === 'VIDEO' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' :
+                        res.type === 'ARTICLE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25' :
+                        res.type === 'PROJECT' ? 'bg-amber-500/10 text-amber-400 border-amber-500/25' :
+                        'bg-indigo-500/10 text-indigo-400 border-indigo-500/25';
+
+                      return (
+                        <div
+                          key={res.id || rIdx}
+                          onClick={() => {
+                            if (res.url && res.url !== '#') {
+                              window.open(res.url, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                          className="p-4 rounded-2xl bg-input/50 hover:bg-input border border-border/80 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-xs"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <span className={`badge text-[10px] font-bold border ${badgeColor}`}>
+                                {res.type || 'DOCS'}
+                              </span>
+                              <span className="text-[11px] font-mono text-muted">
+                                {res.duration || '45m'}
+                              </span>
+                              <span className="text-[11px] text-muted font-medium ml-auto sm:ml-0">
+                                {res.source || 'Official Documentation'}
+                              </span>
+                            </div>
+
+                            <h4 className="text-sm font-bold text-main m-0 group-hover:text-indigo-300 transition-colors leading-snug">
+                              {res.title}
+                            </h4>
+
+                            <p className="text-xs text-muted leading-relaxed m-0 mt-1 line-clamp-2">
+                              {res.description || 'Verified production guide and documentation with code samples.'}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-400 flex-shrink-0 group-hover:translate-x-0.5 transition-transform">
+                            <span>Open Resource</span>
+                            <ExternalLink size={13} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ── TAB 3: Mini Assessment ── */}
+              {drawerTab === 'quiz' && (
+                <div className="flex flex-col gap-6 animate-fade-in">
+                  
+                  {/* Assessment Intro Header */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-card to-card border border-indigo-500/25 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckSquare size={16} className="text-indigo-400" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-main m-0">
+                          Milestone Knowledge Verification
+                        </h3>
+                      </div>
+                      <span className="badge text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                        {activeQuiz.length} Questions
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed m-0">
+                      Answer the 3 knowledge-check questions below to verify mastery of {selectedMilestone.title} and unlock your milestone badge.
+                    </p>
+                  </div>
+
+                  {/* Quiz Score Banner (if submitted) */}
+                  {quizSubmitted && (
+                    <div className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${
+                      quizScore === activeQuiz.length
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                        : 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        {quizScore === activeQuiz.length ? (
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                            <CheckCircle2 size={22} />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
+                            <AlertCircle size={22} />
+                          </div>
+                        )}
+                        <div>
+                          <h4 className="text-sm font-bold m-0 leading-tight">
+                            {quizScore === activeQuiz.length
+                              ? 'Assessment Cleared! 100% Score'
+                              : `Assessment Score: ${quizScore}/${activeQuiz.length}`}
+                          </h4>
+                          <p className="text-xs opacity-90 m-0 mt-0.5">
+                            {quizScore === activeQuiz.length
+                              ? 'All knowledge checks validated. Milestone badge unlocked!'
+                              : 'Review incorrect answers highlighted in red and retry.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {quizScore === activeQuiz.length && selectedMilestone.status !== 'COMPLETED' && (
+                        <button
+                          type="button"
+                          onClick={() => handleMilestoneAction(selectedMilestone, 'COMPLETED')}
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
+                        >
+                          <Award size={14} />
+                          <span>Claim Badge (+50 XP)</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 3 Questions List */}
+                  <div className="flex flex-col gap-6">
+                    {activeQuiz.map((q, qIdx) => {
+                      const selectedOption = quizAnswers[qIdx];
+                      const isAnswered = selectedOption !== undefined;
+
+                      return (
+                        <div 
+                          key={qIdx}
+                          className="p-5 rounded-2xl bg-input/40 border border-border/80 flex flex-col gap-3.5 shadow-xs"
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <span className="w-6 h-6 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xs font-bold font-mono flex-shrink-0 mt-0.5">
+                              {qIdx + 1}
+                            </span>
+                            <h4 className="text-sm font-bold text-main m-0 leading-snug">
+                              {q.question}
+                            </h4>
+                          </div>
+
+                          {/* Options */}
+                          <div className="grid grid-cols-1 gap-2 pl-8">
+                            {q.options.map((option, optIdx) => {
+                              const isSelected = selectedOption === optIdx;
+                              const isCorrect = q.correctIndex === optIdx;
+
+                              let cardStyles = 'bg-input/70 hover:bg-input border-border/80 text-muted';
+                              if (quizSubmitted) {
+                                if (isCorrect) {
+                                  cardStyles = 'bg-emerald-500/15 border-emerald-500/50 text-emerald-300 font-semibold';
+                                } else if (isSelected && !isCorrect) {
+                                  cardStyles = 'bg-rose-500/15 border-rose-500/50 text-rose-300 line-through';
+                                }
+                              } else if (isSelected) {
+                                cardStyles = 'bg-indigo-600/15 border-indigo-500/60 text-indigo-300 font-semibold ring-1 ring-indigo-500/30';
+                              }
+
+                              return (
+                                <button
+                                  key={optIdx}
+                                  type="button"
+                                  disabled={quizSubmitted}
+                                  onClick={() => {
+                                    setQuizAnswers(prev => ({ ...prev, [qIdx]: optIdx }));
+                                  }}
+                                  className={`p-3 rounded-xl border text-xs text-left transition-all flex items-center justify-between gap-3 cursor-pointer ${cardStyles}`}
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <span className="w-5 h-5 rounded-md bg-input border border-border flex items-center justify-center text-[10px] font-mono font-bold text-muted flex-shrink-0">
+                                      {String.fromCharCode(65 + optIdx)}
+                                    </span>
+                                    <span className="leading-relaxed">{option}</span>
+                                  </div>
+
+                                  {quizSubmitted && isCorrect && (
+                                    <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                                  )}
+                                  {quizSubmitted && isSelected && !isCorrect && (
+                                    <X size={16} className="text-rose-400 flex-shrink-0" />
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Quiz Action Buttons */}
+                  <div className="flex items-center justify-between gap-3 pt-2">
+                    {quizSubmitted ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuizAnswers({});
+                          setQuizSubmitted(false);
+                          setQuizScore(null);
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-input text-main hover:bg-input/80 border border-border text-xs font-bold flex items-center gap-2 cursor-pointer transition-all"
+                      >
+                        <RefreshCw size={13} />
+                        <span>Retry Knowledge Check</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleQuizSubmit(activeQuiz)}
+                        disabled={Object.keys(quizAnswers).length < activeQuiz.length}
+                        className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                          Object.keys(quizAnswers).length >= activeQuiz.length
+                            ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 cursor-pointer'
+                            : 'bg-input text-muted/50 border border-border cursor-not-allowed'
+                        }`}
+                      >
+                        <CheckSquare size={14} />
+                        <span>Submit Assessment ({Object.keys(quizAnswers).length}/{activeQuiz.length} answered)</span>
+                      </button>
+                    )}
+
+                    {selectedMilestone.status !== 'COMPLETED' && (
+                      <button
+                        type="button"
+                        onClick={() => handleMilestoneAction(selectedMilestone, 'COMPLETED')}
+                        className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Check size={13} />
+                        <span>Skip to Mark Completed</span>
+                      </button>
+                    )}
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

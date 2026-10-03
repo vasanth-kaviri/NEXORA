@@ -16,7 +16,7 @@ import { logger } from '../utils/logger';
 
 // safeNotify: fire-and-forget wrapper
 // Catches sync throws and async rejections so notification failures NEVER crash the HTTP response.
-function safeNotify(fn: () => Promise<void>, label: string): void {
+function safeNotify(fn: () => Promise<unknown>, label: string): void {
   Promise.resolve().then(fn).catch((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err);
     logger.warn(`safeNotify [${label}] failed (non-fatal): ${msg}`);
@@ -81,10 +81,19 @@ export const signupWithEmail = async (
     safeNotify(() => sendEmailVerification(user.email!, user.name, verifyToken), 'sendEmailVerification');
     safeNotify(() => sendOtpEmail(user.email!, user.name, otp), 'sendOtpEmail');
 
+    const isDev = process.env.NODE_ENV !== 'production';
     res.status(201).json(
       sendSuccess(
-        { userId: user._id, email: user.email, name: user.name, authMethod: 'email' },
-        'Account created. Check your email (or backend console in dev mode) for the verification code.',
+        {
+          userId: user._id,
+          email: user.email,
+          name: user.name,
+          authMethod: 'email',
+          debugOtp: isDev ? otp : undefined,
+        },
+        isDev
+          ? `Verification code dispatched to ${user.email}. Code: ${otp}`
+          : 'Account created. Check your email for the verification code.',
         201,
       ),
     );
@@ -155,10 +164,21 @@ export const signupWithPhone = async (
       : () => sendSmsOtp(fullPhone, otp);
     safeNotify(sendFn, `sendPhoneOtp(${channel})`);
 
+    const isDev = process.env.NODE_ENV !== 'production';
     res.status(201).json(
       sendSuccess(
-        { userId: user._id, phone: pureDigits, countryCode: cleanCode, name: user.name, authMethod: 'phone', channel },
-        'Account created. Check your phone (or backend console in dev mode) for the OTP.',
+        {
+          userId: user._id,
+          phone: pureDigits,
+          countryCode: cleanCode,
+          name: user.name,
+          authMethod: 'phone',
+          channel,
+          debugOtp: isDev ? otp : undefined,
+        },
+        isDev
+          ? `Verification code dispatched to ${fullPhone}. Code: ${otp}`
+          : 'Account created. Check your phone for the verification code.',
         201,
       ),
     );
@@ -617,7 +637,15 @@ export const resendOtp = async (
       return;
     }
 
-    res.status(200).json(sendSuccess(null, 'A new verification code has been dispatched.'));
+    const isDev = process.env.NODE_ENV !== 'production';
+    res.status(200).json(
+      sendSuccess(
+        { debugOtp: isDev ? otp : undefined },
+        isDev
+          ? `A new verification code has been dispatched. Code: ${otp}`
+          : 'A new verification code has been dispatched to your contact.',
+      ),
+    );
   } catch (err) { next(err); }
 };
 

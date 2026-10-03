@@ -118,6 +118,22 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
+// --- Root Health & Diagnostic Probe ------------------------------------------
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    status: 'online',
+    service: 'NEXORA Enterprise Full-Stack API Gateway',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      api: '/api/v1',
+      health: '/api/health',
+      jobs: '/api/v1/jobs',
+      auth: '/api/v1/auth'
+    }
+  });
+});
+
 // --- 404 Handler -------------------------------------------------------------
 app.use(notFoundHandler);
 

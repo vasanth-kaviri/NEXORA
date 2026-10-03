@@ -117,7 +117,13 @@ async function secureFetch(endpoint, options = {}) {
     }
   }
 
-  const url = finalEndpoint.startsWith('http') ? finalEndpoint : `${API_BASE_URL}${finalEndpoint}`;
+  // Universal API normalizer: automatically guarantees /api/v1 prefix for all relative routes
+  let normalizedEndpoint = finalEndpoint;
+  if (!normalizedEndpoint.startsWith('http') && !normalizedEndpoint.startsWith('/api/')) {
+    normalizedEndpoint = `/api/v1${normalizedEndpoint.startsWith('/') ? '' : '/'}${normalizedEndpoint}`;
+  }
+
+  const url = normalizedEndpoint.startsWith('http') ? normalizedEndpoint : `${API_BASE_URL}${normalizedEndpoint}`;
   const requestId = generateRequestId();
   const token = getActiveBearerToken();
 

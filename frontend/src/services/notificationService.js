@@ -11,9 +11,10 @@ export const notificationService = {
    */
   async getMyNotifications() {
     try {
-      const response = await apiClient.get('/notifications');
-      if (response.data && response.data.success) {
-        const notifs = response.data.data.notifications || [];
+      const response = await apiClient.get('/api/v1/notifications');
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        const notifs = resData.notifications || (Array.isArray(resData) ? resData : []);
         localStorage.setItem('nexora_notifications', JSON.stringify(notifs));
         return notifs;
       }
@@ -59,7 +60,7 @@ export const notificationService = {
    */
   async markAsRead(id) {
     try {
-      apiClient.patch(`/notifications/${id}/read`).catch(() => {});
+      apiClient.patch(`/api/v1/notifications/${id}/read`).catch(() => {});
       const raw = localStorage.getItem('nexora_notifications');
       if (raw) {
         const list = JSON.parse(raw);
@@ -77,7 +78,7 @@ export const notificationService = {
    */
   async clearAll() {
     try {
-      apiClient.patch('/notifications/mark-all-read').catch(() => {});
+      apiClient.patch('/api/v1/notifications/mark-all-read').catch(() => {});
       localStorage.setItem('nexora_notifications', JSON.stringify([]));
       window.dispatchEvent(new Event('nexora_notifications_updated'));
     } catch (e) {

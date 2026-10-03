@@ -55,6 +55,16 @@ export interface IUser extends Document {
     color?: string;
   }>;
 
+  // Gamification & Progress
+  xp?: number;
+  level?: number;
+  streak?: number;
+  interviewScore?: number;
+  quizScore?: number;
+  careerMatch?: number;
+  completedNodes?: string[];
+  inProgressNodes?: string[];
+
   // Verification tokens
   emailVerifyToken?: string;
   emailVerifyTokenExpires?: Date;
@@ -172,6 +182,16 @@ const UserSchema = new Schema<IUser, IUserModel>(
       credentialId: { type: String },
       color: { type: String },
     }],
+
+    // Gamification & Progress
+    xp: { type: Number, default: 0 },
+    level: { type: Number, default: 1 },
+    streak: { type: Number, default: 0 },
+    interviewScore: { type: Number, default: 0 },
+    quizScore: { type: Number, default: 0 },
+    careerMatch: { type: Number, default: 0 },
+    completedNodes: [{ type: String }],
+    inProgressNodes: [{ type: String }],
 
     // Verification tokens
     emailVerifyToken: { type: String, select: false },

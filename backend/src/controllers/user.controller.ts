@@ -28,6 +28,14 @@ export const formatSafeUser = (user: IUser) => ({
   extractedProjects: user.extractedProjects || [],
   experiences: user.experiences || [],
   certifications: user.certifications || [],
+  xp: user.xp ?? 0,
+  level: user.level ?? 1,
+  streak: user.streak ?? 0,
+  interviewScore: user.interviewScore ?? 0,
+  quizScore: user.quizScore ?? 0,
+  careerMatch: user.careerMatch ?? 0,
+  completedNodes: user.completedNodes || [],
+  inProgressNodes: user.inProgressNodes || [],
   isVerified: Boolean(user.isVerified),
   tier: user.tier || 'free',
   profileCompleted: Boolean(user.profileCompleted),
@@ -85,6 +93,15 @@ export const updateMe = async (req: Request, res: Response): Promise<void> => {
       skills,
       experiences,
       certifications,
+      xp,
+      level,
+      streak,
+      interviewScore,
+      quizScore,
+      careerMatch,
+      atsScore,
+      completedNodes,
+      inProgressNodes,
     } = req.body;
 
     if (!userId && !email && !phone) {
@@ -124,6 +141,16 @@ export const updateMe = async (req: Request, res: Response): Promise<void> => {
     if (skills !== undefined) updateFields.skills = skills;
     if (experiences !== undefined) updateFields.experiences = experiences;
     if (certifications !== undefined) updateFields.certifications = certifications;
+
+    if (xp !== undefined) updateFields.xp = Number(xp);
+    if (level !== undefined) updateFields.level = Number(level);
+    if (streak !== undefined) updateFields.streak = Number(streak);
+    if (interviewScore !== undefined) updateFields.interviewScore = Number(interviewScore);
+    if (quizScore !== undefined) updateFields.quizScore = Number(quizScore);
+    if (careerMatch !== undefined) updateFields.careerMatch = Number(careerMatch);
+    if (atsScore !== undefined) updateFields.atsScore = Number(atsScore);
+    if (completedNodes !== undefined) updateFields.completedNodes = completedNodes;
+    if (inProgressNodes !== undefined) updateFields.inProgressNodes = inProgressNodes;
 
     // Explicitly enforce profileCompleted: true when submitting onboarding/calibration
     if (profileCompleted !== undefined) {
@@ -194,6 +221,15 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       email,
       phone,
       profileCompleted,
+      xp,
+      level,
+      streak,
+      interviewScore,
+      quizScore,
+      careerMatch,
+      atsScore,
+      completedNodes,
+      inProgressNodes,
     } = req.body;
 
     let user = null;
@@ -247,6 +283,15 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     if (graduationYear !== undefined) updateData.graduationYear = Number(graduationYear);
     if (skills !== undefined) updateData.skills = Array.isArray(skills) ? skills : [skills];
     if (goals !== undefined) updateData.goals = Array.isArray(goals) ? goals : [goals];
+    if (xp !== undefined) updateData.xp = Number(xp);
+    if (level !== undefined) updateData.level = Number(level);
+    if (streak !== undefined) updateData.streak = Number(streak);
+    if (interviewScore !== undefined) updateData.interviewScore = Number(interviewScore);
+    if (quizScore !== undefined) updateData.quizScore = Number(quizScore);
+    if (careerMatch !== undefined) updateData.careerMatch = Number(careerMatch);
+    if (atsScore !== undefined) updateData.atsScore = Number(atsScore);
+    if (completedNodes !== undefined) updateData.completedNodes = completedNodes;
+    if (inProgressNodes !== undefined) updateData.inProgressNodes = inProgressNodes;
     updateData.profileCompleted = profileCompleted !== undefined ? Boolean(profileCompleted) : true;
 
     const savedUser = await User.findByIdAndUpdate(

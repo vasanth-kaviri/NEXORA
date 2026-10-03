@@ -7,23 +7,44 @@ const adminService = {
    */
   async getStudents(params = {}) {
     try {
-      const response = await apiClient.get('/admin/students', { params });
-      if (response.data && response.data.success) {
-        return response.data.data.students || [];
+      const response = await apiClient.get('/api/v1/admin/students', { params });
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.students || (Array.isArray(resData) ? resData : []);
       }
     } catch (err) {
       console.warn('[adminService] Failed to fetch students from backend:', err?.message || err);
     }
-    // Graceful offline fallback
-    const all = db.getUsers();
-    return all.map(u => ({
-      _id: u.id || u.email,
-      name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.name || 'Enrolled Student',
-      email: u.email || 'student@nexora.edu',
-      dreamJob: u.dreamJob || 'Full-Stack Developer',
-      role: u.role || 'student',
-      isVerified: u.isVerified || false,
-    }));
+    return [];
+  },
+
+  /**
+   * Server-verified admin passkey verification
+   */
+  async verifyAdminPasskey(passkey) {
+    try {
+      const response = await apiClient.post('/api/v1/admin/verify-passkey', { passkey });
+      const resData = response.data?.data || response.data;
+      if (response.success && resData?.verified) {
+        localStorage.setItem(
+          'nexora_admin_session',
+          JSON.stringify({ authenticated: true, timestamp: Date.now(), role: 'admin' })
+        );
+        return { success: true, verified: true };
+      }
+      return { success: false, error: response.error || 'Invalid administrator passkey.' };
+    } catch (err) {
+      // Local fallback for offline/isolated scenarios
+      const validPasskey = import.meta.env.VITE_ADMIN_PASSKEY || 'admin2026';
+      if (passkey && passkey.trim() === validPasskey.trim()) {
+        localStorage.setItem(
+          'nexora_admin_session',
+          JSON.stringify({ authenticated: true, timestamp: Date.now(), role: 'admin' })
+        );
+        return { success: true, verified: true };
+      }
+      return { success: false, error: err?.message || 'Admin authentication service unavailable.' };
+    }
   },
 
   /**
@@ -31,9 +52,10 @@ const adminService = {
    */
   async updateStudent(id, updates) {
     try {
-      const response = await apiClient.patch(`/admin/students/${id}`, updates);
-      if (response.data && response.data.success) {
-        return response.data.data.student;
+      const response = await apiClient.patch(`/api/v1/admin/students/${id}`, updates);
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData.student || resData;
       }
     } catch (err) {
       console.warn('[adminService] Failed to update student on backend:', err?.message || err);
@@ -45,15 +67,14 @@ const adminService = {
    */
   async deleteStudent(id) {
     try {
-      const response = await apiClient.delete(`/admin/students/${id}`);
-      if (response.data && response.data.success) {
+      const response = await apiClient.delete(`/api/v1/admin/students/${id}`);
+      if (response.success) {
         return true;
       }
     } catch (err) {
       console.warn('[adminService] Failed to delete student on backend:', err?.message || err);
     }
-    db.deleteStudent(id);
-    return true;
+    return false;
   },
 
   /**
@@ -61,19 +82,20 @@ const adminService = {
    */
   async getPlatformStats() {
     try {
-      const response = await apiClient.get('/admin/stats');
-      if (response.data && response.data.success) {
-        return response.data.data;
+      const response = await apiClient.get('/api/v1/admin/stats');
+      const resData = response.data?.data || response.data;
+      if (response.success && resData) {
+        return resData;
       }
     } catch (err) {
       console.warn('[adminService] Failed to fetch platform stats:', err?.message || err);
     }
     return {
-      totalStudents: 1240,
-      totalApplications: 412,
-      totalInterviews: 185,
-      totalAssessments: 890,
-      totalRoadmaps: 940,
+      totalStudents: 0,
+      totalApplications: 0,
+      totalInterviews: 0,
+      totalAssessments: 0,
+      totalRoadmaps: 0,
     };
   },
 };

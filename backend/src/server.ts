@@ -1,4 +1,10 @@
-﻿import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Robust dual-path environment loader (resolves backend/.env explicitly regardless of execution cwd)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config();
+
 import http from 'http';
 import app from './app';
 import { connectDB } from './config/db';
@@ -49,8 +55,25 @@ const bootstrap = async () => {
     // Automatically seed real-world industry jobs on bootstrap if empty
     await seedJobsDatabase();
 
-    server.listen(PORT, () => {
-      logger.info(`NEXORA Backend Server Running on Port ${PORT} (http://localhost:${PORT}/api/v1)`);
+    server.on('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        logger.warn(`Port ${PORT} is temporarily busy. Retrying in 1.5 seconds...`);
+        setTimeout(() => {
+          try {
+            server.close();
+          } catch {}
+          server.listen(PORT, '0.0.0.0');
+        }, 1500);
+      } else {
+        logger.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+
+    server.listen(PORT, '0.0.0.0', () => {
+      logger.info(`NEXORA Backend Server Running on Port ${PORT} (http://localhost:${PORT})`);
+      logger.info(`REST API Gateway: http://localhost:${PORT}/api/v1`);
+      logger.info(`Health Endpoint : http://localhost:${PORT}/api/health`);
     });
   } catch (err) {
     logger.error('Failed to start server:', err);

@@ -112,3 +112,32 @@ export const getPlatformStats = async (_req: Request, res: Response): Promise<vo
     res.status(500).json(sendError('Failed to fetch platform telemetry.', 500));
   }
 };
+
+// --- Verify Admin Passkey ----------------------------------------------------
+export const verifyAdminPasskey = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { passkey } = req.body;
+    const expectedPasskey = process.env.ADMIN_PASSKEY || 'admin2026';
+
+    if (!passkey || String(passkey).trim() !== expectedPasskey.trim()) {
+      res.status(401).json(sendError('Invalid administrative passkey.', 401));
+      return;
+    }
+
+    logger.info('[AdminController] Admin clearance verified via secure passkey.');
+    res.status(200).json(
+      sendSuccess(
+        {
+          verified: true,
+          role: 'admin',
+          sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 8), // 8-hour admin clearance
+        },
+        'Administrative passkey verified successfully.'
+      )
+    );
+  } catch (err: any) {
+    logger.error('[AdminController] Error verifying admin passkey:', err?.message || err);
+    res.status(500).json(sendError('Admin verification failed.', 500));
+  }
+};
+

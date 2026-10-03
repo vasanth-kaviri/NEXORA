@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Lock, ArrowRight, Clock, ShieldAlert } from 'lucide-react';
 import db from '../../services/db';
+import adminService from '../../services/adminService';
 import securityService from '../../services/securityService';
 import { useToast } from '../../contexts/ToastContext';
 
@@ -15,6 +16,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
     const status = securityService.checkLoginRateLimit('admin_root');
@@ -36,7 +38,7 @@ export default function AdminLogin() {
     return () => clearInterval(timer);
   }, [lockoutSeconds]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!securityService.canExecuteAction('admin_login', 1500)) return;
@@ -53,8 +55,11 @@ export default function AdminLogin() {
       return;
     }
 
-    const ok = db.verifyAdminPasskey(password.trim());
-    if (ok) {
+    setIsVerifying(true);
+    const result = await adminService.verifyAdminPasskey(password.trim());
+    setIsVerifying(false);
+
+    if (result.success) {
       securityService.resetLoginRateLimit('admin_root');
       securityService.logSecurityEvent('ADMIN_LOGIN_SUCCESS');
       setError('');

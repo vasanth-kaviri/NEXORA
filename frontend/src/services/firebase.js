@@ -27,12 +27,13 @@ let app = null;
 const rtdb = null; // RTDB decommissioned
 let auth = null;
 
-try {
-  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  // RTDB removed to eliminate '@firebase/database: FIREBASE WARNING'
-  auth = getAuth(app);
-} catch (err) {
-  console.warn('[NEXORA] Firebase init failed - running in local mock mode:', err && err.message);
+if (isFirebaseConfigured()) {
+  try {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+  } catch (_err) {
+    // Graceful fallback to local mock mode
+  }
 }
 
 export { app, rtdb, auth, firebaseConfig };

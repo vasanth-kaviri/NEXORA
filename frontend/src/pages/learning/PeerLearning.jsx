@@ -10,8 +10,8 @@ import peerService from '../../services/peerService';
 export default function PeerLearning() {
   const currentUser = db.getCurrentUser() || {};
 
-  // Comprehensive active peers directory
-  const peersList = [
+  // Default fallback peers directory
+  const DEFAULT_PEERS = [
     {
       id: 'peer_1',
       name: 'Jordan Lee',
@@ -176,6 +176,8 @@ export default function PeerLearning() {
   const [sharedNotes, setSharedNotes] = useState('# Collaborative Session Notes\n\n- [x] O(1) Get Operation verified\n- [x] Eviction on capacity boundary\n- [ ] Edge cases: duplicate keys & capacity = 1');
   const [toastMessage, setToastMessage] = useState('');
   const [liveRooms, setLiveRooms] = useState(studyRooms);
+  const [peers, setPeers] = useState(DEFAULT_PEERS);
+  const [isLoadingPeers, setIsLoadingPeers] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -192,6 +194,19 @@ export default function PeerLearning() {
         setLiveRooms(mapped);
       }
     });
+
+    setIsLoadingPeers(true);
+    peerService.listPeers().then(backendPeers => {
+      if (mounted) {
+        setIsLoadingPeers(false);
+        if (backendPeers && backendPeers.length > 0) {
+          setPeers(backendPeers);
+        }
+      }
+    }).catch(() => {
+      if (mounted) setIsLoadingPeers(false);
+    });
+
     return () => { mounted = false; };
   }, []);
 
@@ -280,7 +295,7 @@ export default function PeerLearning() {
     setShowInvitePeerModal(false);
   };
 
-  const filteredPeers = peersList.filter(peer => {
+  const filteredPeers = peers.filter(peer => {
     const matchesSearch = 
       peer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       peer.role.toLowerCase().includes(searchQuery.toLowerCase()) ||

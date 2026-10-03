@@ -12,18 +12,12 @@ import { logger } from '../utils/logger';
  */
 function buildRedisStore(prefix: string): RedisStore | undefined {
   try {
-    if (!isRedisReady()) {
-      logger.warn(`[RateLimit] Redis not ready for prefix "${prefix}", using in-memory fallback.`);
-      return undefined;
-    }
     return new RedisStore({
       sendCommand: (...args: string[]) =>
         getRedisClient().call(args[0], ...args.slice(1)) as unknown as Promise<RedisReply>,
       prefix: `nexora_rl_${prefix}_`,
     });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.warn(`[RateLimit] Could not build RedisStore for "${prefix}": ${msg}. Using in-memory.`);
+  } catch (_err) {
     return undefined;
   }
 }

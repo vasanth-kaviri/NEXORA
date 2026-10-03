@@ -1,4 +1,4 @@
-﻿import Redis from 'ioredis';
+import Redis from 'ioredis';
 import { logger } from '../utils/logger';
 
 let redisClient: Redis | null = null;
@@ -40,10 +40,15 @@ export const isRedisReady = (): boolean => _isReady;
 
 export const connectRedis = async (): Promise<void> => {
   const client = getRedisClient();
+  if (client.status === 'ready' || client.status === 'connecting' || client.status === 'connect') {
+    return;
+  }
   try {
     await client.connect();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.warn('Redis connection failed (non-fatal, falling back to in-memory): ' + msg);
+    if (!msg.includes('already')) {
+      logger.warn('Redis connection failed (non-fatal, falling back to in-memory): ' + msg);
+    }
   }
 };

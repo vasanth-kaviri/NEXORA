@@ -1,12 +1,24 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export type MilestoneStatus = 'LOCKED' | 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED';
-export type ResourceType = 'DOCS' | 'VIDEO' | 'PROJECT';
+export type ResourceType = 'DOCS' | 'VIDEO' | 'ARTICLE' | 'PROJECT';
 
 export interface IRoadmapResource {
   title: string;
   url: string;
   type: ResourceType;
+}
+
+export interface ICodeSnippet {
+  language: string;
+  code: string;
+  title: string;
+}
+
+export interface IQuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
 }
 
 export interface IMilestone {
@@ -18,6 +30,13 @@ export interface IMilestone {
   resources: IRoadmapResource[];
   status: MilestoneStatus;
   completedAt?: Date;
+
+  // Educational fields for Learning & Execution Drawer
+  summary?: string;
+  keyTopics?: string[];
+  codeSnippet?: ICodeSnippet;
+  quiz?: IQuizQuestion[];
+  taskPrompt?: string;
 }
 
 export interface IPhase {
@@ -44,7 +63,30 @@ const RoadmapResourceSchema = new Schema<IRoadmapResource>(
   {
     title: { type: String, required: true },
     url: { type: String, required: true },
-    type: { type: String, enum: ['DOCS', 'VIDEO', 'PROJECT'], required: true, default: 'DOCS' },
+    type: {
+      type: String,
+      enum: ['DOCS', 'VIDEO', 'ARTICLE', 'PROJECT'],
+      required: true,
+      default: 'DOCS',
+    },
+  },
+  { _id: false },
+);
+
+const CodeSnippetSchema = new Schema<ICodeSnippet>(
+  {
+    language: { type: String, default: 'typescript' },
+    code: { type: String, default: '' },
+    title: { type: String, default: '' },
+  },
+  { _id: false },
+);
+
+const QuizQuestionSchema = new Schema<IQuizQuestion>(
+  {
+    question: { type: String, required: true },
+    options: { type: [String], required: true },
+    correctIndex: { type: Number, required: true },
   },
   { _id: false },
 );
@@ -63,6 +105,13 @@ const MilestoneSchema = new Schema<IMilestone>(
       default: 'LOCKED',
     },
     completedAt: { type: Date },
+
+    // Educational fields for Learning & Execution Drawer
+    summary: { type: String, default: '' },
+    keyTopics: { type: [String], default: [] },
+    codeSnippet: { type: CodeSnippetSchema, default: null },
+    quiz: { type: [QuizQuestionSchema], default: [] },
+    taskPrompt: { type: String, default: '' },
   },
   { _id: false },
 );
