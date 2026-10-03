@@ -39,6 +39,8 @@ import TaskPage from './pages/learning/TaskPage';
 import PeerLearning from './pages/learning/PeerLearning';
 import Resources from './pages/learning/Resources';
 import ResourceViewer from './pages/learning/ResourceViewer';
+import DomainHub from './pages/learning/DomainHub';
+import VideoClassroom from './pages/learning/VideoClassroom';
 
 // Career & Opportunities
 import Jobs from './pages/career/Jobs';
@@ -136,6 +138,8 @@ function App() {
                     <Route path="/peer-learning" element={<PeerLearning />} />
                     <Route path="/task/:taskId" element={<TaskPage />} />
                     <Route path="/resource/:id" element={<ResourceViewer />} />
+                    <Route path="/domains" element={<DomainHub />} />
+                    <Route path="/classroom/:videoId" element={<VideoClassroom />} />
                     <Route path="/notification/:id" element={<NotificationDetail />} />
                     <Route path="/subscription" element={<Subscription />} />
                     <Route path="/projects" element={<Projects />} />

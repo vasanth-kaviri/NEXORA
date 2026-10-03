@@ -3,7 +3,8 @@ import {
   ArrowRight, Compass, CheckCircle2, ChevronRight,
   ExternalLink, Code2, Play, Award, Zap, RotateCcw,
   Layers, CheckSquare, Bookmark, HelpCircle, Shield,
-  AlertCircle, X, Copy, CheckCheck, RefreshCw, FileText
+  AlertCircle, X, Copy, CheckCheck, RefreshCw, FileText,
+  LayoutGrid, Video
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
@@ -13,6 +14,14 @@ import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import db from '../../services/db';
 import apiClient from '../../services/apiClient';
+
+// Fallback helper to extract YouTube ID from standard video URLs
+function extractYouTubeId(url) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
 
 // Fallback helper to resolve active domain from user profile or saved course
 function getActiveRoadmapDomain(targetRole, domain) {
@@ -625,6 +634,17 @@ export default function Roadmap() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap w-full lg:w-auto">
+            {/* All 12 Domains Hub Launcher */}
+            <button
+              type="button"
+              onClick={() => navigate('/domains')}
+              className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/25 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+              title="Explore all 12 real-time industry domains and video masterclasses"
+            >
+              <LayoutGrid size={15} />
+              <span>All 12 Domains</span>
+            </button>
+
             {/* Domain Selector Dropdown */}
             <div className="flex items-center gap-2 flex-1 sm:flex-initial">
               <span className="text-xs font-semibold text-muted hidden sm:inline">Track:</span>
@@ -1072,44 +1092,49 @@ export default function Roadmap() {
 
                 {currentResources.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {currentResources.slice(0, 4).map((res) => (
-                      <div 
-                        key={res.id}
-                        onClick={() => {
-                          if (res.url && res.url !== '#') {
-                            window.open(res.url, '_blank', 'noopener,noreferrer');
-                          } else {
-                            navigate(`/resource/${res.id}`, { state: { resource: res } });
-                          }
-                        }}
-                        className="p-4 rounded-2xl bg-input/50 hover:bg-input border border-border/70 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between gap-3 group shadow-xs"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between gap-2 mb-1.5">
-                            <span className="badge text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                              {res.type || 'Course'}
-                            </span>
-                            <span className="text-[11px] font-mono text-muted">
-                              {res.duration || '45m'}
+                    {currentResources.slice(0, 4).map((res) => {
+                      const ytId = extractYouTubeId(res.url);
+                      return (
+                        <div 
+                          key={res.id}
+                          onClick={() => {
+                            if (res.type === 'VIDEO') {
+                              navigate(`/classroom/${ytId || 'W6NZfCO5SIk'}`);
+                            } else if (res.url && res.url !== '#') {
+                              window.open(res.url, '_blank', 'noopener,noreferrer');
+                            } else {
+                              navigate(`/resource/${res.id}`, { state: { resource: res } });
+                            }
+                          }}
+                          className="p-4 rounded-2xl bg-input/50 hover:bg-input border border-border/70 hover:border-indigo-500/40 transition-all cursor-pointer flex flex-col justify-between gap-3 group shadow-xs"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <span className="badge text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                {res.type || 'Course'}
+                              </span>
+                              <span className="text-[11px] font-mono text-muted">
+                                {res.duration || '45m'}
+                              </span>
+                            </div>
+                            <h4 className="text-xs sm:text-sm font-bold text-main m-0 group-hover:text-indigo-300 transition-colors leading-snug line-clamp-2">
+                              {res.title}
+                            </h4>
+                            <p className="text-muted text-[11px] leading-relaxed m-0 mt-1 line-clamp-2">
+                              {res.description || 'Verified documentation and code examples from official development guides.'}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-border/50 text-[11px]">
+                            <span className="text-muted font-medium">{res.source || 'NEXORA Curriculum'}</span>
+                            <span className="text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                              <span>{res.type === 'VIDEO' ? 'Watch Class' : 'Open'}</span>
+                              {res.type === 'VIDEO' ? <Video size={12} /> : <ExternalLink size={11} />}
                             </span>
                           </div>
-                          <h4 className="text-xs sm:text-sm font-bold text-main m-0 group-hover:text-indigo-300 transition-colors leading-snug line-clamp-2">
-                            {res.title}
-                          </h4>
-                          <p className="text-muted text-[11px] leading-relaxed m-0 mt-1 line-clamp-2">
-                            {res.description || 'Verified documentation and code examples from official development guides.'}
-                          </p>
                         </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-border/50 text-[11px]">
-                          <span className="text-muted font-medium">{res.source || 'NEXORA Curriculum'}</span>
-                          <span className="text-indigo-400 font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                            <span>Open</span>
-                            <ExternalLink size={11} />
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="p-4 rounded-xl bg-input/30 border border-border/40 text-center">
@@ -1428,11 +1453,15 @@ export default function Roadmap() {
                         res.type === 'PROJECT' ? 'bg-amber-500/10 text-amber-400 border-amber-500/25' :
                         'bg-indigo-500/10 text-indigo-400 border-indigo-500/25';
 
+                      const ytId = extractYouTubeId(res.url);
+
                       return (
                         <div
                           key={res.id || rIdx}
                           onClick={() => {
-                            if (res.url && res.url !== '#') {
+                            if (res.type === 'VIDEO') {
+                              navigate(`/classroom/${ytId || 'W6NZfCO5SIk'}`);
+                            } else if (res.url && res.url !== '#') {
                               window.open(res.url, '_blank', 'noopener,noreferrer');
                             }
                           }}
@@ -1460,10 +1489,24 @@ export default function Roadmap() {
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-400 flex-shrink-0 group-hover:translate-x-0.5 transition-transform">
-                            <span>Open Resource</span>
-                            <ExternalLink size={13} />
-                          </div>
+                          {res.type === 'VIDEO' ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/classroom/${ytId || 'W6NZfCO5SIk'}`);
+                              }}
+                              className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition-all flex-shrink-0 cursor-pointer"
+                            >
+                              <Video size={13} />
+                              <span>Watch Masterclass</span>
+                            </button>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-400 flex-shrink-0 group-hover:translate-x-0.5 transition-transform">
+                              <span>Open Resource</span>
+                              <ExternalLink size={13} />
+                            </div>
+                          )}
                         </div>
                       );
                     })}

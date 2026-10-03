@@ -34,6 +34,7 @@ export interface ISeedRoadmap {
 }
 
 export const SEED_ROADMAPS: Record<string, ISeedRoadmap> = {
+  // ── 1. Mobile App Developer ────────────────────────────────────────────────
   mobile: {
     role: 'Mobile App Developer',
     domain: 'Mobile App Development',
@@ -49,12 +50,10 @@ export const SEED_ROADMAPS: Record<string, ISeedRoadmap> = {
           {
             milestoneId: 'mob_m1',
             title: 'React Native & Expo Architecture',
-            description:
-              'Master JSX components, StyleSheet primitives, Expo Router file-based stack navigation, and safe area handling across devices.',
+            description: 'Master JSX components, StyleSheet primitives, Expo Router file-based stack navigation, and safe area handling across devices.',
             estimatedHours: 25,
             skills: ['React Native', 'Expo', 'File-based Routing', 'TypeScript'],
-            summary:
-              'Modern cross-platform mobile engineering centers on declarative UI components coupled to native platform views via the React Native runtime. With Expo Router and the New Architecture (Fabric renderer and TurboModules), developers structure applications with file-based routing and synchronous C++ JSI bindings, eliminating bridge serializations and ensuring strict 60fps render pipelines across iOS and Android.',
+            summary: 'Modern cross-platform mobile engineering centers on declarative UI components coupled to native platform views via the React Native runtime. With Expo Router and the New Architecture (Fabric renderer and TurboModules), developers structure applications with file-based routing and synchronous C++ JSI bindings, eliminating bridge serializations and ensuring strict 60fps render pipelines across iOS and Android.',
             keyTopics: [
               'Fabric rendering pipeline and synchronous JSI C++ layout calculation via Yoga',
               'Expo Router file-system convention with dynamic route segments and modal stacks',
@@ -64,60 +63,11 @@ export const SEED_ROADMAPS: Record<string, ISeedRoadmap> = {
             codeSnippet: {
               title: 'Expo Router Stack Layout with Typed Screen Options',
               language: 'typescript',
-              code: `import { Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: isDark ? '#0f172a' : '#ffffff',
-        },
-        headerTintColor: isDark ? '#f8fafc' : '#0f172a',
-        headerTitleStyle: {
-          fontWeight: '700',
-          fontSize: 18,
-        },
-        headerShadowVisible: false,
-        animation: 'slide_from_right',
-      }}
-    >
-      <Stack.Screen
-        name="(tabs)"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="modal/details"
-        options={{
-          presentation: 'modal',
-          title: 'Milestone Execution',
-          headerBackTitle: 'Dismiss',
-        }}
-      />
-    </Stack>
-  );
-}`,
+              code: `import { Stack } from 'expo-router';\nimport { useColorScheme } from 'react-native';\n\nexport default function RootLayout() {\n  const colorScheme = useColorScheme();\n  const isDark = colorScheme === 'dark';\n\n  return (\n    <Stack\n      screenOptions={{\n        headerStyle: {\n          backgroundColor: isDark ? '#0f172a' : '#ffffff',\n        },\n        headerTintColor: isDark ? '#f8fafc' : '#0f172a',\n        headerTitleStyle: { fontWeight: '700', fontSize: 18 },\n        animation: 'slide_from_right',\n      }}\n    >\n      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />\n      <Stack.Screen name="modal/details" options={{ presentation: 'modal', title: 'Milestone Execution' }} />\n    </Stack>\n  );\n}`,
             },
             resources: [
-              {
-                title: 'Expo Router Official Documentation',
-                url: 'https://docs.expo.dev/router/introduction/',
-                type: 'DOCS',
-              },
-              {
-                title: 'React Native New Architecture: Fabric & TurboModules',
-                url: 'https://reactnative.dev/docs/the-new-architecture/landing-page',
-                type: 'ARTICLE',
-              },
-              {
-                title: 'Building Universal React Native Apps with Expo',
-                url: 'https://docs.expo.dev/guides/overview/',
-                type: 'DOCS',
-              },
+              { title: 'Expo Router Official Documentation', url: 'https://docs.expo.dev/router/introduction/', type: 'DOCS' },
+              { title: 'React Native New Architecture Guide', url: 'https://reactnative.dev/docs/the-new-architecture/landing-page', type: 'ARTICLE' },
             ],
             quiz: [
               {
@@ -127,1201 +77,134 @@ export default function RootLayout() {
               },
               {
                 question: 'In Expo Router, how do you define a modal presentation screen in stack navigation?',
-                options: [
-                  'Set presentation: "modal" in Stack.Screen options',
-                  'Wrap with HTML <dialog> tag',
-                  'Invoke navigator.openModal() imperative call',
-                  'Include modal="true" in index.html',
-                ],
+                options: ['Set presentation: "modal" in Stack.Screen options', 'Wrap with HTML <dialog> tag', 'Invoke navigator.openModal()', 'modal="true" attribute'],
                 correctIndex: 0,
               },
               {
-                question: 'Why should SafeAreaProvider from react-native-safe-area-context wrap the app root?',
-                options: [
-                  'To measure physical display cutouts, notches, and home indicator insets dynamically',
-                  'To prevent users from taking screenshots',
-                  'To enforce landscape-only orientation',
-                  'To compress native image assets',
-                ],
+                question: 'Why should SafeAreaProvider wrap the application root?',
+                options: ['To measure display cutouts, notches, and home indicator insets dynamically', 'To prevent screenshots', 'To enforce landscape orientation', 'To compress images'],
                 correctIndex: 0,
               },
             ],
-            taskPrompt:
-              'Scaffold an Expo Router application with a bottom tab navigator and a nested details modal screen. Apply dark/light theme tokens and protect header safe-area insets.',
+            taskPrompt: 'Scaffold an Expo Router application with a bottom tab navigator and a nested details modal screen. Apply dark/light theme tokens and protect header safe-area insets.',
           },
           {
             milestoneId: 'mob_m2',
             title: 'Navigation & Native Device State',
-            description:
-              'Implement deep linking, bottom tabs, drawer navigation, modal sheets, and global client state synchronization.',
+            description: 'Implement deep linking, bottom tabs, drawer navigation, modal sheets, and global client state synchronization.',
             estimatedHours: 20,
             skills: ['React Navigation', 'Deep Linking', 'Zustand', 'Context API'],
-            summary:
-              'Production mobile applications require seamless deep linking to handle universal links and push notification routes. Combining React Navigation with a lightweight reactive state store like Zustand guarantees predictable client state synchronization, immediate hydration from persistent storage, and decoupled business logic outside the UI render tree.',
+            summary: 'Production mobile applications require seamless deep linking to handle universal links and push notification routes. Combining React Navigation with a lightweight reactive state store like Zustand guarantees predictable client state synchronization, immediate hydration from persistent storage, and decoupled business logic outside the UI render tree.',
             keyTopics: [
               'Custom deep linking schemes (myapp://) and universal iOS/Android web links',
               'Atomic reactive state management with Zustand and AsyncStorage persistence middleware',
-              'Nested navigation hierarchies (Tabs within Stacks with independent navigation guards)',
               'Handling hardware back buttons on Android with BackHandler listeners',
             ],
             codeSnippet: {
               title: 'Zustand Persistent Mobile Store with Typed Selectors',
               language: 'typescript',
-              code: `import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface AuthState {
-  userToken: string | null;
-  activeTrackId: string;
-  setToken: (token: string | null) => void;
-  setActiveTrack: (trackId: string) => void;
-  logout: () => Promise<void>;
-}
-
-export const useMobileStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      userToken: null,
-      activeTrackId: 'mobile-eng',
-      setToken: (token) => set({ userToken: token }),
-      setActiveTrack: (trackId) => set({ activeTrackId: trackId }),
-      logout: async () => {
-        await AsyncStorage.removeItem('mobile_vault_token');
-        set({ userToken: null });
-      },
-    }),
-    {
-      name: 'nexora_mobile_vault',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);`,
+              code: `import { create } from 'zustand';\nimport { persist, createJSONStorage } from 'zustand/middleware';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\ninterface AuthState {\n  userToken: string | null;\n  setToken: (token: string | null) => void;\n}\n\nexport const useMobileStore = create<AuthState>()(\n  persist(\n    (set) => ({\n      userToken: null,\n      setToken: (token) => set({ userToken: token }),\n    }),\n    { name: 'nexora_vault', storage: createJSONStorage(() => AsyncStorage) }\n  )\n);`,
             },
             resources: [
-              {
-                title: 'React Navigation Deep Linking Architecture',
-                url: 'https://reactnavigation.org/docs/deep-linking/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Zustand State Management for React Native',
-                url: 'https://docs.pmnd.rs/zustand/getting-started/introduction',
-                type: 'DOCS',
-              },
-              {
-                title: 'Universal Linking on iOS & Android Deep Link Verification',
-                url: 'https://docs.expo.dev/guides/deep-linking/',
-                type: 'ARTICLE',
-              },
+              { title: 'React Navigation Deep Linking Architecture', url: 'https://reactnavigation.org/docs/deep-linking/', type: 'DOCS' },
+              { title: 'Zustand State Management for React Native', url: 'https://docs.pmnd.rs/zustand/getting-started/introduction', type: 'DOCS' },
             ],
             quiz: [
               {
                 question: 'Which component is required to handle deep links seamlessly across cold and warm app starts?',
-                options: [
-                  'A linking configuration with prefixes and path-to-screen mappings',
-                  'An HTTP proxy server running locally on the device',
-                  'A native C++ background daemon',
-                  'A dedicated Android Service in Java only',
-                ],
+                options: ['A linking configuration with prefixes and path-to-screen mappings', 'An HTTP proxy server running locally', 'A native C++ background daemon', 'An Android Service in Java only'],
                 correctIndex: 0,
               },
               {
                 question: 'What is the primary benefit of Zustand over React Context for frequently updated mobile state?',
-                options: [
-                  'Selective re-rendering via selector functions prevents unnecessary component re-renders',
-                  'Zustand runs in a web worker thread',
-                  'Zustand compiles to WebAssembly',
-                  'Context cannot store objects or arrays',
-                ],
+                options: ['Selective re-rendering via selector functions prevents unnecessary component re-renders', 'Zustand runs in a web worker thread', 'Zustand compiles to WebAssembly', 'Context cannot store objects'],
                 correctIndex: 0,
               },
               {
                 question: 'How does Android handle back navigation when hardware back button is pressed?',
-                options: [
-                  'It triggers hardware BackHandler event which can be intercepted and prevented',
-                  'It terminates the entire operating system',
-                  'It immediately clears the entire SQLite database',
-                  'It triggers a browser page refresh',
-                ],
+                options: ['It triggers hardware BackHandler event which can be intercepted and prevented', 'It terminates the OS', 'It clears SQLite', 'It refreshes the browser'],
                 correctIndex: 0,
               },
             ],
-            taskPrompt:
-              'Configure a custom linking config supporting paths like "nexora://roadmap/:milestoneId". Connect it to a persistent Zustand auth slice with AsyncStorage.',
-          },
-        ],
-      },
-      {
-        phaseId: 'mob_p2',
-        phaseTitle: 'Phase 2: Hardware Integrations, Biometrics & Security',
-        order: 2,
-        milestones: [
-          {
-            milestoneId: 'mob_m3',
-            title: 'Camera, GPS & Hardware Sensors',
-            description:
-              'Integrate device camera viewfinders, background GPS geolocation tracking, accelerometer telemetry, and runtime permission flows.',
-            estimatedHours: 30,
-            skills: ['Expo Camera', 'Expo Location', 'Sensors API', 'Permissions API'],
-            summary:
-              'Accessing native hardware requires strict compliance with platform permission models, privacy declarations (Info.plist / AndroidManifest.xml), and battery-conscious background location geofencing. Building resilient camera capture components with optical bar-code scanning or photo processing requires managing camera sessions and surface hardware lifecycle.',
-            keyTopics: [
-              'Runtime permission handling with rationales for iOS NSCameraUsageDescription and Android ACCESS_FINE_LOCATION',
-              'Expo Camera Next implementation with custom torch, exposure, and photo capture hooks',
-              'Background geofencing and task manager registration using TaskManager.defineTask',
-              'Battery throttling strategies when streaming sensor telemetry (accelerometer, gyroscope)',
-            ],
-            codeSnippet: {
-              title: 'Robust Hardware Permission & Camera Capture Component',
-              language: 'typescript',
-              code: `import React, { useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-
-export function HardwareScanner() {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [scannedCode, setScannedCode] = useState<string | null>(null);
-  const cameraRef = useRef<any>(null);
-
-  if (!permission) return <View style={styles.container} />;
-
-  if (!permission.granted) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.prompt}>NEXORA Lab requires camera access to scan engineering badges.</Text>
-        <TouchableOpacity style={styles.btn} onPress={requestPermission}>
-          <Text style={styles.btnText}>Grant Camera Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <CameraView
-        ref={cameraRef}
-        style={StyleSheet.absoluteFillObject}
-        facing="back"
-        onBarcodeScanned={(result) => setScannedCode(result.data)}
-      />
-      {scannedCode && (
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>Scanned: {scannedCode}</Text>
-        </View>
-      )}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  prompt: { color: '#f8fafc', textAlign: 'center', marginBottom: 16 },
-  btn: { backgroundColor: '#4f46e5', paddingHorizontal: 20, paddingVertical: 12, rounded: 12 },
-  btnText: { color: '#fff', fontWeight: 'bold' },
-  banner: { position: 'absolute', bottom: 40, left: 20, right: 20, padding: 16, backgroundColor: 'rgba(15,23,42,0.9)', borderRadius: 12 },
-  bannerText: { color: '#38bdf8', textAlign: 'center', fontWeight: '600' },
-});`,
-            },
-            resources: [
-              {
-                title: 'Expo Camera Documentation & Best Practices',
-                url: 'https://docs.expo.dev/versions/latest/sdk/camera/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Expo Location: Geofencing & Battery-Conscious Tracking',
-                url: 'https://docs.expo.dev/versions/latest/sdk/location/',
-                type: 'DOCS',
-              },
-              {
-                title: 'OWASP Mobile Security: Hardware Sensor Permissions',
-                url: 'https://mas.owasp.org/MASTG/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What is required on iOS before calling any Camera or Location native APIs?',
-                options: [
-                  'Declaring user-facing usage descriptions in Info.plist and requesting runtime permissions',
-                  'Registering an Apple Developer Enterprise certificate',
-                  'Restarting the physical iPhone hardware',
-                  'Converting JSX files to Objective-C headers',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which API allows executing background location coordinates even when the app is suspended?',
-                options: [
-                  'Expo Location background tracking with TaskManager.defineTask',
-                  'Standard window.setInterval() in JavaScript',
-                  'CSS keyframe animations',
-                  'Redux dispatch inside setTimeout()',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'How should sensor sampling frequency (e.g. Accelerometer) be configured to preserve battery?',
-                options: [
-                  'Set update interval to sensor-appropriate thresholds (e.g., 200-500ms) and unsubscribe on unmount',
-                  'Poll at 10,000 Hz continuously in an infinite while loop',
-                  'Never unsubscribe when screen is turned off',
-                  'Store each coordinate in global window object without bounds',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Construct a hardware telemetry module that checks location permissions, streams GPS coordinates to a reactive map view, and captures photo milestones with battery telemetry checks.',
-          },
-          {
-            milestoneId: 'mob_m4',
-            title: 'Biometrics & Keychain Storage',
-            description:
-              'Secure user sessions with FaceID / TouchID biometric challenges, iOS Keychain, and Android Keystore hardware-backed encryption.',
-            estimatedHours: 20,
-            skills: ['LocalAuthentication', 'Expo SecureStore', 'Hardware Keystore', 'Biometrics'],
-            summary:
-              'Enterprise-grade mobile security demands that sensitive tokens, cryptographic keys, and refresh secrets reside strictly within hardware-isolated vaults (iOS Secure Enclave / Android Trusted Execution Environment Keystore). Standard AsyncStorage stores plaintext on the device flash storage; replacing it with SecureStore guarded by biometric authentication shields users from memory dumping and physical attacks.',
-            keyTopics: [
-              'Hardware Secure Enclave vs. plaintext AsyncStorage security vulnerabilities',
-              'Expo LocalAuthentication: Biometric capability auditing (hasHardwareAsync, isEnrolledAsync)',
-              'Hardware-backed AES-256 encrypted storage using expo-secure-store',
-              'Graceful biometric fallback to device passcode authentication',
-            ],
-            codeSnippet: {
-              title: 'Biometric Authenticator with Hardware Keychain Encryption',
-              language: 'typescript',
-              code: `import * as LocalAuthentication from 'expo-local-authentication';
-import * as SecureStore from 'expo-secure-store';
-
-export async function unlockDeviceVault(): Promise<string | null> {
-  // 1. Audit hardware capabilities
-  const hasHardware = await LocalAuthentication.hasHardwareAsync();
-  const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-  if (!hasHardware || !isEnrolled) {
-    throw new Error('Biometric hardware unavailable or no biometrics enrolled.');
-  }
-
-  // 2. Prompt biometric challenge
-  const authResult = await LocalAuthentication.authenticateAsync({
-    promptMessage: 'Unlock NEXORA Developer Credentials',
-    fallbackLabel: 'Enter Passcode',
-    disableDeviceFallback: false,
-    cancelLabel: 'Cancel',
-  });
-
-  if (!authResult.success) {
-    return null;
-  }
-
-  // 3. Decrypt token from hardware-backed Keychain / Keystore
-  const sessionToken = await SecureStore.getItemAsync('nexora_jwt_vault', {
-    keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-  });
-
-  return sessionToken;
-}`,
-            },
-            resources: [
-              {
-                title: 'Expo LocalAuthentication API Documentation',
-                url: 'https://docs.expo.dev/versions/latest/sdk/local-authentication/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Expo SecureStore: Hardware-Backed Keychain & Keystore',
-                url: 'https://docs.expo.dev/versions/latest/sdk/securestore/',
-                type: 'DOCS',
-              },
-              {
-                title: 'OWASP Mobile Security Testing Guide: Cryptography & Key Storage',
-                url: 'https://mas.owasp.org/MASTG/tests/android/MASVS-CRYPTO/MASTG-TEST-0017/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'Why should user authentication tokens NEVER be placed in standard AsyncStorage?',
-                options: [
-                  'AsyncStorage is unencrypted plaintext on flash storage, making it accessible on rooted/jailbroken devices',
-                  'AsyncStorage can only hold numbers under 100',
-                  'AsyncStorage is cleared every 5 minutes automatically',
-                  'AsyncStorage does not support string serialization',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which iOS hardware component stores and validates FaceID/TouchID biometric data?',
-                options: ['Secure Enclave', 'GPU Compute Unit', 'NAND Flash Controller', 'Baseband Modem'],
-                correctIndex: 0,
-              },
-              {
-                question: 'What accessibility flag in SecureStore prevents tokens from being backed up to iCloud or transferred to another device?',
-                options: [
-                  'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
-                  'ALWAYS_PUBLIC',
-                  'ICLOUD_GLOBAL_SHARE',
-                  'NO_SECURITY_OVERRIDE',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Implement a biometric lock screen component that challenges the user via FaceID/TouchID before decrypting and hydrating sensitive JWT session tokens from Expo SecureStore.',
-          },
-        ],
-      },
-      {
-        phaseId: 'mob_p3',
-        phaseTitle: 'Phase 3: Offline-First Architecture & Data Persistence',
-        order: 3,
-        milestones: [
-          {
-            milestoneId: 'mob_m5',
-            title: 'SQLite, WatermelonDB & Local Persistence',
-            description:
-              'Design local embedded database schemas with SQLite, schema migrations, batch indexing, and high-performance querying.',
-            estimatedHours: 35,
-            skills: ['Expo SQLite', 'WatermelonDB', 'Local Schemas', 'Indexing'],
-            summary:
-              'World-class mobile apps maintain immediate sub-10ms response times by operating on local SQLite database replicas rather than waiting on network waterfalls. Expo SQLite with typed WAL (Write-Ahead Logging) mode and PRAGMA indexing allows apps to store tens of thousands of records locally and execute complex joins with zero UI stutter.',
-            keyTopics: [
-              'Embedded SQLite database lifecycle with expo-sqlite/next modern async API',
-              'Write-Ahead Logging (WAL) configuration and foreign key constraint enforcement',
-              'Database schema migrations with version tracking tables',
-              'Batch indexing strategies for ultra-fast full-text and ID lookups',
-            ],
-            codeSnippet: {
-              title: 'Expo SQLite Next Typed Migration & Query Runner',
-              language: 'typescript',
-              code: `import * as SQLite from 'expo-sqlite';
-
-export async function initializeDatabase() {
-  const db = await SQLite.openDatabaseAsync('nexora_local.db');
-
-  // Configure high-performance WAL mode & foreign keys
-  await db.execAsync(\`
-    PRAGMA journal_mode = WAL;
-    PRAGMA foreign_keys = ON;
-    
-    CREATE TABLE IF NOT EXISTS milestones (
-      id TEXT PRIMARY KEY NOT NULL,
-      title TEXT NOT NULL,
-      status TEXT NOT NULL CHECK(status IN ('LOCKED','AVAILABLE','IN_PROGRESS','COMPLETED')),
-      updated_at INTEGER NOT NULL
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_milestones_status ON milestones (status);
-  \`);
-
-  return db;
-}
-
-export async function upsertMilestone(db: SQLite.SQLiteDatabase, id: string, title: string, status: string) {
-  const statement = await db.prepareAsync(\`
-    INSERT INTO milestones (id, title, status, updated_at)
-    VALUES ($id, $title, $status, $updatedAt)
-    ON CONFLICT(id) DO UPDATE SET
-      status = excluded.status,
-      updated_at = excluded.updated_at;
-  \`);
-
-  try {
-    await statement.executeAsync({
-      $id: id,
-      $title: title,
-      $status: status,
-      $updatedAt: Date.now(),
-    });
-  } finally {
-    await statement.finalizeAsync();
-  }
-}`,
-            },
-            resources: [
-              {
-                title: 'Expo SQLite Next Modern API Guide',
-                url: 'https://docs.expo.dev/versions/latest/sdk/sqlite/',
-                type: 'DOCS',
-              },
-              {
-                title: 'High-Performance Local DB with WatermelonDB & SQLite',
-                url: 'https://watermelondb.dev/docs',
-                type: 'DOCS',
-              },
-              {
-                title: 'Designing Offline-First Mobile Architectures',
-                url: 'https://martinfowler.com/articles/patterns-of-distributed-systems/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What is the primary advantage of SQLite Write-Ahead Logging (WAL) mode in mobile apps?',
-                options: [
-                  'Readers do not block writers and writers do not block readers, drastically improving concurrent performance',
-                  'It stores database rows in HTML tables',
-                  'It automatically backs up data to Facebook servers',
-                  'It compiles SQL statements directly into Swift',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Why are prepared statements (db.prepareAsync) recommended for frequent database writes?',
-                options: [
-                  'They compile and optimize the SQL query plan once and prevent SQL injection vulnerabilities',
-                  'They prevent JavaScript garbage collection',
-                  'They compress images to WebP',
-                  'They enforce HTTPS certificates',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'How do index tables (CREATE INDEX) optimize queries on status columns?',
-                options: [
-                  'By establishing a B-Tree structure allowing O(log N) lookups instead of expensive full table scans',
-                  'By deleting uncompleted tasks automatically',
-                  'By converting text to uppercase',
-                  'By generating CSS stylesheets',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Create an Expo SQLite database migration service that sets up a local milestones table, creates B-Tree indexes, and performs batch upserts with transaction safety.',
-          },
-          {
-            milestoneId: 'mob_m6',
-            title: 'Background Synchronization & Conflict Resolution',
-            description:
-              'Orchestrate background mutations, offline write-ahead queues, optimistic UI reconciliation, and CRDT / timestamp conflict resolution.',
-            estimatedHours: 30,
-            skills: ['Offline Sync', 'TanStack Query', 'NetInfo', 'CRDTs'],
-            summary:
-              'An offline-first application writes mutations immediately to an idempotent local write-ahead queue, updates the UI optimistically, and listens to network connectivity changes via NetInfo. Once connectivity resumes, background workers drain the queue and reconcile conflicts using Last-Write-Wins (LWW) or Conflict-Free Replicated Data Types (CRDTs).',
-            keyTopics: [
-              'Idempotent mutation queue design with exponential backoff retries',
-              'Network connectivity monitoring with @react-native-community/netinfo',
-              'TanStack Query mutation caching and offline persist-client plugins',
-              'Conflict resolution strategies (Last-Write-Wins timestamps vs. 3-way vector clock merges)',
-            ],
-            codeSnippet: {
-              title: 'Resilient Offline Mutation Sync Worker',
-              language: 'typescript',
-              code: `import NetInfo from '@react-native-community/netinfo';
-
-interface QueuedMutation {
-  id: string;
-  endpoint: string;
-  payload: Record<string, any>;
-  timestamp: number;
-}
-
-export class OfflineSyncQueue {
-  private queue: QueuedMutation[] = [];
-  private isProcessing = false;
-
-  constructor() {
-    NetInfo.addEventListener(state => {
-      if (state.isConnected && state.isInternetReachable) {
-        this.drainQueue();
-      }
-    });
-  }
-
-  public enqueue(endpoint: string, payload: Record<string, any>) {
-    const item: QueuedMutation = {
-      id: Math.random().toString(36).substring(2, 9),
-      endpoint,
-      payload,
-      timestamp: Date.now(),
-    };
-    this.queue.push(item);
-  }
-
-  public async drainQueue() {
-    if (this.isProcessing || this.queue.length === 0) return;
-    this.isProcessing = true;
-
-    while (this.queue.length > 0) {
-      const item = this.queue[0];
-      try {
-        await fetch(item.endpoint, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...item.payload, clientTimestamp: item.timestamp }),
-        });
-        this.queue.shift(); // Successfully flushed
-      } catch (err) {
-        console.warn('Network sync interrupted, backing off:', err);
-        break; // Retry when network fires again
-      }
-    }
-    this.isProcessing = false;
-  }
-}`,
-            },
-            resources: [
-              {
-                title: 'TanStack Query Offline Persistence & Cache Resumption',
-                url: 'https://tanstack.com/query/latest/docs/framework/react/guides/offline-mutations',
-                type: 'DOCS',
-              },
-              {
-                title: 'Offline-First Web & Mobile Synchronization Strategies',
-                url: 'https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Offline',
-                type: 'ARTICLE',
-              },
-              {
-                title: 'Conflict-Free Replicated Data Types (CRDT) Primer',
-                url: 'https://crdt.tech/',
-                type: 'DOCS',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What is the primary role of an idempotent mutation queue in offline mobile apps?',
-                options: [
-                  'To buffer local actions during network dropouts and execute them in order without duplicate effects upon reconnect',
-                  'To bypass user authentication checks',
-                  'To prevent users from navigating between screens',
-                  'To format dates to UTC',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which network property from NetInfo confirms actual HTTP communication rather than merely WiFi connection?',
-                options: ['isInternetReachable', 'isConnected', 'type', 'isWifiEnabled'],
-                correctIndex: 0,
-              },
-              {
-                question: 'In Last-Write-Wins (LWW) conflict resolution, how is a conflicting record updated?',
-                options: [
-                  'The mutation with the higher monotonic or server-verified timestamp takes precedence',
-                  'The user is prompted to delete their account',
-                  'Both records are permanently deleted',
-                  'The shortest string value is selected',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Build an offline mutation queue that wraps the PATCH milestone endpoint, caches failed network attempts locally, and automatically flushes them when NetInfo detects connectivity.',
-          },
-        ],
-      },
-      {
-        phaseId: 'mob_p4',
-        phaseTitle: 'Phase 4: High-Performance Animations & Native Bridges',
-        order: 4,
-        milestones: [
-          {
-            milestoneId: 'mob_m7',
-            title: 'React Native Reanimated 3 & Gesture Handler',
-            description:
-              'Architect 120Hz physics-based fluid UI interactions using Reanimated 3 worklets, shared values, and pan gesture interpolations.',
-            estimatedHours: 35,
-            skills: ['Reanimated 3', 'Gesture Handler', 'UI Worklets', 'Micro-interactions'],
-            summary:
-              'Achieving buttery smooth 60fps and 120Hz ProMotion gesture interactions requires running animation frames directly on the native UI thread, bypassing JavaScript bridge communication completely. React Native Reanimated 3 uses JavaScript Worklets—small functions compiled to C++ runtimes—to evaluate spring dynamics and swipe interpolations with zero dropped frames.',
-            keyTopics: [
-              'Architecture of Reanimated worklets and the secondary UI JavaScript thread',
-              'useSharedValue, useAnimatedStyle, and withSpring physics damping configs',
-              'Gesture.Pan() chaining with onChange and onEnd velocity decels',
-              'Shared element transitions between list view and milestone execution drawers',
-            ],
-            codeSnippet: {
-              title: 'Fluid 120Hz Slide-Over Drawer with Reanimated 3 & Gestures',
-              language: 'typescript',
-              code: `import React from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
-
-export function SlideOverDrawer({ isOpen, onClose, children }: any) {
-  const translateX = useSharedValue(DRAWER_WIDTH);
-
-  React.useEffect(() => {
-    translateX.value = withSpring(isOpen ? 0 : DRAWER_WIDTH, {
-      damping: 20,
-      stiffness: 150,
-      mass: 0.8,
-    });
-  }, [isOpen]);
-
-  const panGesture = Gesture.Pan()
-    .onChange((event) => {
-      'worklet';
-      if (event.translationX > 0) {
-        translateX.value = event.translationX;
-      }
-    })
-    .onEnd((event) => {
-      'worklet';
-      if (event.translationX > DRAWER_WIDTH * 0.3 || event.velocityX > 500) {
-        translateX.value = withSpring(DRAWER_WIDTH, { velocity: event.velocityX });
-        runOnJS(onClose)();
-      } else {
-        translateX.value = withSpring(0);
-      }
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  return (
-    <GestureDetector gesture={panGesture}>
-      <Animated.View style={[styles.drawer, animatedStyle]}>
-        {children}
-      </Animated.View>
-    </GestureDetector>
-  );
-}
-
-const styles = StyleSheet.create({
-  drawer: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: DRAWER_WIDTH,
-    backgroundColor: '#0f172a',
-    borderLeftWidth: 1,
-    borderColor: 'rgba(99,102,241,0.2)',
-    shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 25,
-  },
-});`,
-            },
-            resources: [
-              {
-                title: 'React Native Reanimated 3 Official Docs',
-                url: 'https://docs.swmansion.com/react-native-reanimated/',
-                type: 'DOCS',
-              },
-              {
-                title: 'React Native Gesture Handler v2 Gesture API',
-                url: 'https://docs.swmansion.com/react-native-gesture-handler/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Building 60FPS Fluid Gestures in Mobile Apps',
-                url: 'https://blog.swmansion.com/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What is a Reanimated "worklet"?',
-                options: [
-                  'A JavaScript function flagged with "worklet" directive compiled to run synchronously on the native UI runtime',
-                  'A web worker running on Node.js',
-                  'A CSS stylesheet animation',
-                  'A background audio player',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Why does animating standard React state cause dropped frames during complex swipes?',
-                options: [
-                  'State updates must cross the asynchronous bridge and wait for React reconcile cycle before native views update',
-                  'Smartphones only support 10 frames per second',
-                  'JSX cannot render on mobile screens',
-                  'State is stored on cloud servers',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which Reanimated function calls back to the JavaScript thread from an onEnd worklet handler?',
-                options: ['runOnJS()', 'postMessage()', 'eval()', 'requestAnimationFrame()'],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Implement an interactive slide-over drawer using Reanimated 3 and Gesture Handler that tracks finger position, supports fling-to-dismiss, and uses spring physics.',
-          },
-          {
-            milestoneId: 'mob_m8',
-            title: 'Native Modules (TurboModules & JSI)',
-            description:
-              'Author direct C++ / Swift / Kotlin native modules binding directly to the JavaScript runtime without bridge serialization.',
-            estimatedHours: 35,
-            skills: ['TurboModules', 'JSI', 'Swift', 'Kotlin', 'C++'],
-            summary:
-              'When high-throughput computation—such as image manipulation, audio DSP, or high-security cryptography—exceeds JavaScript speeds, mobile engineers build TurboModules. TurboModules compile against typed Codegen specs and hook directly into the JavaScript Interface (JSI), enabling JavaScript to hold direct C++ memory pointers to native host objects.',
-            keyTopics: [
-              'JSI (JavaScript Interface) architectural paradigms vs. legacy JSON bridge serialization',
-              'TurboModule Codegen specifications using TypeScript or Flow interfaces',
-              'Writing Swift and Objective-C++ implementations on iOS',
-              'Writing Kotlin and modern Android NDK bindings on Android',
-            ],
-            codeSnippet: {
-              title: 'Typed TurboModule TypeScript Specification',
-              language: 'typescript',
-              code: `import type { TurboModule } from 'react-native';
-import { TurboModuleRegistry } from 'react-native';
-
-export interface Spec extends TurboModule {
-  // Synchronous JSI direct call returning native high-precision hardware timestamp
-  getHighPrecisionTime(): number;
-
-  // Cryptographic hardware hash generation
-  sha256Digest(content: string): Promise<string>;
-
-  // Native device thermal status (nominal, fair, serious, critical)
-  getThermalState(): Promise<string>;
-}
-
-export default TurboModuleRegistry.getEnforcing<Spec>('NexoraHardwareEngine');`,
-            },
-            resources: [
-              {
-                title: 'Creating a New Architecture TurboModule',
-                url: 'https://reactnative.dev/docs/the-new-architecture/pillars-turbomodules',
-                type: 'DOCS',
-              },
-              {
-                title: 'React Native Codegen Specification Guide',
-                url: 'https://reactnative.dev/docs/the-new-architecture/what-is-codegen',
-                type: 'DOCS',
-              },
-              {
-                title: 'Understanding JSI and Direct C++ Binding Performance',
-                url: 'https://formidable.com/blog/2019/jsi-cheatsheet/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What makes JSI (JavaScript Interface) calls orders of magnitude faster than the legacy bridge?',
-                options: [
-                  'JavaScript holds direct memory references to C++ HostObjects without stringifying JSON payloads across threads',
-                  'It compiles everything into assembly language on the server',
-                  'It runs only when connected to fast fiber internet',
-                  'It skips type checking completely',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'What is the role of Codegen in TurboModules?',
-                options: [
-                  'Generates typed C++ and Java/Objective-C boilerplate from TypeScript interface specs to enforce compile-time type safety',
-                  'Generates app store marketing screenshots',
-                  'Minifies CSS stylesheet files',
-                  'Encrypts SQLite databases',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which method retrieves an enforced TurboModule instance in React Native?',
-                options: [
-                  'TurboModuleRegistry.getEnforcing<Spec>("ModuleName")',
-                  'document.getElementById("module")',
-                  'window.requireNative("ModuleName")',
-                  'process.env.NATIVE_MODULE',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Write a typed TurboModule specification for an encryption module. Outline the corresponding Swift and Kotlin class headers implementing the JSI methods.',
-          },
-        ],
-      },
-      {
-        phaseId: 'mob_p5',
-        phaseTitle: 'Phase 5: Automated Testing, CI/CD & App Store Release',
-        order: 5,
-        milestones: [
-          {
-            milestoneId: 'mob_m9',
-            title: 'End-to-End Testing with Maestro & Jest',
-            description:
-              'Implement automated end-to-end mobile user flow tests using Maestro UI automation, unit tests, and CI test matrices.',
-            estimatedHours: 25,
-            skills: ['Maestro UI', 'Jest', 'React Native Testing Library', 'E2E Testing'],
-            summary:
-              'Modern mobile teams maintain 99.9% crash-free sessions by gating releases with automated end-to-end user flows. Maestro has emerged as the industry standard for mobile UI testing—driving native iOS and Android apps with declarative YAML flows that handle animations, biometric simulations, and device permissions with zero flaky sleep timeouts.',
-            keyTopics: [
-              'Declarative UI testing with Maestro YAML flows across iOS Simulators and Android Emulators',
-              'React Native Testing Library unit and component integration test standards',
-              'Simulating deep links, network drops, and orientation changes in automated test runs',
-              'Crashlytics telemetry and automated crash symbolication (dSYM / ProGuard mapping upload)',
-            ],
-            codeSnippet: {
-              title: 'Maestro E2E Automated Verification Flow for Milestone Drawer',
-              language: 'yaml',
-              code: `appId: com.nexora.app
----
-- launchApp
-- assertVisible: "DAG Learning Sequence"
-
-# Tap on first active milestone card
-- tapOn: "React Native & Expo Architecture"
-- assertVisible: "Milestone Execution Drawer"
-- assertVisible: "Concept & Snippets"
-
-# Verify tabs and code snippet copy
-- tapOn: "Curated Resources"
-- assertVisible: "Expo Router Official Documentation"
-
-# Complete Mini Assessment
-- tapOn: "Mini Assessment"
-- assertVisible: "Knowledge Check"
-- tapOn: "Fabric & TurboModules (JSI)"
-- tapOn: "Submit Assessment"
-
-# Validate status update and progress increment
-- assertVisible: "Milestone Cleared"`,
-            },
-            resources: [
-              {
-                title: 'Maestro Mobile UI Testing Guide',
-                url: 'https://maestro.mobile.dev/',
-                type: 'DOCS',
-              },
-              {
-                title: 'React Native Testing Library Best Practices',
-                url: 'https://callstack.github.io/react-native-testing-library/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Achieving 99.9% Crash-Free User Sessions in Mobile',
-                url: 'https://firebase.google.com/products/crashlytics',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'Why is Maestro preferred over legacy Appium for mobile E2E automation?',
-                options: [
-                  'Maestro uses built-in smart waits for animations and network requests, eliminating flaky hardcoded sleep delays',
-                  'Maestro only runs in the Google Chrome browser',
-                  'Maestro requires rooting physical smartphones',
-                  'Maestro does not support iOS devices',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'What are dSYM files on iOS and ProGuard mappings on Android essential for in production?',
-                options: [
-                  'De-obfuscating and symbolicating crash stack traces into readable code files and line numbers',
-                  'Decreasing the download size of the application',
-                  'Translating strings into Spanish and German',
-                  'Generating SVG vector graphics',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'What is the recommended testing library for React Native component integration tests?',
-                options: [
-                  'React Native Testing Library (@testing-library/react-native)',
-                  'Puppeteer',
-                  'Selenium Web Driver',
-                  'Mocha PhantomJS',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Write a Maestro automation test file that launches the NEXORA mobile app, selects a milestone, inspects the drawer tabs, and validates the +50 XP telemetry grant.',
-          },
-          {
-            milestoneId: 'mob_m10',
-            title: 'EAS Build, Fastlane & App Store Distribution',
-            description:
-              'Configure cloud native build profiles, OTA updates, automated certificate provisioning, and Play Store / TestFlight pipelines.',
-            estimatedHours: 30,
-            skills: ['EAS Build', 'Fastlane', 'App Store Connect', 'Google Play Console', 'EAS Update'],
-            summary:
-              'Distributing production mobile software requires automated CI/CD pipelines that manage cryptographic signing identities (Apple Distribution Certificates, Provisioning Profiles, and Android Upload Keystores). With Expo Application Services (EAS) Build and Fastlane, engineers automate internal staging tracks, production releases, and Over-The-Air (OTA) runtime JavaScript patches.',
-            keyTopics: [
-              'EAS Build multi-environment configuration (eas.json for development, staging, production)',
-              'Automated cryptographic signing with Match / Fastlane and Expo credentials manager',
-              'OTA (Over-The-Air) update rollout strategies and channel management with EAS Update',
-              'Apple App Store Review Guidelines and Google Play Data Safety declaration protocols',
-            ],
-            codeSnippet: {
-              title: 'Production eas.json Build and Update Pipeline Configuration',
-              language: 'json',
-              code: `{
-  "cli": {
-    "version": ">= 10.0.0"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "ios": { "simulator": true }
-    },
-    "preview": {
-      "distribution": "internal",
-      "channel": "preview",
-      "android": { "buildType": "apk" }
-    },
-    "production": {
-      "channel": "production",
-      "autoIncrement": true,
-      "android": {
-        "buildType": "app-bundle"
-      },
-      "ios": {
-        "enterpriseProvisioning": false
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./google-services-key.json",
-        "track": "internal"
-      },
-      "ios": {
-        "appleId": "eng@nexora.io",
-        "ascAppId": "1672390192"
-      }
-    }
-  }
-}`,
-            },
-            resources: [
-              {
-                title: 'EAS Build Configuration Guide (eas.json)',
-                url: 'https://docs.expo.dev/build/eas-json/',
-                type: 'DOCS',
-              },
-              {
-                title: 'EAS Update: Over-The-Air (OTA) Deployment Protocol',
-                url: 'https://docs.expo.dev/eas-update/introduction/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Fastlane: Continuous Deployment for iOS and Android',
-                url: 'https://fastlane.tools/',
-                type: 'ARTICLE',
-              },
-            ],
-            quiz: [
-              {
-                question: 'What can be updated instantly using EAS Update without submitting a new binary build to App Store review?',
-                options: [
-                  'JavaScript code, React components, and bundled asset files',
-                  'New native C++ libraries and Android permissions in AndroidManifest.xml',
-                  'Objective-C AppDelegate header files',
-                  'Operating system iOS kernel version',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Why should Android production builds use the Android App Bundle (.aab) format instead of universal .apk?',
-                options: [
-                  'Google Play generates optimized device-specific APKs tailored to each user CPU architecture and screen density',
-                  'App bundles bypass Google Play store fees',
-                  'APKs cannot exceed 5 megabytes',
-                  'AAB files do not require signing certificates',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Which tool securely syncs Apple Developer signing certificates across engineering teams using an encrypted Git repo?',
-                options: ['Fastlane Match', 'Git LFS', 'npm install', 'Docker Desktop'],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt:
-              'Configure an eas.json file with internal preview and production channels. Outline the GitHub Actions workflow that triggers an automated EAS build on tag release.',
+            taskPrompt: 'Configure a custom linking config supporting paths like "nexora://roadmap/:milestoneId". Connect it to a persistent Zustand auth slice with AsyncStorage.',
           },
         ],
       },
     ],
   },
 
+  // ── 2. Full-Stack Web Development ──────────────────────────────────────────
   fullstack: {
     role: 'Full Stack Developer',
     domain: 'Web Development',
-    matchKeys: ['fullstack', 'full-stack', 'web', 'mern', 'react', 'node', 'frontend', 'backend'],
-    description:
-      'Master end-to-end full-stack engineering from modern Next.js/React architectures to distributed microservices, database tuning, and cloud deployments.',
+    matchKeys: ['fullstack', 'full-stack', 'web', 'mern', 'react', 'node', 'frontend', 'backend', 'next.js', 'nextjs'],
+    description: 'Master end-to-end full-stack engineering from modern Next.js/React architectures to distributed microservices, database tuning, and cloud deployments.',
     phases: [
       {
         phaseId: 'fs_p1',
-        phaseTitle: 'Phase 1: Advanced Frontend & System Architecture',
+        phaseTitle: 'Phase 1: Modern React 19, Server Components & Design Systems',
         order: 1,
         milestones: [
           {
             milestoneId: 'fs_m1',
-            title: 'Modern React Architecture & Component Patterns',
-            description:
-              'Master React 19 server components, concurrent mode, custom hooks, state machines, and compound component patterns.',
+            title: 'Modern React 19 Architecture & Server Components',
+            description: 'Master React 19 server components, concurrent mode, custom hooks, state machines, and compound component patterns.',
             estimatedHours: 25,
             skills: ['React 19', 'Server Components', 'Custom Hooks', 'Compound Components'],
-            summary:
-              'Modern enterprise frontends require deep comprehension of React 19 Server Components (RSC), Suspense streaming, and compound component architecture. RSC executes data fetching on the server, shipping zero client-side JavaScript for static subtree renders while maintaining seamless hydration for interactive components.',
+            summary: 'Modern enterprise frontends require deep comprehension of React 19 Server Components (RSC), Suspense streaming, and compound component architecture. RSC executes data fetching on the server, shipping zero client-side JavaScript for static subtree renders while maintaining seamless hydration for interactive components.',
             keyTopics: [
-              'React Server Components vs. Client Hydration boundaries ("use client")',
+              'React Server Components vs Client Hydration boundaries ("use client")',
               'Compound component architecture with React.Children and Context delegation',
               'Concurrent mode, useTransition, and non-blocking state updates',
-              'Custom hook composition and deterministic cleanup protocols',
             ],
             codeSnippet: {
               title: 'Compound Component with Typed Context and Accessibility',
               language: 'typescript',
-              code: `import React, { createContext, useContext, useState } from 'react';
-
-interface TabsContextType {
-  activeTab: string;
-  setActiveTab: (id: string) => void;
-}
-
-const TabsContext = createContext<TabsContextType | null>(null);
-
-export function Tabs({ defaultTab, children }: { defaultTab: string; children: React.ReactNode }) {
-  const [activeTab, setActiveTab] = useState(defaultTab);
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className="flex flex-col gap-4 w-full">{children}</div>
-    </TabsContext.Provider>
-  );
-}
-
-export function TabTrigger({ id, children }: { id: string; children: React.ReactNode }) {
-  const ctx = useContext(TabsContext);
-  if (!ctx) throw new Error('TabTrigger must be used inside Tabs');
-  const isActive = ctx.activeTab === id;
-
-  return (
-    <button
-      role="tab"
-      aria-selected={isActive}
-      onClick={() => ctx.setActiveTab(id)}
-      className={\`px-4 py-2 text-sm font-semibold rounded-lg transition-all \${
-        isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
-      }\`}
-    >
-      {children}
-    </button>
-  );
-}`,
+              code: `import React, { createContext, useContext, useState } from 'react';\n\ninterface TabsContextType {\n  activeTab: string;\n  setActiveTab: (id: string) => void;\n}\nconst TabsContext = createContext<TabsContextType | null>(null);\n\nexport function Tabs({ defaultTab, children }: { defaultTab: string; children: React.ReactNode }) {\n  const [activeTab, setActiveTab] = useState(defaultTab);\n  return <TabsContext.Provider value={{ activeTab, setActiveTab }}>{children}</TabsContext.Provider>;\n}`,
             },
             resources: [
-              {
-                title: 'React 19 Official Documentation & Architecture',
-                url: 'https://react.dev/blog/2024/04/25/react-19',
-                type: 'DOCS',
-              },
-              {
-                title: 'Mastering Compound Components in React',
-                url: 'https://kentcdodds.com/blog/compound-components-with-react-hooks',
-                type: 'ARTICLE',
-              },
-              {
-                title: 'Deep Dive: React Server Components Mental Model',
-                url: 'https://github.com/reactjs/rfcs/blob/main/text/0188-server-components.md',
-                type: 'DOCS',
-              },
+              { title: 'React 19 Official Documentation & Architecture', url: 'https://react.dev/blog/2024/04/25/react-19', type: 'DOCS' },
+              { title: 'Mastering Compound Components in React', url: 'https://kentcdodds.com/blog/compound-components-with-react-hooks', type: 'ARTICLE' },
             ],
             quiz: [
               {
                 question: 'What is the main bundle-size advantage of React Server Components (RSC)?',
-                options: [
-                  'Server Component dependencies never get bundled into client-side JavaScript, reducing browser download size to zero for those components',
-                  'They compress HTML files into ZIP archives',
-                  'They replace CSS with SVG images',
-                  'They force clients to download WebAssembly runtimes',
-                ],
+                options: ['Server Component dependencies never get bundled into client-side JavaScript', 'They compress HTML into ZIP archives', 'They replace CSS with SVG images', 'They force clients to download WebAssembly'],
                 correctIndex: 0,
               },
               {
-                question: 'Which hook marks state transitions as non-blocking to prevent UI freezes during heavy re-renders?',
+                question: 'Which hook marks state transitions as non-blocking to prevent UI freezes?',
                 options: ['useTransition()', 'useEffect()', 'useLayoutEffect()', 'useRef()'],
                 correctIndex: 0,
               },
               {
                 question: 'What pattern allows subcomponents like Tabs.Trigger and Tabs.Content to share state implicitly?',
-                options: [
-                  'Compound Component pattern backed by React Context',
-                  'Global window variables',
-                  'Writing to localStorage on every keypress',
-                  'Calling eval() on props',
-                ],
+                options: ['Compound Component pattern backed by React Context', 'Global window variables', 'Writing to localStorage on every keypress', 'Calling eval() on props'],
                 correctIndex: 0,
               },
             ],
-            taskPrompt:
-              'Build a reusable Tabs compound component supporting accessible keyboard navigation (arrow keys), active indicator pill animation, and lazy mounting.',
+            taskPrompt: 'Build a reusable Tabs compound component supporting accessible keyboard navigation (arrow keys), active indicator pill animation, and lazy mounting.',
           },
           {
             milestoneId: 'fs_m2',
-            title: 'Design Systems & Responsive Layouts',
-            description:
-              'Architect production-grade CSS design systems using Tailwind CSS, CSS Variables, glassmorphism, and responsive breakpoints.',
+            title: 'Design Systems & Glassmorphic CSS Architecture',
+            description: 'Architect production-grade CSS design systems using Tailwind CSS, CSS Variables, glassmorphism, and responsive breakpoints.',
             estimatedHours: 20,
             skills: ['Tailwind CSS', 'CSS Architecture', 'Responsive Design', 'Accessibility'],
-            summary:
-              'Scalable design systems rely on semantic token abstractions (colors, typography, spacing, elevations) defined as CSS variables that adapt dynamically across dark/light themes. Pairing utility-first CSS with strict WCAG 2.1 AA accessibility guidelines produces visually breathtaking interfaces that remain accessible to all users.',
+            summary: 'Scalable design systems rely on semantic token abstractions (colors, typography, spacing, elevations) defined as CSS variables that adapt dynamically across dark/light themes. Pairing utility-first CSS with strict WCAG 2.1 AA accessibility guidelines produces visually breathtaking interfaces that remain accessible to all users.',
             keyTopics: [
-              'Semantic CSS design tokens, HSL color ramps, and dynamic CSS custom properties',
-              'Tailwind responsive utility layering (sm, md, lg, xl, 2xl) and container queries',
+              'Semantic CSS design tokens and dynamic CSS custom properties',
+              'Tailwind responsive utility layering and container queries',
               'Glassmorphism techniques using backdrop-filter: blur() with subtle alpha borders',
-              'WCAG 2.1 AA color contrast compliance and screen reader aria semantics',
             ],
             codeSnippet: {
               title: 'Ultra-Modern Glassmorphic Card Token System',
               language: 'css',
-              code: `:root {
-  --bg-primary: #090d16;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --border-glass: rgba(99, 102, 241, 0.18);
-  --glow-accent: rgba(99, 102, 241, 0.25);
-  --text-primary: #f8fafc;
-  --text-muted: #94a3b8;
-}
-
-.glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.glass-panel:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 12px 40px 0 var(--glow-accent);
-}`,
+              code: `:root {\n  --bg-card: rgba(15, 23, 42, 0.75);\n  --border-glass: rgba(99, 102, 241, 0.18);\n}\n.glass-panel {\n  background: var(--bg-card);\n  backdrop-filter: blur(16px);\n  border: 1px solid var(--border-glass);\n  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);\n}`,
             },
             resources: [
-              {
-                title: 'Tailwind CSS Official Design System Guide',
-                url: 'https://tailwindcss.com/docs',
-                type: 'DOCS',
-              },
-              {
-                title: 'W3C Web Content Accessibility Guidelines (WCAG) 2.1',
-                url: 'https://www.w3.org/TR/WCAG21/',
-                type: 'DOCS',
-              },
-              {
-                title: 'Modern CSS Fluid Typography & Container Queries',
-                url: 'https://web.dev/learn/design/',
-                type: 'ARTICLE',
-              },
+              { title: 'Tailwind CSS Official Design System Guide', url: 'https://tailwindcss.com/docs', type: 'DOCS' },
+              { title: 'W3C Web Content Accessibility Guidelines (WCAG) 2.1', url: 'https://www.w3.org/TR/WCAG21/', type: 'DOCS' },
             ],
             quiz: [
               {
@@ -1336,17 +219,621 @@ export function TabTrigger({ id, children }: { id: string; children: React.React
               },
               {
                 question: 'Why are CSS custom properties (--variable) preferred over SASS variables for theming?',
-                options: [
-                  'CSS custom properties resolve at runtime and can be overridden dynamically by theme classes without recompiling',
-                  'CSS variables can only store numbers',
-                  'SASS variables are faster in Chrome',
-                  'CSS variables run in Node.js',
-                ],
+                options: ['CSS custom properties resolve at runtime and can be overridden dynamically by theme classes', 'CSS variables can only store numbers', 'SASS variables are faster in Chrome', 'CSS variables run in Node.js'],
                 correctIndex: 0,
               },
             ],
-            taskPrompt:
-              'Create a dark/light responsive layout with a glassmorphic sidebar and data cards utilizing semantic CSS variables and responsive grid auto-fit columns.',
+            taskPrompt: 'Create a dark/light responsive layout with a glassmorphic sidebar and data cards utilizing semantic CSS variables and responsive grid auto-fit columns.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 3. AI & Deep Learning ──────────────────────────────────────────────────
+  ai: {
+    role: 'AI / Machine Learning Engineer',
+    domain: 'Artificial Intelligence',
+    matchKeys: ['ai', 'machine learning', 'ml', 'deep learning', 'nlp', 'llm', 'computer vision', 'pytorch'],
+    description: 'Train, fine-tune, and deploy state-of-the-art machine learning models, neural networks, transformers, and scalable RAG pipelines for production inference.',
+    phases: [
+      {
+        phaseId: 'ai_p1',
+        phaseTitle: 'Phase 1: Mathematical Foundations & Neural Backpropagation',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'ai_m1',
+            title: 'PyTorch Deep Neural Networks & Autograd',
+            description: 'Build multilayer perceptrons (MLP), backprop autograd engines, and GPU training loops in PyTorch.',
+            estimatedHours: 35,
+            skills: ['PyTorch', 'Autograd', 'CUDA Training', 'Backpropagation'],
+            summary: 'Deep neural networks learn representations through compositions of linear transformations and non-linear activations. Implementing automatic differentiation with PyTorch autograd computational graphs provides foundational understanding of gradient descent and weight updates.',
+            keyTopics: [
+              'Computational graphs, forward passes, and backward automatic differentiation',
+              'Stochastic gradient descent with momentum and AdamW optimization',
+              'Loss landscapes, weight initialization, and batch normalization',
+            ],
+            codeSnippet: {
+              title: 'PyTorch Training Loop with Gradient Clipping',
+              language: 'typescript',
+              code: `import torch\nimport torch.nn as nn\n\nclass MLP(nn.Module):\n    def __init__(self, in_features, out_features):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(in_features, 128),\n            nn.ReLU(),\n            nn.Linear(128, out_features)\n        )\n    def forward(self, x):\n        return self.net(x)`,
+            },
+            resources: [
+              { title: 'PyTorch Deep Learning Tutorials', url: 'https://pytorch.org/tutorials/', type: 'DOCS' },
+              { title: 'Karpathy Neural Networks: Zero to Hero', url: 'https://karpathy.ai/zero-to-hero.html', type: 'VIDEO' },
+            ],
+            quiz: [
+              {
+                question: 'Why is zero_grad() called before backward() in PyTorch training loops?',
+                options: ['PyTorch accumulates gradients by default on backward calls', 'To reset neural network weights', 'To clear GPU VRAM', 'To stop training'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which activation function avoids the vanishing gradient problem in deep hidden layers?',
+                options: ['ReLU / GELU', 'Sigmoid', 'Step Function', 'Linear'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the purpose of gradient clipping?',
+                options: ['To prevent exploding gradients from destabilizing training', 'To make models run on CPU', 'To reduce dataset size', 'To prune weights to zero'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Implement a PyTorch training pipeline on a synthetic classification dataset with learning rate warm-up and validation evaluation.',
+          },
+          {
+            milestoneId: 'ai_m2',
+            title: 'Transformers, Attention & Hugging Face',
+            description: 'Master scaled dot-product attention, multi-head attention mechanisms, BERT/GPT architectures, and Hugging Face fine-tuning.',
+            estimatedHours: 35,
+            skills: ['Transformers', 'Attention Mechanism', 'Hugging Face', 'LoRA Fine-tuning'],
+            summary: 'Transformers replace recurrent networks with self-attention mechanisms, allowing parallel computation across long sequences. Understanding query-key-value vector interactions is the cornerstone of modern LLMs.',
+            keyTopics: [
+              'Scaled dot-product attention: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k))V',
+              'Positional encodings (sinusoidal, RoPE) for sequence token ordering',
+              'Parameter-efficient fine-tuning with Low-Rank Adaptation (LoRA)',
+            ],
+            codeSnippet: {
+              title: 'Multi-Head Attention PyTorch Block',
+              language: 'typescript',
+              code: `import torch.nn.functional as F\n\ndef scaled_dot_product_attention(q, k, v, mask=None):\n    d_k = q.size(-1)\n    scores = torch.matmul(q, k.transpose(-2, -1)) / (d_k ** 0.5)\n    if mask is not None:\n        scores = scores.masked_fill(mask == 0, -1e9)\n    return torch.matmul(F.softmax(scores, dim=-1), v)`,
+            },
+            resources: [
+              { title: 'Attention Is All You Need Paper', url: 'https://arxiv.org/abs/1706.03762', type: 'DOCS' },
+              { title: 'Hugging Face Transformers Documentation', url: 'https://huggingface.co/docs/transformers', type: 'DOCS' },
+            ],
+            quiz: [
+              {
+                question: 'Why do we scale QK^T by sqrt(d_k) before taking softmax in attention?',
+                options: ['To prevent dot products from growing large in magnitude and pushing softmax into regions with tiny gradients', 'To convert matrices into integers', 'To sort tokens alphabetically', 'To reduce token length'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the role of causal masking in GPT decoder self-attention?',
+                options: ['Prevents tokens from attending to subsequent tokens in the sequence', 'Hides toxic words', 'Compresses embeddings', 'Enforces bilingual translation'],
+                correctIndex: 0,
+              },
+              {
+                question: 'How does LoRA fine-tuning reduce GPU memory requirements?',
+                options: ['Freezes pre-trained weights and injects trainable rank decomposition matrices into layers', 'Quantizes text into ASCII', 'Removes all attention heads', 'Runs inference on mobile CPU'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Fine-tune a Hugging Face transformer model using PEFT/LoRA for sentiment classification with WandB telemetry logging.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 4. Data Science & ML Engineering ───────────────────────────────────────
+  data: {
+    role: 'Data Scientist & Machine Learning Engineer',
+    domain: 'Data Science & Analytics',
+    matchKeys: ['data', 'data science', 'analytics', 'pandas', 'scikit', 'xgboost', 'eda'],
+    description: 'Master mathematical modeling, statistical analysis, deep neural networks, and production ML pipelines.',
+    phases: [
+      {
+        phaseId: 'data_p1',
+        phaseTitle: 'Phase 1: Scientific Computing & Classical ML',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'ds_m1',
+            title: 'NumPy Vectorization & Pandas Data Pipelines',
+            description: 'Master vectorized computations with NumPy, manipulation with Pandas, and data wrangling.',
+            estimatedHours: 25,
+            skills: ['NumPy', 'Pandas', 'Vectorization', 'Data Cleaning'],
+            summary: 'Data Science foundations rely on high-performance C-backed array representations in NumPy and tabular indexing in Pandas. Vectorized column operations execute orders of magnitude faster than iterative Python loops.',
+            keyTopics: [
+              'Broadcasting rules and memory strides in NumPy multidimensional arrays',
+              'Handling missing values, categorical encoding, and date parsing in Pandas',
+              'Aggregations and grouped transformations using groupby and apply',
+            ],
+            codeSnippet: {
+              title: 'Vectorized Outlier Detection & Z-Score Imputation',
+              language: 'typescript',
+              code: `import numpy as np\nimport pandas as pd\n\ndef clean_features(df: pd.DataFrame, column: str) -> pd.DataFrame:\n    mean = df[column].mean()\n    std = df[column].std()\n    z_scores = np.abs((df[column] - mean) / std)\n    return df[z_scores < 3.0]`,
+            },
+            resources: [
+              { title: 'Python Data Science Handbook', url: 'https://jakevdp.github.io/PythonDataScienceHandbook/', type: 'DOCS' },
+              { title: 'Pandas Performance Guide', url: 'https://pandas.pydata.org/docs/user_guide/enhancingperf.html', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'Why is vectorization in NumPy faster than standard Python for-loops?',
+                options: ['Computations are executed in pre-compiled C loops without Python interpreter overhead', 'NumPy compiles code into HTML', 'Python loops only run on single cores', 'NumPy runs on external servers'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is broadcasting in NumPy?',
+                options: ['Rules allowing NumPy to perform arithmetic operations on arrays of different shapes', 'Streaming data via WebSockets', 'Sending audio to Bluetooth', 'Printing data to console'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which method efficiently calculates aggregates across grouped categories in Pandas?',
+                options: ['df.groupby("category").agg(...)', 'Iterating rows with a while loop', 'Converting DataFrame to a JSON string', 'Calling eval() on CSV data'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Build an automated data cleaning script that reads CSV files with malformed data, imputes missing values, and calculates statistical distributions.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 5. Cloud & DevOps Engineering ──────────────────────────────────────────
+  devops: {
+    role: 'Cloud & DevOps Engineer',
+    domain: 'Cloud Infrastructure & DevOps',
+    matchKeys: ['devops', 'cloud', 'aws', 'docker', 'kubernetes', 'k8s', 'terraform', 'ci/cd'],
+    description: 'Automate zero-downtime infrastructure with Docker, Kubernetes, Terraform Infrastructure as Code (IaC), AWS, and continuous deployment.',
+    phases: [
+      {
+        phaseId: 'dev_p1',
+        phaseTitle: 'Phase 1: Containerization, Kubernetes & GitOps',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'dev_m1',
+            title: 'Multi-Stage Docker & Kubernetes Orchestration',
+            description: 'Containerize microservices with multi-stage Docker builds and deploy self-healing Kubernetes clusters.',
+            estimatedHours: 30,
+            skills: ['Docker', 'Kubernetes', 'K8s Ingress', 'Helm', 'Container Security'],
+            summary: 'Containerization packages application runtimes into immutable, isolated OCI images. Orchestration with Kubernetes coordinates scheduling, automated rollouts, service discovery, and cluster health monitoring.',
+            keyTopics: [
+              'Multi-stage Dockerfiles optimizing image size and eliminating build tool vulnerabilities',
+              'Kubernetes primitives: Pods, Deployments, ReplicaSets, Services, and Ingress',
+              'Resource limits (requests and limits) preventing CPU and memory starvation',
+            ],
+            codeSnippet: {
+              title: 'Production Multi-Stage Dockerfile with Security Hardening',
+              language: 'dockerfile',
+              code: `FROM node:20-alpine AS builder\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nFROM node:20-alpine AS runner\nWORKDIR /app\nUSER node\nCOPY --from=builder /app/dist ./dist\nEXPOSE 3000\nCMD ["node", "dist/server.js"]`,
+            },
+            resources: [
+              { title: 'Docker Official Documentation', url: 'https://docs.docker.com/', type: 'DOCS' },
+              { title: 'Kubernetes Official Guides', url: 'https://kubernetes.io/docs/', type: 'DOCS' },
+            ],
+            quiz: [
+              {
+                question: 'Why should production containers NOT run as the root user?',
+                options: ['To mitigate privilege escalation attacks if a container is compromised', 'Root containers use 10x more RAM', 'Kubernetes disallows root containers entirely', 'Docker cannot compile as root'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the role of a Kubernetes Service of type ClusterIP?',
+                options: ['Provides an internal stable IP and DNS entry for load balancing traffic across matching pods', 'Exposes the pod directly to the public internet', 'Saves logs to disk', 'Backs up database tables'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the benefit of multi-stage Docker builds?',
+                options: ['Produces minimal final images containing only runtime artifacts, reducing attack surface and download size', 'Allows running multiple OS versions concurrently in one container', 'Eliminates the need for package.json', 'Bypasses image registries'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Write a multi-stage Dockerfile for an Express API and create Kubernetes Deployment and Service YAML manifests with liveness/readiness probes.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 6. Cybersecurity & Ethical Hacking ──────────────────────────────────────
+  security: {
+    role: 'Cybersecurity Analyst & Ethical Hacker',
+    domain: 'Cybersecurity',
+    matchKeys: ['security', 'cybersecurity', 'hacking', 'penetration testing', 'infosec', 'pentest', 'soc'],
+    description: 'Defend systems from modern threats through ethical hacking, vulnerability assessments, OWASP testing, cryptography, and SIEM monitoring.',
+    phases: [
+      {
+        phaseId: 'sec_p1',
+        phaseTitle: 'Phase 1: Web Application Security & OWASP Top 10',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'sec_m1',
+            title: 'OWASP Top 10 Vulnerabilities & API Hardening',
+            description: 'Audit and exploit web vulnerabilities including SQL Injection, XSS, CSRF, SSRF, and Broken Access Control.',
+            estimatedHours: 30,
+            skills: ['OWASP Top 10', 'Burp Suite', 'SQL Injection', 'XSS', 'API Security'],
+            summary: 'Application security engineers discover and patch vulnerabilities before malicious actors exploit them. Understanding offensive exploitation techniques allows defenders to build resilient security architectures.',
+            keyTopics: [
+              'SQL Injection mechanics and parameterized query remediation',
+              'Cross-Site Scripting (Reflected, Stored, DOM-based) and Content Security Policy (CSP)',
+              'Server-Side Request Forgery (SSRF) and metadata service protections',
+            ],
+            codeSnippet: {
+              title: 'Strict Security Headers & Content Security Policy Middleware',
+              language: 'typescript',
+              code: `import helmet from 'helmet';\n\nexport const securityMiddleware = helmet({\n  contentSecurityPolicy: {\n    directives: {\n      defaultSrc: ["'self'"],\n      scriptSrc: ["'self'"],\n      objectSrc: ["'none'"],\n    },\n  },\n  hsts: { maxAge: 31536000, includeSubDomains: true },\n});`,
+            },
+            resources: [
+              { title: 'OWASP Top 10 Documentation', url: 'https://owasp.org/Top10/', type: 'DOCS' },
+              { title: 'PortSwigger Web Security Academy', url: 'https://portswigger.net/web-security', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'What is the most effective defense against SQL Injection vulnerabilities?',
+                options: ['Using parameterized queries / prepared statements instead of string concatenation', 'Filtering apostrophes with regex', 'Encrypting the SQL table names', 'Hiding the database behind port 8080'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which HTTP response header restricts the origins from which scripts and assets can be loaded?',
+                options: ['Content-Security-Policy', 'X-Powered-By', 'Access-Control-Allow-Origin', 'Set-Cookie'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is Broken Object Level Authorization (BOLA / IDOR)?',
+                options: ['When an API endpoint accesses records by ID without verifying if the requesting user owns that record', 'A broken Wi-Fi router password', 'An unminified JavaScript bundle', 'A hardware CPU defect'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Set up an intentional vulnerable endpoint in a sandbox, exploit an IDOR vulnerability, and write the patch verifying authorization ownership.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 7. Blockchain & Web3 ───────────────────────────────────────────────────
+  blockchain: {
+    role: 'Blockchain & Smart Contract Engineer',
+    domain: 'Blockchain & Web3',
+    matchKeys: ['blockchain', 'web3', 'solidity', 'ethereum', 'smart contract', 'crypto', 'defi'],
+    description: 'Architect decentralized applications (DApps), smart contracts with Solidity, token standards, and DeFi protocols.',
+    phases: [
+      {
+        phaseId: 'bc_p1',
+        phaseTitle: 'Phase 1: Solidity & EVM Architecture',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'bc_m1',
+            title: 'Solidity Smart Contracts & Gas Optimization',
+            description: 'Write, compile, and audit Solidity contracts adhering to ERC-20 and ERC-721 token standards with gas optimization.',
+            estimatedHours: 35,
+            skills: ['Solidity', 'Hardhat', 'EVM', 'Gas Optimization', 'Foundry'],
+            summary: 'Smart contracts execute immutably on the Ethereum Virtual Machine (EVM). Because execution requires gas fees paid in ETH, developers write contracts that minimize storage writes and guard against reentrancy attacks.',
+            keyTopics: [
+              'EVM storage layout (32-byte storage slots, packing variables, memory vs storage)',
+              'Reentrancy attacks and the Checks-Effects-Interactions pattern',
+              'ERC-20 token standard implementation and event emitting',
+            ],
+            codeSnippet: {
+              title: 'Reentrancy-Protected Solidity Vault Contract',
+              language: 'typescript',
+              code: `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract SecureVault {\n  mapping(address => uint256) public balances;\n  bool private locked;\n\n  modifier nonReentrant() {\n    require(!locked, "ReentrancyGuard");\n    locked = true; _;\n    locked = false;\n  }\n  function deposit() external payable { balances[msg.sender] += msg.value; }\n}`,
+            },
+            resources: [
+              { title: 'Solidity Official Documentation', url: 'https://docs.soliditylang.org/', type: 'DOCS' },
+              { title: 'OpenZeppelin Smart Contract Library', url: 'https://docs.openzeppelin.com/', type: 'DOCS' },
+            ],
+            quiz: [
+              {
+                question: 'What pattern prevents reentrancy attacks in smart contracts?',
+                options: ['Checks-Effects-Interactions pattern and nonReentrant mutex modifiers', 'Using while loops', 'Calling transfer() inside a constructor', 'Writing comments on every line'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Why is writing to contract storage (SSTORE) the most expensive operation in EVM?',
+                options: ['Storage is persisted permanently across all global validator nodes in the blockchain state trie', 'Storage is kept in RAM', 'EVM compiles to Java', 'Miners charge per character'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which tool suite provides fast Rust-based testing and fuzzing for Solidity contracts?',
+                options: ['Foundry (forge)', 'WordPress', 'Webpack', 'Postman'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Write a Solidity ERC-20 staking contract with variable packing for gas efficiency and unit tests in Foundry.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 8. Game Development ────────────────────────────────────────────────────
+  game: {
+    role: 'Game Developer & Graphics Engineer',
+    domain: 'Game Development',
+    matchKeys: ['game', 'game dev', 'unity', 'unreal', 'c#', 'c++', 'shaders', '3d'],
+    description: 'Design immersive 2D and 3D games with Unity and Unreal Engine, physics simulation, HLSL shader programming, and multiplayer netcode.',
+    phases: [
+      {
+        phaseId: 'game_p1',
+        phaseTitle: 'Phase 1: 3D Engine Architecture & Gameplay Loop',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'game_m1',
+            title: 'Game Loop, Vector Math & Physics Simulation',
+            description: 'Master fixed time-step loops, linear algebra transformations, quaternions, and rigid body physics.',
+            estimatedHours: 30,
+            skills: ['Game Loop', 'Vector Math', 'Quaternions', 'Rigid Body Physics', 'C#'],
+            summary: 'Video games operate on real-time simulation loops running at 60 to 144 frames per second. Understanding vector transformations, dot products, cross products, and quaternion rotations is fundamental for 3D game engines.',
+            keyTopics: [
+              'Frame-rate independent delta time (Time.deltaTime) updates',
+              'Quaternions avoiding gimbal lock in 3D rotations',
+              'Collision detection (AABB, raycasting, SAT) and impulse resolution',
+            ],
+            codeSnippet: {
+              title: 'Frame-Rate Independent Physics Controller in C#',
+              language: 'csharp',
+              code: `using UnityEngine;\n\npublic class PlayerController : MonoBehaviour {\n    public float speed = 10f;\n    private Rigidbody rb;\n    void Start() { rb = GetComponent<Rigidbody>(); }\n    void FixedUpdate() {\n        float h = Input.GetAxisRaw("Horizontal");\n        float v = Input.GetAxisRaw("Vertical");\n        Vector3 movement = new Vector3(h, 0f, v).normalized * speed;\n        rb.MovePosition(rb.position + movement * Time.fixedDeltaTime);\n    }\n}`,
+            },
+            resources: [
+              { title: 'Unity Engine Documentation', url: 'https://docs.unity3d.com/Manual/', type: 'DOCS' },
+              { title: '3D Math Primer for Graphics and Game Development', url: 'https://gamemath.com/', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'Why should physics calculations happen in FixedUpdate() rather than Update() in game engines?',
+                options: ['FixedUpdate runs at a deterministic, constant tick rate required for stable physics simulation', 'Update is only for audio', 'FixedUpdate runs on the GPU', 'Update has no access to variables'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What problem do Quaternions solve in 3D rotation math?',
+                options: ['Gimbal lock and non-linear interpolation artifacts seen in Euler angles', 'Slow internet ping', 'Pixel distortion', 'Sound latency'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the purpose of multiplying movement speed by Time.deltaTime in the game loop?',
+                options: ['To ensure movement is frame-rate independent regardless of whether the game runs at 30 or 144 FPS', 'To speed up rendering', 'To decrease physics gravity', 'To save player score'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Build a 3D character controller with raycast ground detection, smooth camera tracking, and collision bounds in Unity.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 9. Embedded Systems & IoT ───────────────────────────────────────────────
+  embedded: {
+    role: 'Embedded Systems & IoT Engineer',
+    domain: 'Embedded Systems & Hardware',
+    matchKeys: ['embedded', 'iot', 'hardware', 'c', 'c++', 'esp32', 'arduino', 'freertos', 'microcontroller'],
+    description: 'Program low-level microcontrollers, real-time operating systems (FreeRTOS), hardware registers, and wireless IoT sensor protocols.',
+    phases: [
+      {
+        phaseId: 'emb_p1',
+        phaseTitle: 'Phase 1: Bare-Metal Microcontroller Architecture',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'emb_m1',
+            title: 'Bare-Metal C, Memory-Mapped Registers & GPIOs',
+            description: 'Write hardware drivers manipulating memory-mapped peripheral registers, timers, and interrupt service routines.',
+            estimatedHours: 30,
+            skills: ['Embedded C', 'Memory-Mapped I/O', 'GPIOs', 'Timers', 'Interrupts (ISRs)'],
+            summary: 'Embedded systems interface directly with physical silicon hardware. By reading and writing to specific 32-bit peripheral registers mapped into the CPU memory address space, firmware engineers configure clocks, GPIO pins, and communication buses with sub-microsecond precision.',
+            keyTopics: [
+              'Memory-mapped register manipulation using volatile pointers and bitwise masks',
+              'Interrupt Service Routines (ISRs) and atomic operations',
+              'Serial communication protocols: UART, I2C, and SPI timing diagrams',
+            ],
+            codeSnippet: {
+              title: 'Bare-Metal Register GPIO Toggle in C',
+              language: 'c',
+              code: `#include <stdint.h>\n#define GPIOA_BASE   0x40020000UL\n#define GPIOA_ODR    (*(volatile uint32_t *)(GPIOA_BASE + 0x14))\n\nvoid toggle_led(void) {\n    GPIOA_ODR ^= (1UL << 5); // Toggle Pin 5\n}`,
+            },
+            resources: [
+              { title: 'ARM Architecture Reference Manual', url: 'https://developer.arm.com/', type: 'DOCS' },
+              { title: 'ESP-IDF Programming Guide', url: 'https://docs.espressif.com/projects/esp-idf/en/latest/', type: 'DOCS' },
+            ],
+            quiz: [
+              {
+                question: 'Why is the "volatile" keyword essential when defining pointers to hardware registers in C?',
+                options: ['Tells the compiler not to optimize away reads/writes because the register value can change asynchronously outside program control', 'Encrypts the pointer', 'Makes the variable available in global scope', 'Forces the CPU into sleep mode'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which serial protocol uses two bidirectional open-drain lines (SDA and SCL) with pull-up resistors?',
+                options: ['I2C', 'SPI', 'UART', 'Ethernet'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is a critical rule for writing Interrupt Service Routines (ISRs)?',
+                options: ['Keep them short and fast; never perform blocking delays or dynamic memory allocations', 'Always print to stdout', 'Reboot the device at the end', 'Declare all variables as strings'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Write a C firmware module that initializes a hardware timer to generate an interrupt every 500ms and toggles an LED state.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 10. UI/UX & Product Design ─────────────────────────────────────────────
+  design: {
+    role: 'UI/UX & Product Designer',
+    domain: 'Product & Design Systems',
+    matchKeys: ['design', 'ui', 'ux', 'product design', 'figma', 'wireframe', 'prototyping'],
+    description: 'Design intuitive, accessible user experiences using modern design systems, Figma component architectures, and usability heuristics.',
+    phases: [
+      {
+        phaseId: 'des_p1',
+        phaseTitle: 'Phase 1: Design Systems, Tokens & Accessibility',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'des_m1',
+            title: 'Figma Auto-Layout & Design System Tokens',
+            description: 'Architect atomic design systems with nested Figma components, responsive auto-layout, variables, and WCAG contrast checks.',
+            estimatedHours: 25,
+            skills: ['Figma', 'Design Systems', 'Auto-Layout', 'Design Tokens', 'WCAG AA'],
+            summary: 'Modern product design bridges the gap between creative visual expression and rigorous engineering constraints. Crafting reusable Figma components backed by design tokens enables rapid prototyping and seamless developer handoff.',
+            keyTopics: [
+              'Atomic design methodology: Atoms, Molecules, Organisms, Templates, and Pages',
+              'Figma Auto-Layout (flexbox mental model) for responsive component resizing',
+              'WCAG 2.1 AA accessibility standards for color contrast and visual hierarchy',
+            ],
+            codeSnippet: {
+              title: 'Design Token System Schema in JSON',
+              language: 'json',
+              code: `{\n  "color": {\n    "brand": { "primary": { "value": "#4f46e5" }, "accent": { "value": "#38bdf8" } },\n    "surface": { "canvas": { "value": "#0f172a" }, "card": { "value": "rgba(30, 41, 59, 0.8)" } }\n  }\n}`,
+            },
+            resources: [
+              { title: 'Figma Best Practices Guide', url: 'https://help.figma.com/', type: 'DOCS' },
+              { title: 'Nielsen Norman Group Usability Heuristics', url: 'https://www.nngroup.com/articles/ten-usability-heuristics/', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'What is the primary benefit of Figma Auto-Layout?',
+                options: ['Allows designs to resize and respond adaptively to different screen sizes and content lengths', 'Exports designs directly to the App Store', 'Converts images to audio', 'Automatically writes TypeScript code'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the minimum WCAG 2.1 AA contrast ratio required for large text (18pt+ or 14pt bold)?',
+                options: ['3:1', '1:1', '7:1', '4.5:1'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the purpose of design tokens?',
+                options: ['Platform-agnostic single source of truth for design decisions like colors and spacing', 'Cryptocurrency tokens for purchasing themes', 'Figma user passwords', 'CSS animation tags'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Design a complete responsive design system in Figma including typography scale, dark mode tokens, and accessible button variants.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 11. QA & Test Automation ───────────────────────────────────────────────
+  qa: {
+    role: 'QA Automation Engineer (SDET)',
+    domain: 'Quality Assurance & Automation',
+    matchKeys: ['qa', 'test', 'automation', 'sdet', 'playwright', 'cypress', 'selenium', 'testing'],
+    description: 'Ensure software reliability through automated end-to-end testing with Playwright, performance benchmarking, API validation, and CI testing.',
+    phases: [
+      {
+        phaseId: 'qa_p1',
+        phaseTitle: 'Phase 1: Modern E2E Browser Automation with Playwright',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'qa_m1',
+            title: 'Playwright E2E Testing & Page Object Model',
+            description: 'Build robust end-to-end test automation suites using Playwright, TypeScript, and the Page Object Model (POM) pattern.',
+            estimatedHours: 25,
+            skills: ['Playwright', 'TypeScript', 'Page Object Model', 'API Mocking', 'CI Automation'],
+            summary: 'Software Development Engineers in Test (SDETs) write automation frameworks that simulate real user interactions across browsers. Playwright provides built-in auto-waiting, network request interception, and multi-browser execution.',
+            keyTopics: [
+              'Auto-waiting mechanisms eliminating arbitrary sleep timeouts in tests',
+              'Page Object Model (POM) separating test specifications from UI locator implementation',
+              'Mocking network responses and inspecting network payloads',
+            ],
+            codeSnippet: {
+              title: 'Playwright Page Object Model in TypeScript',
+              language: 'typescript',
+              code: `import { Page, Locator } from '@playwright/test';\n\nexport class RoadmapPage {\n  readonly page: Page;\n  readonly drawer: Locator;\n  constructor(page: Page) {\n    this.page = page;\n    this.drawer = page.locator('[data-testid="learning-drawer"]');\n  }\n  async openMilestone(title: string) {\n    await this.page.getByText(title).click();\n  }\n}`,
+            },
+            resources: [
+              { title: 'Playwright Official Documentation', url: 'https://playwright.dev/docs/intro', type: 'DOCS' },
+              { title: 'Page Object Model Best Practices', url: 'https://playwright.dev/docs/pom', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'Why does Playwright have fewer flaky tests than legacy Selenium frameworks?',
+                options: ['Playwright automatically waits for elements to be actionable (visible, stable, enabled) before performing clicks', 'Playwright only tests one page at a time', 'Selenium is written in PHP', 'Playwright disables JavaScript'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the primary architectural benefit of the Page Object Model (POM)?',
+                options: ['Centralizes UI selectors so layout changes only need updating in one place rather than across dozens of tests', 'Compiles tests to C++', 'Runs tests on physical mobile towers', 'Removes the need for assertions'],
+                correctIndex: 0,
+              },
+              {
+                question: 'How do you intercept and mock API responses in Playwright?',
+                options: ['Using page.route() to fulfill requests with mock JSON data', 'Editing the user hosts file', 'Stopping the database server', 'Modifying CSS stylesheets'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Write a Playwright test suite using the Page Object Model that verifies student login, opens the roadmap, and validates drawer tab navigation.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 12. Data Analytics & Business Intelligence ─────────────────────────────
+  analytics: {
+    role: 'Data Analyst & Business Intelligence Specialist',
+    domain: 'Business Intelligence & Data Analytics',
+    matchKeys: ['analytics', 'bi', 'business intelligence', 'sql', 'power bi', 'tableau', 'dbt'],
+    description: 'Transform complex business data into strategic decisions using advanced SQL window functions, dimensional modeling, Power BI, and dbt.',
+    phases: [
+      {
+        phaseId: 'ana_p1',
+        phaseTitle: 'Phase 1: Advanced Analytical SQL & Data Warehousing',
+        order: 1,
+        milestones: [
+          {
+            milestoneId: 'ana_m1',
+            title: 'Advanced Analytical SQL: Window Functions & CTEs',
+            description: 'Master analytical SQL queries with Common Table Expressions (CTEs), ranking, running totals, and partition window functions.',
+            estimatedHours: 25,
+            skills: ['SQL', 'Window Functions', 'CTEs', 'Data Modeling', 'Aggregations'],
+            summary: 'Business Intelligence specialists transform raw operational database transactions into clean analytical metrics. SQL window functions allow calculations across partitions of rows without collapsing rows like standard GROUP BY clauses.',
+            keyTopics: [
+              'Window functions: ROW_NUMBER(), RANK(), DENSE_RANK(), LEAD(), and LAG()',
+              'Cumulative metrics using SUM() OVER (PARTITION BY ... ORDER BY ...)',
+              'Common Table Expressions (WITH clauses) structuring complex queries for readability',
+            ],
+            codeSnippet: {
+              title: 'Monthly User Retention Cohort Analysis in SQL',
+              language: 'sql',
+              code: `WITH monthly_users AS (\n  SELECT user_id, DATE_TRUNC('month', created_at) AS signup_month\n  FROM users\n)\nSELECT signup_month, COUNT(user_id) AS cohort_size,\n       ROW_NUMBER() OVER (ORDER BY signup_month) AS cohort_index\nFROM monthly_users\nGROUP BY signup_month;`,
+            },
+            resources: [
+              { title: 'PostgreSQL Window Functions Tutorial', url: 'https://www.postgresql.org/docs/current/tutorial-window.html', type: 'DOCS' },
+              { title: 'Mode Analytics SQL Guide', url: 'https://mode.com/sql-tutorial/', type: 'ARTICLE' },
+            ],
+            quiz: [
+              {
+                question: 'What is the main difference between GROUP BY and window functions (OVER)?',
+                options: ['Window functions compute values across row partitions while retaining individual row identity; GROUP BY collapses rows into single summaries', 'Window functions only work on numbers', 'GROUP BY is only for SQLite', 'Window functions cannot compute sums'],
+                correctIndex: 0,
+              },
+              {
+                question: 'Which window function returns the value from the previous row within a partition?',
+                options: ['LAG()', 'LEAD()', 'FIRST_VALUE()', 'COUNT()'],
+                correctIndex: 0,
+              },
+              {
+                question: 'What is the difference between RANK() and DENSE_RANK() when there is a tie?',
+                options: ['RANK() leaves gaps in the ranking sequence; DENSE_RANK() leaves no gaps', 'DENSE_RANK() only ranks negative numbers', 'RANK() returns text', 'There is no difference'],
+                correctIndex: 0,
+              },
+            ],
+            taskPrompt: 'Write a SQL analytics query computing a rolling 7-day revenue average and month-over-month percentage growth partitioned by product category.',
           },
         ],
       },
@@ -1354,7 +841,9 @@ export function TabTrigger({ id, children }: { id: string; children: React.React
   },
 };
 
-// --- Adaptive Seed Generator for Arbitrary Roles -------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// RESOLVER HELPER (Matches user roles against all 12 domains)
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function resolveSeedForRole(role: string, domain: string): ISeedRoadmap {
   const query = `${role} ${domain}`.toLowerCase();
@@ -1372,92 +861,6 @@ export function resolveSeedForRole(role: string, domain: string): ISeedRoadmap {
     }
   }
 
-  // Fallback to Mobile App Developer curriculum as the primary anchor
-  if (SEED_ROADMAPS.mobile) {
-    return SEED_ROADMAPS.mobile;
-  }
-
-  // General Adaptive Fallback
-  const resolvedRole = role.trim() || domain.trim() || 'Software Engineer';
-  const resolvedDomain = domain.trim() || 'Engineering';
-
-  return {
-    role: resolvedRole,
-    domain: resolvedDomain,
-    matchKeys: [resolvedRole.toLowerCase()],
-    description: `A custom-tailored DAG curriculum for mastering the core and advanced competencies expected of a modern ${resolvedRole}.`,
-    phases: [
-      {
-        phaseId: 'adapt_p1',
-        phaseTitle: `Phase 1: Foundations & Core Architecture for ${resolvedRole}`,
-        order: 1,
-        milestones: [
-          {
-            milestoneId: 'adapt_m1',
-            title: `Foundations & Architectural Patterns`,
-            description: 'Core concepts, syntax, architectural fundamentals, and clean code principles.',
-            estimatedHours: 25,
-            skills: ['Foundations', 'Git Collaboration', 'Clean Architecture'],
-            summary: `Core principles and architecture standards governing high-velocity development for ${resolvedRole}. Master code organization, typed contracts, and testing disciplines.`,
-            keyTopics: [
-              `Core syntax, execution models, and runtime primitives in ${resolvedRole}`,
-              'Separation of concerns, dependency injection, and clean architecture boundaries',
-              'Git trunk-based development and pull request review standards',
-            ],
-            codeSnippet: {
-              title: 'Clean Architecture Domain Entity & Service Contract',
-              language: 'typescript',
-              code: `export interface DomainEntity {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export abstract class BaseService<T extends DomainEntity> {
-  abstract findById(id: string): Promise<T | null>;
-  abstract save(entity: T): Promise<T>;
-}`,
-            },
-            resources: [
-              { title: `${resolvedRole} Overview & Standards`, url: 'https://roadmap.sh', type: 'DOCS' },
-              { title: 'Clean Architecture: A Craftsman\'s Guide', url: 'https://martinfowler.com/architecture/', type: 'ARTICLE' },
-            ],
-            quiz: [
-              {
-                question: 'What is the primary objective of Clean Architecture in engineering systems?',
-                options: [
-                  'Decouple core business rules from external frameworks, databases, and UI dependencies',
-                  'Maximize the lines of code in each file',
-                  'Avoid writing any automated tests',
-                  'Force all code to run synchronously on a single thread',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'Why are typed contracts (interfaces) critical in large-scale codebases?',
-                options: [
-                  'They catch type mismatch defects at compile-time and serve as self-documenting code contracts',
-                  'They make the JavaScript file size twice as big',
-                  'They prevent code from running on Linux servers',
-                  'They disable garbage collection',
-                ],
-                correctIndex: 0,
-              },
-              {
-                question: 'What is the main practice of trunk-based development?',
-                options: [
-                  'Developers merge small, frequent updates directly into a core trunk branch rather than maintaining long-lived feature branches',
-                  'Never using Git commits',
-                  'Deploying to production only once every 3 years',
-                  'Deleting the repository every week',
-                ],
-                correctIndex: 0,
-              },
-            ],
-            taskPrompt: `Implement a clean architectural module for ${resolvedRole} featuring domain entities, repository interfaces, and unit tests verifying boundary isolation.`,
-          },
-        ],
-      },
-    ],
-  };
+  // Fallback to Fullstack or Mobile App Developer
+  return SEED_ROADMAPS.fullstack || SEED_ROADMAPS.mobile;
 }

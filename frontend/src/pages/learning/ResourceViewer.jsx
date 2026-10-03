@@ -67,6 +67,19 @@ export default function Solution() {
 
         <div className="flex items-center gap-xs">
           <button
+            onClick={() => {
+              const ytId = (resource.url ? (resource.url.match(/(?:youtu\.be\/|v=)([^&#?]+)/)?.[1]) : null) || resource.videoId || 'W6NZfCO5SIk';
+              navigate(`/classroom/${ytId}`);
+            }}
+            className="btn btn-primary flex items-center gap-xs"
+            style={{ fontSize: '0.82rem', padding: '6px 14px' }}
+            title="Launch split-screen video studio with live code sandbox and notes"
+          >
+            <PlayCircle size={15} />
+            <span>Open in Split-Screen Studio</span>
+          </button>
+
+          <button
             onClick={() => window.open(resource.url, '_blank')}
             className="btn btn-secondary flex items-center gap-xs"
             style={{ fontSize: '0.82rem', padding: '6px 14px' }}

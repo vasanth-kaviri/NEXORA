@@ -22,6 +22,7 @@ import catalogRoutes from './routes/catalog.routes';
 import adminRoutes from './routes/admin.routes';
 import aiRoutes from './routes/ai.routes';
 import notificationRoutes from './routes/notification.routes';
+import videoRoutes from './routes/video.routes';
 
 const app: Application = express();
 
@@ -117,6 +118,7 @@ app.use('/api/v1', catalogRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/videos', videoRoutes);
 
 // --- Root Health & Diagnostic Probe ------------------------------------------
 app.get('/', (_req, res) => {
