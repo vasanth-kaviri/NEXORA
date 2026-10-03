@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import {
   Trophy, Calendar, Clock, Users, MapPin,
   Flame, Zap, Star, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import db from '../../services/db';
+import catalogService from '../../services/catalogService';
 import LiveCountdown from '../../components/common/LiveCountdown';
 
 /* ─── Status Config ─────────────────────────────────────────── */
@@ -365,10 +366,42 @@ const FILTERS = ['All', 'Registering', 'Upcoming', 'Ongoing'];
 /* ─── Page ──────────────────────────────────────────────────── */
 export default function Hackathons() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [items, setItems] = useState(hackathons);
+
+  useEffect(() => {
+    let mounted = true;
+    catalogService.getHackathons().then(backendHacks => {
+      if (mounted && backendHacks && backendHacks.length > 0) {
+        // Map backend hackathons to skeuo card structure while keeping existing verified list
+        const mapped = backendHacks.map(b => ({
+          name: b.title,
+          host: b.organizer,
+          theme: b.domain,
+          desc: `${b.domain} hackathon featuring authentic challenges.`,
+          prize: b.prizePool,
+          deadline: new Date(b.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          duration: '48 hours',
+          participants: b.registeredTeams || 500,
+          maxTeam: 4,
+          location: b.location,
+          status: 'Registering',
+          tags: b.tags || ['Competition', 'Open'],
+          glowRgb: '16, 185, 129',
+          featured: b.featured,
+          registerUrl: b.applyUrl,
+        }));
+        // Merge without duplicating
+        const names = new Set(hackathons.map(h => h.name.toLowerCase()));
+        const uniqueBackend = mapped.filter(m => !names.has(m.name.toLowerCase()));
+        setItems([...hackathons, ...uniqueBackend]);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const filtered = activeFilter === 'All'
-    ? hackathons
-    : hackathons.filter(h => h.status === activeFilter);
+    ? items
+    : items.filter(h => h.status === activeFilter);
 
   return (
     <div className="animate-fade-in flex flex-col gap-lg" style={{ paddingBottom: '5rem' }}>

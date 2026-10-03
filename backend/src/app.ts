@@ -18,6 +18,7 @@ import applicationRoutes from './routes/application.routes';
 import assessmentRoutes from './routes/assessment.routes';
 import interviewRoutes from './routes/interview.routes';
 import peerRoutes from './routes/peer.routes';
+import catalogRoutes from './routes/catalog.routes';
 
 const app: Application = express();
 
@@ -108,6 +109,8 @@ app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/interviews', interviewRoutes);
 app.use('/api/v1/peers', peerRoutes);
+app.use('/api/v1/catalog', catalogRoutes);
+app.use('/api/v1', catalogRoutes);
 
 // --- 404 Handler -------------------------------------------------------------
 app.use(notFoundHandler);
