@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, Edit2, Trash2, Users } from 'lucide-react';
 import db from '../../services/db';
+import adminService from '../../services/adminService';
 
 export default function ManageStudents() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +21,22 @@ export default function ManageStudents() {
     return [];
   });
 
+  useEffect(() => {
+    let mounted = true;
+    adminService.getStudents().then(res => {
+      if (mounted && res && res.length > 0) {
+        setStudents(res.map(u => ({
+          id: u._id || u.id || u.email,
+          name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.name || 'Enrolled Student',
+          email: u.email || 'student@nexora.edu',
+          path: u.dreamJob || 'Full-Stack Developer',
+          progress: u.xp ? Math.min(100, Math.round((u.xp / 2000) * 100)) : 65
+        })));
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
+
   const filteredStudents = students.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,7 +48,7 @@ export default function ManageStudents() {
   const [editPath, setEditPath] = useState('');
 
   const handleDelete = (id) => {
-    db.deleteStudent(id);
+    adminService.deleteStudent(id);
     setStudents(prev => prev.filter(s => s.id !== id));
   };
 
