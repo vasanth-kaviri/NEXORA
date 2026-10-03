@@ -59,13 +59,32 @@ export const geminiApi = {
         const response = await result.response;
         return response.text();
       } catch (err) {
-        console.warn('[geminiApi] Live Gemini request notice (using calibrated mentor model):', err.message);
-        // Fall back to calibrated local engine
+        console.warn('[geminiApi] Live Gemini browser request notice:', err?.message || err);
       }
     }
 
+    // Attempt secure server-side AI proxy
+    try {
+      const backendRes = await fetch('/api/v1/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: prompt,
+          context: studentProfile.dreamJob || 'Software Engineering',
+        }),
+      });
+      if (backendRes.ok) {
+        const json = await backendRes.json();
+        if (json && json.data && json.data.reply) {
+          return json.data.reply;
+        }
+      }
+    } catch {
+      // Graceful fallback to calibrated engine
+    }
+
     // Calibrated Local Engineering Mentor Engine
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 600));
     return this.generateSimulatedMentorResponse(prompt, studentProfile);
   },
 

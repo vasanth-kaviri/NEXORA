@@ -20,6 +20,8 @@ import interviewRoutes from './routes/interview.routes';
 import peerRoutes from './routes/peer.routes';
 import catalogRoutes from './routes/catalog.routes';
 import adminRoutes from './routes/admin.routes';
+import aiRoutes from './routes/ai.routes';
+import notificationRoutes from './routes/notification.routes';
 
 const app: Application = express();
 
@@ -113,6 +115,8 @@ app.use('/api/v1/peers', peerRoutes);
 app.use('/api/v1/catalog', catalogRoutes);
 app.use('/api/v1', catalogRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // --- 404 Handler -------------------------------------------------------------
 app.use(notFoundHandler);
