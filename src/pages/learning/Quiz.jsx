@@ -5,6 +5,7 @@ import {
   Timer
 } from 'lucide-react';
 import db from '../../services/db';
+import assessmentService from '../../services/assessmentService';
 
 export default function Quiz() {
   const navigate = useNavigate();
@@ -174,11 +175,30 @@ export default function Quiz() {
 
       // Add XP
       const xpEarned = correctCount * 15;
-      db.updateUserProfile({
-        xp: (currentUser.xp || 1200) + xpEarned,
-        quizScore: Math.round((correctCount / currentQuestions.length) * 100)
+      const percentage = Math.round((correctCount / currentQuestions.length) * 100);
+
+      // Persist to MongoDB Atlas backend
+      const responses = currentQuestions.map((q, idx) => ({
+        questionId: q.id,
+        question: q.question,
+        userAnswer: userAnswers[idx] !== undefined ? q.options[userAnswers[idx]] : 'Unanswered',
+        correctAnswer: q.options[q.correctIndex],
+        isCorrect: userAnswers[idx] === q.correctIndex,
+        topic: q.topic,
+        explanation: q.explanation,
+      }));
+
+      assessmentService.submitAssessment({
+        type: 'QUIZ',
+        track: selectedCourse,
+        totalQuestions: currentQuestions.length,
+        correctAnswers: correctCount,
+        percentage,
+        timeSpentSeconds: 900 - secondsLeft,
+        responses,
       });
-      triggerToast(`Quiz completed! ${correctCount}/15 Correct. +${xpEarned} XP awarded!`);
+
+      triggerToast(`Quiz completed! ${correctCount}/15 Correct. +${xpEarned} XP awarded! Persisted to profile.`);
     }
   };
 

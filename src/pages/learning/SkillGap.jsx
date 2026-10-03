@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, CheckCircle2, Sparkles, 
   ExternalLink, Layers, ShieldAlert, Zap, X 
 } from 'lucide-react';
 import db from '../../services/db';
+import assessmentService from '../../services/assessmentService';
 
 export default function SkillGap() {
   const navigate = useNavigate();
@@ -22,6 +23,17 @@ export default function SkillGap() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [activeSkillModal, setActiveSkillModal] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
+  const [liveSkillVector, setLiveSkillVector] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    assessmentService.getSkillGapAnalysis().then(res => {
+      if (mounted && res && res.skillVector) {
+        setLiveSkillVector(res.skillVector);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
