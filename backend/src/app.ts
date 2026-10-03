@@ -17,6 +17,7 @@ import jobRoutes from './routes/job.routes';
 import applicationRoutes from './routes/application.routes';
 import assessmentRoutes from './routes/assessment.routes';
 import interviewRoutes from './routes/interview.routes';
+import peerRoutes from './routes/peer.routes';
 
 const app: Application = express();
 
@@ -106,6 +107,7 @@ app.use('/api/v1/jobs', jobRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/interviews', interviewRoutes);
+app.use('/api/v1/peers', peerRoutes);
 
 // --- 404 Handler -------------------------------------------------------------
 app.use(notFoundHandler);

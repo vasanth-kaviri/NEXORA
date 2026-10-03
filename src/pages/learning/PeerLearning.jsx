@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Users, MessageSquare, Search, CheckCircle2, 
   Sparkles, X, UserPlus, Radio, Code2, 
   Send, Mic, MicOff, Play, ArrowLeft
 } from 'lucide-react';
 import db from '../../services/db';
+import peerService from '../../services/peerService';
 
 export default function PeerLearning() {
   const currentUser = db.getCurrentUser() || {};
@@ -174,6 +175,25 @@ export default function PeerLearning() {
   const [chatInput, setChatInput] = useState('');
   const [sharedNotes, setSharedNotes] = useState('# Collaborative Session Notes\n\n- [x] O(1) Get Operation verified\n- [x] Eviction on capacity boundary\n- [ ] Edge cases: duplicate keys & capacity = 1');
   const [toastMessage, setToastMessage] = useState('');
+  const [liveRooms, setLiveRooms] = useState(studyRooms);
+
+  useEffect(() => {
+    let mounted = true;
+    peerService.listRooms().then(rooms => {
+      if (mounted && rooms && rooms.length > 0) {
+        const mapped = rooms.map((r, idx) => ({
+          id: r.roomId,
+          title: r.title,
+          topic: r.topic,
+          members: (r.activeParticipants || []).length || 1,
+          maxMembers: r.maxParticipants || 8,
+          activeProblem: studyRooms[idx % studyRooms.length]?.activeProblem || studyRooms[0].activeProblem,
+        }));
+        setLiveRooms(mapped);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -203,10 +223,14 @@ export default function PeerLearning() {
     setActiveStudioRoom(room);
     setRoomCode(room.activeProblem?.starterCode?.javascript || room.activeProblem?.starterCode?.python || '// Enter your solution');
     setTestOutput(null);
+    peerService.joinRoom(room.id);
     triggerToast(`Navigated to Virtual Studio: "${room.title}". Real-time collaborative environment active!`);
   };
 
   const handleLeaveStudioRoom = () => {
+    if (activeStudioRoom?.id) {
+      peerService.leaveRoom(activeStudioRoom.id);
+    }
     setActiveStudioRoom(null);
     triggerToast('Left Virtual Room. Returned to DevConnect Hub.');
   };
@@ -239,11 +263,15 @@ export default function PeerLearning() {
 
   const handleSendRoomChat = (e) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    const text = chatInput.trim();
+    if (!text) return;
     setRoomChatMessages(prev => [
       ...prev,
-      { user: currentUser.firstName || 'Student', text: chatInput.trim(), time: 'Just now' }
+      { user: currentUser.firstName || 'Student', text, time: 'Just now' }
     ]);
+    if (activeStudioRoom?.id) {
+      peerService.sendMessage(activeStudioRoom.id, text);
+    }
     setChatInput('');
   };
 
@@ -578,11 +606,11 @@ export default function PeerLearning() {
                 <Radio size={18} className="text-secondary animate-pulse" />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Live Collaborative Study & Coding Rooms</h3>
               </div>
-              <span className="text-muted" style={{ fontSize: '0.8rem' }}>3 Rooms Running Live</span>
+              <span className="text-muted" style={{ fontSize: '0.8rem' }}>{liveRooms.length} Rooms Running Live</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
-              {studyRooms.map(room => (
+              {liveRooms.map(room => (
                 <div 
                   key={room.id}
                   className="glass-panel flex flex-col justify-between"
