@@ -2,13 +2,26 @@ import { useState } from 'react';
 import { Search, Plus, Trash2, X, Sparkles } from 'lucide-react';
 
 export default function ManagePaths() {
-  const [paths, setPaths] = useState([
-    { id: 'path_1', title: 'Full-Stack Web Engineering', domain: 'Engineering', students: 542, milestones: 8, status: 'Active', updated: '2 days ago' },
-    { id: 'path_2', title: 'AI & Machine Learning Foundations', domain: 'Data & AI', students: 418, milestones: 9, status: 'Active', updated: 'Yesterday' },
-    { id: 'path_3', title: 'Cloud DevOps & SRE Masterclass', domain: 'Infrastructure', students: 285, milestones: 7, status: 'Active', updated: '1 week ago' },
-    { id: 'path_4', title: 'Cybersecurity Analyst & SOC Operations', domain: 'Security', students: 164, milestones: 6, status: 'Active', updated: '3 days ago' },
-    { id: 'path_5', title: 'Autonomous Robotic Systems (ROS 2)', domain: 'Robotics', students: 82, milestones: 5, status: 'Draft', updated: '4 days ago' }
-  ]);
+  const [paths, setPaths] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_admin_paths');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [
+      { id: 'path_1', title: 'Full-Stack Web Engineering', domain: 'Engineering', students: 542, milestones: 8, status: 'Active', updated: '2 days ago' },
+      { id: 'path_2', title: 'AI & Machine Learning Foundations', domain: 'Data & AI', students: 418, milestones: 9, status: 'Active', updated: 'Yesterday' },
+      { id: 'path_3', title: 'Cloud DevOps & SRE Masterclass', domain: 'Infrastructure', students: 285, milestones: 7, status: 'Active', updated: '1 week ago' },
+      { id: 'path_4', title: 'Cybersecurity Analyst & SOC Operations', domain: 'Security', students: 164, milestones: 6, status: 'Active', updated: '3 days ago' },
+      { id: 'path_5', title: 'Autonomous Robotic Systems (ROS 2)', domain: 'Robotics', students: 82, milestones: 5, status: 'Draft', updated: '4 days ago' }
+    ];
+  });
+
+  const savePaths = (updated) => {
+    setPaths(updated);
+    try {
+      localStorage.setItem('nexora_admin_paths', JSON.stringify(updated));
+    } catch {}
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -36,19 +49,19 @@ export default function ManagePaths() {
       updated: 'Just now'
     };
 
-    setPaths([newPath, ...paths]);
+    savePaths([newPath, ...paths]);
     setShowAddModal(false);
     setNewTitle('');
     triggerToast(`Career path "${newTitle}" created successfully!`);
   };
 
   const handleToggleStatus = (id) => {
-    setPaths(paths.map(p => p.id === id ? { ...p, status: p.status === 'Active' ? 'Draft' : 'Active' } : p));
+    savePaths(paths.map(p => p.id === id ? { ...p, status: p.status === 'Active' ? 'Draft' : 'Active' } : p));
     triggerToast('Path status updated.');
   };
 
   const handleDelete = (id) => {
-    setPaths(paths.filter(p => p.id !== id));
+    savePaths(paths.filter(p => p.id !== id));
     triggerToast('Career path removed.');
   };
 

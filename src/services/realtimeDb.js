@@ -1,269 +1,83 @@
-import { ref, onValue, set, update, push, remove } from 'firebase/database';
-import { rtdb } from './firebase';
-
 /**
- * NEXORA Firebase Realtime Database Service Layer
- * Synchronizes user trajectory, tasks, roadmap progress, notifications,
- * saved jobs, interview evaluations, and feedback in real time.
+ * NEXORA Realtime Database Service Layer (DECOMMISSIONED)
+ * Firebase Realtime Database has been decommissioned in favor of MongoDB REST APIs.
+ * All methods are safe no-ops returning empty teardown functions () => {} or resolved promises.
  */
 
+const noOpUnsub = () => {};
+
 export const realtimeDb = {
-  // ==========================================
-  // USER PROFILE
-  // ==========================================
-  subscribeToUserProfile(userId, callback) {
-    if (!userId) return () => {};
-    try {
-      const userRef = ref(rtdb, `users/${userId}/profile`);
-      return onValue(userRef, (snapshot) => {
-        callback(snapshot.val());
-      }, (error) => {
-        console.warn('[Firebase RTDB] Profile listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to profile:', e.message);
-      return () => {};
-    }
+  _ok() { return false; },
+
+  subscribeToUserProfile(_userId, _callback) {
+    return noOpUnsub;
   },
 
-  async updateUserProfile(userId, updates) {
-    if (!userId || !updates) return;
-    try {
-      const userRef = ref(rtdb, `users/${userId}/profile`);
-      await update(userRef, {
-        ...updates,
-        updatedAt: new Date().toISOString()
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error updating profile:', e.message);
-    }
+  async updateUserProfile(_userId, _updates) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // ROADMAP MILESTONES
-  // ==========================================
-  subscribeToRoadmap(userId, domainId, callback) {
-    if (!userId || !domainId) return () => {};
-    try {
-      const roadmapRef = ref(rtdb, `users/${userId}/roadmap/${domainId}`);
-      return onValue(roadmapRef, (snapshot) => {
-        callback(snapshot.val() || {});
-      }, (error) => {
-        console.warn('[Firebase RTDB] Roadmap listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to roadmap:', e.message);
-      return () => {};
-    }
+  subscribeToRoadmap(_userId, _domainId, _callback) {
+    return noOpUnsub;
   },
 
-  async setRoadmapStep(userId, domainId, stepId, status) {
-    if (!userId || !domainId || !stepId) return;
-    try {
-      const stepRef = ref(rtdb, `users/${userId}/roadmap/${domainId}/${stepId}`);
-      await set(stepRef, status);
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error updating roadmap step:', e.message);
-    }
+  async setRoadmapStep(_userId, _domainId, _stepId, _status) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // DAILY SPRINT TASKS
-  // ==========================================
-  subscribeToTasks(userId, callback) {
-    if (!userId) return () => {};
-    try {
-      const tasksRef = ref(rtdb, `users/${userId}/tasks`);
-      return onValue(tasksRef, (snapshot) => {
-        callback(snapshot.val() || {});
-      }, (error) => {
-        console.warn('[Firebase RTDB] Tasks listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to tasks:', e.message);
-      return () => {};
-    }
+  subscribeToTasks(_userId, _callback) {
+    return noOpUnsub;
   },
 
-  async setTaskProgress(userId, taskId, completed) {
-    if (!userId || !taskId) return;
-    try {
-      const taskRef = ref(rtdb, `users/${userId}/tasks/${taskId}`);
-      await set(taskRef, completed);
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error saving task progress:', e.message);
-    }
+  async setTaskProgress(_userId, _taskId, _completed) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // NOTIFICATIONS & AI MENTOR CHAT
-  // ==========================================
-  subscribeToNotifications(userId, callback) {
-    if (!userId) return () => {};
-    try {
-      const notifsRef = ref(rtdb, `users/${userId}/notifications`);
-      return onValue(notifsRef, (snapshot) => {
-        const val = snapshot.val();
-        if (!val) {
-          callback([]);
-          return;
-        }
-        // Handle both object maps and arrays from RTDB
-        const list = Array.isArray(val) 
-          ? val.filter(Boolean) 
-          : Object.keys(val).map(key => ({ ...val[key], id: val[key].id || key }));
-        callback(list);
-      }, (error) => {
-        console.warn('[Firebase RTDB] Notifications listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to notifications:', e.message);
-      return () => {};
-    }
+  subscribeToNotifications(_userId, callback) {
+    if (typeof callback === 'function') callback([]);
+    return noOpUnsub;
   },
 
-  async saveNotification(userId, notification) {
-    if (!userId || !notification?.id) return;
-    try {
-      const notifRef = ref(rtdb, `users/${userId}/notifications/${notification.id}`);
-      await set(notifRef, notification);
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error saving notification:', e.message);
-    }
+  async saveNotification(_userId, _notification) {
+    return Promise.resolve();
   },
 
-  async markNotificationRead(userId, notifId) {
-    if (!userId || !notifId) return;
-    try {
-      const notifRef = ref(rtdb, `users/${userId}/notifications/${notifId}/unread`);
-      await set(notifRef, false);
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error marking notification read:', e.message);
-    }
+  async markNotificationRead(_userId, _notifId) {
+    return Promise.resolve();
   },
 
-  async appendNotificationChat(userId, notifId, text, sender = 'user') {
-    if (!userId || !notifId || !text) return;
-    try {
-      const chatRef = ref(rtdb, `users/${userId}/notifications/${notifId}/chatHistory`);
-      await push(chatRef, {
-        sender,
-        text,
-        time: 'Just now',
-        timestamp: Date.now()
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error appending chat to notification:', e.message);
-    }
+  async appendNotificationChat(_userId, _notifId, _text, _sender) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // SAVED JOBS & SCHOLARSHIPS
-  // ==========================================
-  subscribeToSavedJobs(userId, callback) {
-    if (!userId) return () => {};
-    try {
-      const jobsRef = ref(rtdb, `users/${userId}/savedJobs`);
-      return onValue(jobsRef, (snapshot) => {
-        callback(snapshot.val() || {});
-      }, (error) => {
-        console.warn('[Firebase RTDB] Saved jobs listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to saved jobs:', e.message);
-      return () => {};
-    }
+  subscribeToSavedJobs(_userId, callback) {
+    if (typeof callback === 'function') callback({});
+    return noOpUnsub;
   },
 
-  async toggleSavedJob(userId, jobId, isSaved) {
-    if (!userId || !jobId) return;
-    try {
-      const jobRef = ref(rtdb, `users/${userId}/savedJobs/${jobId}`);
-      if (isSaved) {
-        await set(jobRef, { savedAt: new Date().toISOString() });
-      } else {
-        await remove(jobRef);
-      }
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error toggling saved job:', e.message);
-    }
+  async toggleSavedJob(_userId, _jobId, _isSaved) {
+    return Promise.resolve();
   },
 
-  subscribeToSavedScholarships(userId, callback) {
-    if (!userId) return () => {};
-    try {
-      const schRef = ref(rtdb, `users/${userId}/savedScholarships`);
-      return onValue(schRef, (snapshot) => {
-        callback(snapshot.val() || {});
-      }, (error) => {
-        console.warn('[Firebase RTDB] Saved scholarships listener notice:', error.message);
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error subscribing to saved scholarships:', e.message);
-      return () => {};
-    }
+  subscribeToSavedScholarships(_userId, callback) {
+    if (typeof callback === 'function') callback({});
+    return noOpUnsub;
   },
 
-  async toggleSavedScholarship(userId, scholarshipId, isSaved) {
-    if (!userId || !scholarshipId) return;
-    try {
-      const schRef = ref(rtdb, `users/${userId}/savedScholarships/${scholarshipId}`);
-      if (isSaved) {
-        await set(schRef, { savedAt: new Date().toISOString() });
-      } else {
-        await remove(schRef);
-      }
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error toggling saved scholarship:', e.message);
-    }
+  async toggleSavedScholarship(_userId, _scholarshipId, _isSaved) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // MOCK INTERVIEW & RESUME ANALYSES
-  // ==========================================
-  async saveInterviewResult(userId, sessionData) {
-    if (!userId || !sessionData) return;
-    try {
-      const interviewRef = ref(rtdb, `users/${userId}/interviews`);
-      await push(interviewRef, {
-        ...sessionData,
-        timestamp: Date.now(),
-        date: new Date().toISOString()
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error saving interview result:', e.message);
-    }
+  async saveInterviewResult(_userId, _sessionData) {
+    return Promise.resolve();
   },
 
-  async saveResumeResult(userId, analysisData) {
-    if (!userId || !analysisData) return;
-    try {
-      const resumeRef = ref(rtdb, `users/${userId}/resumes`);
-      await push(resumeRef, {
-        ...analysisData,
-        timestamp: Date.now(),
-        date: new Date().toISOString()
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error saving resume analysis:', e.message);
-    }
+  async saveResumeResult(_userId, _analysisData) {
+    return Promise.resolve();
   },
 
-  // ==========================================
-  // GLOBAL PLATFORM FEEDBACK
-  // ==========================================
-  async submitFeedback(feedbackData) {
-    if (!feedbackData) return;
-    try {
-      const feedbackRef = ref(rtdb, 'feedback');
-      await push(feedbackRef, {
-        ...feedbackData,
-        submittedAt: new Date().toISOString(),
-        timestamp: Date.now()
-      });
-    } catch (e) {
-      console.warn('[Firebase RTDB] Error submitting feedback:', e.message);
-    }
+  async submitFeedback(_feedbackData) {
+    return Promise.resolve();
   }
 };
 

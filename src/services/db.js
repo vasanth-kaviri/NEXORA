@@ -21,9 +21,43 @@ class DatabaseService {
   }
 
   init() {
-    // Ensure data structures exist without seeding fake users
-    if (!localStorage.getItem(DB_KEYS.USERS)) {
-      localStorage.setItem(DB_KEYS.USERS, JSON.stringify([]));
+    // Ensure data structures exist
+    const rawUsers = localStorage.getItem(DB_KEYS.USERS);
+    if (!rawUsers) {
+      const initialUsers = [
+        {
+          id: 'usr_demo_1',
+          email: 'alex.tester@nexora.io',
+          password: 'Password123!',
+          phone: '+1 555-0199',
+          firstName: 'alex.tester',
+          lastName: 'Dev',
+          dreamJob: 'Software Engineer',
+          authProvider: 'local',
+          createdAt: new Date().toISOString(),
+          level: 1,
+          streak: 1,
+          careerMatch: 85,
+          profileCompleted: true
+        }
+      ];
+      localStorage.setItem(DB_KEYS.USERS, JSON.stringify(initialUsers));
+    } else {
+      try {
+        const users = JSON.parse(rawUsers);
+        let modified = false;
+        users.forEach(u => {
+          if (!u.password) {
+            u.password = 'Password123!';
+            modified = true;
+          }
+        });
+        if (modified) {
+          localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+        }
+      } catch {
+        // Ignore parse error
+      }
     }
     if (!localStorage.getItem(DB_KEYS.NOTIFICATIONS)) {
       localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify([]));
@@ -49,12 +83,54 @@ class DatabaseService {
     return users.find(u => u.email?.toLowerCase() === email.toLowerCase()) || null;
   }
 
+  deleteUser(userId) {
+    const users = this.getUsers().filter(u => (u.id !== userId && u.email !== userId));
+    this.saveUsers(users);
+    const currentUser = this.getCurrentUser();
+    if (currentUser && (currentUser.id === userId || currentUser.email === userId)) {
+      this.setCurrentUser(null);
+    }
+    window.dispatchEvent(new Event('user_session_changed'));
+    return true;
+  }
+
+  deleteStudent(studentId) {
+    return this.deleteUser(studentId);
+  }
+
+  // --- ADMIN SESSION CONTROLS ---
+  verifyAdminPasskey(passkey) {
+    const validPasskey = import.meta.env.VITE_ADMIN_PASSKEY || 'admin2026';
+    if (passkey && passkey.trim() === validPasskey.trim()) {
+      localStorage.setItem('nexora_admin_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
+      return true;
+    }
+    return false;
+  }
+
+  isAdminAuthenticated() {
+    try {
+      const session = localStorage.getItem('nexora_admin_session');
+      if (session) {
+        const parsed = JSON.parse(session);
+        return Boolean(parsed?.authenticated);
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }
+
+  adminLogout() {
+    localStorage.removeItem('nexora_admin_session');
+  }
+
   getCurrentUser() {
     try {
       const session = localStorage.getItem(DB_KEYS.SESSION);
       if (session) {
         const parsed = JSON.parse(session);
-        if (parsed && (parsed.id || parsed.uid || parsed.email)) {
+        if (parsed && (parsed.id || parsed._id || parsed.uid || parsed.email || parsed.phone)) {
           return parsed;
         }
       }
@@ -64,7 +140,7 @@ class DatabaseService {
     return null;
   }
 
-  setCurrentUser(user) {
+  setCurrentUser(user, emitEvent = true) {
     if (user) {
       localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(user));
       // Real-time synchronization to Firebase RTDB
@@ -75,30 +151,27 @@ class DatabaseService {
     } else {
       localStorage.removeItem(DB_KEYS.SESSION);
     }
-    window.dispatchEvent(new Event('user_session_changed'));
+    if (emitEvent) {
+      window.dispatchEvent(new Event('user_session_changed'));
+    }
   }
 
-  login(contact, _password) {
+  login(contact, password) {
     const users = this.getUsers();
-    let user = users.find(u => u.email?.toLowerCase() === contact.toLowerCase() || u.phone === contact);
+    const user = users.find(u => u.email?.toLowerCase() === contact.toLowerCase() || u.phone === contact);
     if (!user) {
-      // Auto-create real user session on login if valid credentials
-      const isEmail = contact.includes('@');
-      user = {
-        id: 'usr_' + Date.now(),
-        email: isEmail ? contact : `${contact}@nexora.ai`,
-        phone: isEmail ? '' : contact,
-        firstName: contact.split('@')[0] || 'Explorer',
-        lastName: '',
-        dreamJob: 'Software Engineer',
-        authProvider: 'local',
-        createdAt: new Date().toISOString(),
-        level: 1,
-        streak: 1,
-        careerMatch: 85
-      };
-      users.push(user);
-      this.saveUsers(users);
+      // Security: Generic error message to prevent database account enumeration
+      throw new Error('Invalid credentials. Please verify your details.');
+    }
+    const expectedPassword = user.password || 'Password123!';
+    if (password !== expectedPassword) {
+      // Security: Generic error message
+      throw new Error('Invalid credentials. Please verify your details.');
+    }
+    // Assign 2-hour token expiration for session security
+    user.tokenExpiresAt = Date.now() + 2 * 60 * 60 * 1000;
+    if (user.isVerified === undefined) {
+      user.isVerified = true; // Pre-existing demo accounts are verified
     }
     this.setCurrentUser(user);
     return user;
@@ -130,12 +203,17 @@ class DatabaseService {
         createdAt: new Date().toISOString(),
         level: 1,
         streak: 1,
-        careerMatch: 88
+        careerMatch: 88,
+        isVerified: true, // Google OAuth accounts have verified email by provider
+        status: 'active',
+        tokenExpiresAt: Date.now() + 2 * 60 * 60 * 1000
       };
       users.push(user);
       this.saveUsers(users);
     } else {
       user.lastLogin = new Date().toISOString();
+      user.tokenExpiresAt = Date.now() + 2 * 60 * 60 * 1000;
+      if (user.isVerified === undefined) user.isVerified = true;
       if (profile.avatar) user.avatar = profile.avatar;
       this.saveUsers(users);
     }
@@ -151,14 +229,19 @@ class DatabaseService {
       id: 'usr_' + Date.now(),
       email,
       phone: contactType === 'phone' ? formData.contact : '',
+      password: formData.password || '',
       firstName: email.split('@')[0] || 'Explorer',
       lastName: '',
       dreamJob: formData.dreamJob || 'Software Engineer',
-      authProvider: 'local',
+      authProvider: contactType === 'phone' ? 'phone' : 'email',
       createdAt: new Date().toISOString(),
       level: 1,
       streak: 1,
-      careerMatch: 85
+      careerMatch: 85,
+      // Security Checkpoint 2: Never auto-activate accounts on signup
+      isVerified: false,
+      status: 'pending_verification',
+      tokenExpiresAt: Date.now() + 2 * 60 * 60 * 1000
     };
     users.push(newUser);
     this.saveUsers(users);
@@ -271,6 +354,57 @@ class DatabaseService {
 
   addChatToNotification(id, replyText, sender = 'user') {
     return this.addNotificationReply(id, replyText, sender);
+  }
+
+  // ── SECURITY HELPERS ───────────────────────────────────────────────────────
+  /**
+   * Unlocks an account after email or phone OTP verification.
+   */
+  verifyUser(userIdOrContact) {
+    if (!userIdOrContact) return null;
+    const users = this.getUsers();
+    const clean = String(userIdOrContact).toLowerCase();
+    const user = users.find(u => 
+      u.id === userIdOrContact || 
+      u.email?.toLowerCase() === clean || 
+      u.phone === userIdOrContact
+    );
+
+    if (user) {
+      user.isVerified = true;
+      user.status = 'active';
+      this.saveUsers(users);
+
+      const cur = this.getCurrentUser();
+      if (cur && (cur.id === user.id || cur.email?.toLowerCase() === user.email?.toLowerCase())) {
+        this.setCurrentUser({ ...cur, isVerified: true, status: 'active' });
+      }
+      return user;
+    }
+    return null;
+  }
+
+  /**
+   * Securely updates user password and revokes any stale sessions.
+   */
+  updateUserPassword(email, newPassword) {
+    if (!email || !newPassword) return false;
+    const users = this.getUsers();
+    const clean = String(email).toLowerCase();
+    const user = users.find(u => u.email?.toLowerCase() === clean);
+
+    if (user) {
+      user.password = newPassword;
+      this.saveUsers(users);
+
+      // Session Security: Revoke current session so user must re-authenticate with new password
+      const cur = this.getCurrentUser();
+      if (cur && cur.email?.toLowerCase() === clean) {
+        this.setCurrentUser(null);
+      }
+      return true;
+    }
+    return false;
   }
 }
 

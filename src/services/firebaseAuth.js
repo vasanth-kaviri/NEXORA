@@ -1,153 +1,103 @@
-import { 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   updateProfile
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, rtdb, isFirebaseConfigured } from './firebase';
 import db from './db';
 import { set, ref } from 'firebase/database';
-import rtdb from './firebase';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 /**
- * Robust Firebase Authentication Service
- * Automatically bridges Firebase Auth with Local Database and Realtime Database
+ * Firebase Authentication Service
+ * All methods gracefully fall back when Firebase is not configured.
  */
 export const firebaseAuth = {
-  /**
-   * Google Sign-in via Firebase OAuth Popup
-   * Falls back gracefully if popup is closed or auth domain is unverified
-   */
+  _ok() { return Boolean(auth) && isFirebaseConfigured(); },
+
   async loginWithGoogle() {
+    if (!this._ok()) {
+      return { success: false, error: 'Firebase is not configured. Use email/password login.' };
+    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
       const profile = {
         email: user.email,
         firstName: user.displayName ? user.displayName.split(' ')[0] : 'Google',
         lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'User',
-        avatar: user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.email}`,
+        avatar: user.photoURL || ('https://api.dicebear.com/7.x/bottts/svg?seed=' + user.email),
         dreamJob: 'Software Engineer',
         authProvider: 'google',
         uid: user.uid
       };
-
-      // Sync to local DB
-      const localUser = db.loginWithGoogle(profile);
-      
-      // Sync to Firebase Realtime Database
-      try {
-        await set(ref(rtdb, `users/${localUser.id}/profile`), {
-          ...profile,
-          lastLogin: new Date().toISOString()
-        });
-      } catch (rtdbErr) {
-        console.warn('Realtime DB sync notice:', rtdbErr.message);
+      try { db.createOrUpdateUser(profile); } catch (_) {}
+      if (rtdb) {
+        try { await set(ref(rtdb, 'users/' + user.uid + '/profile'), { ...profile, updatedAt: new Date().toISOString() }); } catch (_) {}
       }
-
-      return { success: true, user: localUser };
+      return { success: true, user: profile };
     } catch (err) {
-      console.warn('Firebase popup sign-in notice (falling back to custom profile):', err.message);
-      return { success: false, error: err.message };
+      console.warn('[FirebaseAuth] Google sign-in failed:', err.message);
+      if (err.code === 'auth/popup-closed-by-user') return { success: false, error: 'Sign-in cancelled.' };
+      if (err.code === 'auth/network-request-failed') return { success: false, error: 'Network error. Check your connection.' };
+      return { success: false, error: 'Authentication failed. Please try again.' };
     }
   },
 
-  /**
-   * Custom / Direct Google Account Login
-   * Enables students to sign in with their real custom Google email even in sandbox environments
-   */
-  loginWithCustomGoogle(account) {
-    const profile = {
-      email: account.email,
-      firstName: account.name ? account.name.split(' ')[0] : 'Explorer',
-      lastName: account.name ? account.name.split(' ').slice(1).join(' ') : '',
-      avatar: account.avatar || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200`,
-      dreamJob: account.role || 'Full-Stack Software Engineer',
-      authProvider: 'google'
-    };
-
-    const localUser = db.loginWithGoogle(profile);
-    return localUser;
-  },
-
-  /**
-   * Email/Password Signup
-   */
-  async signupWithEmail(email, password, displayName = '') {
-    try {
-      let firebaseUser = null;
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        firebaseUser = cred.user;
-        if (displayName) {
-          await updateProfile(firebaseUser, { displayName });
-        }
-      } catch (fbErr) {
-        console.warn('Firebase direct signup notice:', fbErr.message);
-      }
-
-      // Persist in local DB
-      const user = db.signup({ contact: email, password }, 'email');
-      if (displayName) {
-        user.firstName = displayName.split(' ')[0];
-        user.lastName = displayName.split(' ').slice(1).join(' ');
-        db.updateUserProfile(user);
-      }
-
-      return { success: true, user };
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  },
-
-  /**
-   * Email/Password Login
-   */
   async loginWithEmail(email, password) {
+    if (!this._ok()) return { success: false, error: 'Firebase is not configured. Use local login.' };
     try {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (fbErr) {
-        console.warn('Firebase direct login notice:', fbErr.message);
-      }
-
-      const user = db.login(email, password);
-      return { success: true, user };
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      return { success: true, user: { email: result.user.email, uid: result.user.uid } };
     } catch (err) {
-      return { success: false, error: err.message };
+      console.warn('[FirebaseAuth] Email login failed:', err.code);
+      return { success: false, error: 'Invalid credentials.' };
     }
   },
 
-  /**
-   * Password Reset Email
-   */
+  async registerWithEmail(email, password, displayName) {
+    if (!this._ok()) return { success: false, error: 'Firebase is not configured.' };
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      if (displayName) await updateProfile(result.user, { displayName });
+      return { success: true, user: { email: result.user.email, uid: result.user.uid } };
+    } catch (err) {
+      console.warn('[FirebaseAuth] Register failed:', err.code);
+      if (err.code === 'auth/email-already-in-use') return { success: false, error: 'An account with this email already exists.' };
+      return { success: false, error: 'Registration failed. Please try again.' };
+    }
+  },
+
+  async signupWithEmail(email, password, displayName) {
+    return this.registerWithEmail(email, password, displayName);
+  },
+
   async sendPasswordReset(email) {
+    if (!this._ok()) return { success: false, error: 'Firebase is not configured.' };
     try {
       await sendPasswordResetEmail(auth, email);
       return { success: true };
     } catch (err) {
-      console.warn('Firebase reset notice:', err.message);
-      // Fallback: simulate successful delivery
-      return { success: true };
+      console.warn('[FirebaseAuth] Password reset failed:', err.code);
+      return { success: false, error: 'Could not send reset email.' };
     }
   },
 
-  /**
-   * Sign Out
-   */
   async logout() {
-    try {
-      await signOut(auth);
-    } catch {}
-    localStorage.removeItem('nexora_session');
-    window.dispatchEvent(new Event('user_session_changed'));
+    if (!auth) return { success: true };
+    try { await signOut(auth); return { success: true }; }
+    catch (err) { return { success: false, error: err.message }; }
+  },
+
+  getCurrentUser() {
+    if (!auth) return null;
+    return auth.currentUser;
   }
 };
 

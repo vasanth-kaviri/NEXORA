@@ -914,10 +914,21 @@ export const ROADMAP_DOMAINS = {
  */
 export function getRoadmapForJob(dreamJob = '') {
   const query = (dreamJob || '').toLowerCase().trim();
+  if (!query) return ROADMAP_DOMAINS.fullstack;
+
+  // 1. Direct ID match
+  if (ROADMAP_DOMAINS[query]) {
+    return ROADMAP_DOMAINS[query];
+  }
   
   for (const key of Object.keys(ROADMAP_DOMAINS)) {
     const domain = ROADMAP_DOMAINS[key];
-    if (domain.matchKeys.some(k => query.includes(k))) {
+    if (domain.matchKeys.some(k => {
+      if (k.length <= 3) {
+        return new RegExp(`\\b${k}\\b`, 'i').test(query);
+      }
+      return query.includes(k);
+    })) {
       return domain;
     }
   }

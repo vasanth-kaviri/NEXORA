@@ -1,0 +1,1354 @@
+[
+  {
+    "title": "Software Engineering Intern - Cloud & Systems",
+    "company": "Google",
+    "role": "Software Engineer",
+    "domain": "Cloud & DevOps",
+    "location": "Bangalore, India & Mountain View, CA (Hybrid)",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$45 - $55 / hr · ₹85,000 / mo",
+    "deadline": "2026-11-30T00:00:00.000Z",
+    "requiredSkills": ["C++", "Python", "Distributed Systems", "Kubernetes", "Docker", "Linux"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Join Google Cloud engineering to build planetary-scale telemetry pipelines and container infrastructure.",
+    "responsibilities": [
+      "Design and deploy scalable asynchronous APIs in Go and C++.",
+      "Optimize multi-tenant database access patterns to eliminate network bottlenecks.",
+      "Participate in design reviews and blameless post-mortems for distributed services."
+    ],
+    "requirements": [
+      "Enrolled in BS/MS Computer Science or equivalent engineering degree.",
+      "Experience with object-oriented programming, data structures, and algorithms.",
+      "Familiarity with container concepts (Docker, Linux namespaces)."
+    ],
+    "logo": "https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Graduate Software Engineer",
+    "company": "Microsoft",
+    "role": "Full-Stack Developer",
+    "domain": "Software Engineering",
+    "location": "Hyderabad, India & Redmond, WA",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Entry-Level",
+    "salary": "$120k – $145k · ₹18 – 24 LPA",
+    "deadline": "2026-10-30T00:00:00.000Z",
+    "requiredSkills": ["React", "TypeScript", "Node.js", "REST APIs", "C#", "Azure"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build customer-facing enterprise applications for Microsoft 365 and Azure Developer Platform.",
+    "responsibilities": [
+      "Build accessible React/TypeScript web experiences using Fluent UI design tokens.",
+      "Develop secure REST and GraphQL services backed by Azure Cosmos DB.",
+      "Maintain 99.99% service availability with automated health probes."
+    ],
+    "requirements": [
+      "Strong knowledge of modern JavaScript/TypeScript and web development.",
+      "Proficiency with relational and NoSQL databases.",
+      "Solid understanding of Git, CI/CD pipelines, and unit testing."
+    ],
+    "logo": "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Software Development Engineer I (AWS Core)",
+    "company": "Amazon",
+    "role": "Backend Engineer",
+    "domain": "Software Engineering",
+    "location": "Seattle, WA & Bangalore, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Entry-Level",
+    "salary": "$135k – $160k · ₹22 – 30 LPA",
+    "deadline": "2026-11-15T00:00:00.000Z",
+    "requiredSkills": ["Java", "Distributed Systems", "AWS", "DynamoDB", "REST APIs", "Docker"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Invent on behalf of millions of AWS customers. Build mission-critical cloud primitives powering modern internet applications.",
+    "responsibilities": [
+      "Write highly testable, fault-tolerant Java code running on AWS infrastructure.",
+      "Mitigate complex network partitions and state divergence in distributed storage engines.",
+      "Take operational ownership of software services from deployment to live monitoring."
+    ],
+    "requirements": [
+      "Bachelor’s in Computer Science or related STEM field graduating by Summer 2026.",
+      "Deep understanding of concurrency, multithreading, and algorithmic complexity.",
+      "Hands-on experience with cloud infrastructure or Linux systems."
+    ],
+    "logo": "https://images.unsplash.com/photo-1523474253246-72fb9c27030d?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Frontend Platform Engineer",
+    "company": "Stripe",
+    "role": "Frontend Developer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA & Dublin, Ireland (Remote Eligible)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$150k – $180k · ₹35 – 45 LPA",
+    "deadline": "2026-12-01T00:00:00.000Z",
+    "requiredSkills": ["React", "TypeScript", "Node.js", "REST APIs", "State Management", "Design Systems"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Architect world-class payment checkout user experiences handling billions in global transactions with sub-100ms response times.",
+    "responsibilities": [
+      "Build high-reliability frontend SDKs consumed by millions of merchants worldwide.",
+      "Collaborate with security and cryptography teams to ensure frictionless PCI-DSS compliance.",
+      "Develop ultra-responsive checkout UI widgets with zero third-party dependencies."
+    ],
+    "requirements": [
+      "Exceptional command of TypeScript, React component lifecycle, and web performance profiling.",
+      "Experience with browser security primitives, iframe sandboxing, and payment APIs.",
+      "Passion for developer ergonomics and beautiful, accessible user interfaces."
+    ],
+    "logo": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Mobile Application Engineer (iOS & Android)",
+    "company": "Stripe",
+    "role": "Mobile App Developer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$145k – $175k · ₹32 – 42 LPA",
+    "deadline": "2026-11-20T00:00:00.000Z",
+    "requiredSkills": ["React Native", "TypeScript", "Flutter", "REST APIs", "State Management", "Mobile Architecture"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build the mobile point-of-sale and merchant checkout applications powering global commerce on iOS and Android.",
+    "responsibilities": [
+      "Develop cross-platform mobile experiences with 60fps animations and offline sync.",
+      "Integrate hardware card readers via Bluetooth Low Energy and NFC protocols.",
+      "Maintain automated test suites with end-to-end device farm validation."
+    ],
+    "requirements": [
+      "Demonstrated experience shipping production React Native or Flutter applications.",
+      "Deep understanding of mobile security, keychain biometrics, and offline caching.",
+      "Familiarity with native platform bridges in Swift/Kotlin."
+    ],
+    "logo": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Frontend Engineer (UI Infrastructure)",
+    "company": "Meta",
+    "role": "Frontend Developer",
+    "domain": "Software Engineering",
+    "location": "Menlo Park, CA & Remote Eligible",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$140k – $170k · ₹28 – 36 LPA",
+    "deadline": "2026-12-10T00:00:00.000Z",
+    "requiredSkills": ["React", "TypeScript", "GraphQL", "Next.js", "Node.js", "Performance Optimization"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Craft core web rendering frameworks powering Instagram, WhatsApp Web, and Threads for 3+ billion active users.",
+    "responsibilities": [
+      "Implement server-driven UI engines and concurrent React streaming primitives.",
+      "Profile and optimize memory consumption and core web vitals across mobile browsers.",
+      "Contribute directly to open-source React and Relay toolchains."
+    ],
+    "requirements": [
+      "Proficient in React, TypeScript, and modern asynchronous frontend paradigms.",
+      "Experience with CSS architecture, DOM virtualization, and bundle chunking.",
+      "Track record of writing bulletproof automated tests with Jest and Playwright."
+    ],
+    "logo": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "AI & Large Language Model Research Engineer",
+    "company": "OpenAI",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "San Francisco, CA (Hybrid)",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$250k – $350k + Equity",
+    "deadline": "2026-12-31T00:00:00.000Z",
+    "requiredSkills": ["Python", "PyTorch", "Transformers", "CUDA", "Distributed Training", "RLHF"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Train frontier multimodal foundation models and develop alignment algorithms that advance general artificial intelligence safely.",
+    "responsibilities": [
+      "Scale training runs across tens of thousands of GPUs using Megatron and DeepSpeed.",
+      "Implement novel reinforcement learning from human feedback (RLHF) loss formulations.",
+      "Collaborate with red-teaming teams to identify hallucination modes and security vulnerabilities."
+    ],
+    "requirements": [
+      "Strong track record in machine learning research with published papers (NeurIPS, ICML, ICLR).",
+      "Demonstrated ability to write high-performance CUDA kernels and PyTorch C++ extensions.",
+      "Deep understanding of transformer attention mechanics and inference quantization."
+    ],
+    "logo": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Machine Learning Platform Engineer",
+    "company": "Anthropic",
+    "role": "MLOps Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "San Francisco, CA & Seattle, WA",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$210k – $280k",
+    "deadline": "2026-11-25T00:00:00.000Z",
+    "requiredSkills": ["Python", "Kubernetes", "Ray", "Docker", "PyTorch", "MLflow"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Build scalable compute fabrics and real-time model serving infrastructure for Claude conversational models.",
+    "responsibilities": [
+      "Design resilient orchestration systems on Kubernetes clusters handling petabytes of training datasets.",
+      "Optimize low-latency LLM inference pipelines with speculative decoding and vLLM.",
+      "Automate continuous evaluation pipelines testing safety guardrails across model revisions."
+    ],
+    "requirements": [
+      "Experience deploying large scale machine learning services in production.",
+      "Familiarity with distributed clusters, GPU scheduling, and network fabrics (InfiniBand/RoCE).",
+      "Proficient in Python, Go, and cloud native technologies."
+    ],
+    "logo": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cloud Security & DevSecOps Engineer",
+    "company": "Databricks",
+    "role": "Security Engineer",
+    "domain": "Cybersecurity",
+    "location": "San Francisco, CA & Bangalore, India",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$160k – $200k · ₹30 – 40 LPA",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["Terraform", "Kubernetes", "AWS", "Network Security", "Linux", "Python"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Defend cloud lakehouse infrastructure against sophisticated cyber attacks with automated policy enforcement and runtime threat detection.",
+    "responsibilities": [
+      "Embed automated vulnerability scanning and secret detection into CI/CD pipelines.",
+      "Architect zero-trust IAM architectures across multi-cloud deployments (AWS, Azure, GCP).",
+      "Conduct adversarial simulations and red-team audits on core container runtimes."
+    ],
+    "requirements": [
+      "Extensive background in cloud security architecture and container hardening.",
+      "Hands-on scripting skills in Python or Go for automated remediation.",
+      "Knowledge of SOC2, ISO 27001, and FedRAMP compliance frameworks."
+    ],
+    "logo": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Site Reliability Engineer (Edge Infrastructure)",
+    "company": "Cloudflare",
+    "role": "DevOps / SRE",
+    "domain": "Cloud & DevOps",
+    "location": "Austin, TX & London, UK (Remote)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Senior",
+    "salary": "$155k – $190k",
+    "deadline": "2026-11-18T00:00:00.000Z",
+    "requiredSkills": ["Linux", "Go", "BGP", "Docker", "Kubernetes", "Prometheus"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Keep 20% of the world's internet traffic fast, reliable, and secure across Cloudflare's 300+ city edge network.",
+    "responsibilities": [
+      "Automate deployment and canary validation of Anycast routing software.",
+      "Mitigate multi-terabit volumetric DDoS attacks in real time.",
+      "Build high-cardinality observability pipelines tracking trillions of HTTP requests daily."
+    ],
+    "requirements": [
+      "In-depth mastery of the Linux kernel, networking stack (TCP/IP, UDP, QUIC), and BGP routing.",
+      "Strong programming proficiency in Go, Rust, or C.",
+      "Demonstrated incident command and high-severity triage experience."
+    ],
+    "logo": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Distributed Systems Engineer (Core Database)",
+    "company": "Snowflake",
+    "role": "Backend Engineer",
+    "domain": "Data Engineering",
+    "location": "San Mateo, CA & Berlin, Germany",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$170k – $210k + Equity",
+    "deadline": "2026-12-05T00:00:00.000Z",
+    "requiredSkills": ["C++", "Java", "SQL", "Distributed Systems", "Concurrency", "Query Optimization"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Engineer the compute engine that processes exabytes of analytical queries for global enterprises in seconds.",
+    "responsibilities": [
+      "Develop vectorised execution kernels optimizing modern CPU cache hierarchies.",
+      "Enhance transactional durability guarantees in cloud-native metadata stores.",
+      "Benchmark query latency against standard TPC-DS datasets."
+    ],
+    "requirements": [
+      "Strong computer science fundamentals with emphasis on storage systems and compilers.",
+      "Proven systems programming proficiency in modern C++ (C++17/20) or Java.",
+      "Experience building distributed query planners and executors."
+    ],
+    "logo": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "High-Frequency Trading Software Engineer",
+    "company": "Jane Street",
+    "role": "Systems Engineer",
+    "domain": "FinTech",
+    "location": "New York, NY & London, UK",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Entry-Level",
+    "salary": "$250k – $325k Base + Discretionary Bonus",
+    "deadline": "2026-10-31T00:00:00.000Z",
+    "requiredSkills": ["OCaml", "C++", "Linux", "Algorithms", "Low Latency", "Networking"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build automated algorithmic trading engines that execute billions of dollars in equities and derivatives daily.",
+    "responsibilities": [
+      "Develop microsecond-level market data parsers and order routing systems.",
+      "Collaborate directly with quantitative researchers to backtest execution strategies.",
+      "Tune kernel bypass networking libraries (Solarflare OpenOnload) for ultra-low jitter."
+    ],
+    "requirements": [
+      "Brilliant problem solving and algorithmic thinking.",
+      "Experience with functional programming (OCaml, Haskell) or modern systems C++.",
+      "Passion for finance, market microstructure, and high-performance computing."
+    ],
+    "logo": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "FinTech Platform Engineer (Core Payments)",
+    "company": "Razorpay",
+    "role": "Backend Engineer",
+    "domain": "FinTech",
+    "location": "Bangalore, India (Hybrid)",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "₹28 – 38 LPA + ESOPs",
+    "deadline": "2026-11-28T00:00:00.000Z",
+    "requiredSkills": ["Go", "Node.js", "PostgreSQL", "Kafka", "Redis", "Distributed Systems"],
+    "mncTier": "Unicorn",
+    "desc": "Scale payment gateway pipelines handling 10,000+ transactions per second during flash sales across India.",
+    "responsibilities": [
+      "Architect idempotent payment processing services with zero tolerance for state loss.",
+      "Design real-time settlement ledgers backed by distributed SQL databases.",
+      "Integrate directly with national banking rails (UPI, IMPS, RTGS) with resilient retry policies."
+    ],
+    "requirements": [
+      "3+ years experience building mission-critical distributed systems in Go or Java.",
+      "Solid mastery of relational database transactions, locks, and indexing.",
+      "Strong understanding of event-driven architectures using Apache Kafka."
+    ],
+    "logo": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Backend Engineering Intern (Payments & Ledger)",
+    "company": "Stripe",
+    "role": "Software Engineer",
+    "domain": "FinTech",
+    "location": "Seattle, WA & Dublin, Ireland",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$55 - $65 / hr",
+    "deadline": "2026-11-01T00:00:00.000Z",
+    "requiredSkills": ["Ruby", "Java", "Go", "SQL", "REST APIs", "Git"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build automated reconciliation engines and merchant payout pipelines for the financial infrastructure of the internet.",
+    "responsibilities": [
+      "Develop idempotent API endpoints for international currency conversion.",
+      "Write unit and integration tests simulating complex edge-case financial transactions.",
+      "Partner with product managers to deliver transparent reporting features for online businesses."
+    ],
+    "requirements": [
+      "Pursuing a degree in Computer Science, Mathematics, or related technical discipline.",
+      "Solid foundations in object-oriented design, databases, and algorithms.",
+      "Enthusiasm for clean code, robust documentation, and financial technology."
+    ],
+    "logo": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cybersecurity Threat Hunter & Incident Responder",
+    "company": "CrowdStrike",
+    "role": "Security Analyst",
+    "domain": "Cybersecurity",
+    "location": "Sunnyvale, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$135k – $165k · ₹25 – 35 LPA",
+    "deadline": "2026-12-20T00:00:00.000Z",
+    "requiredSkills": ["Python", "SIEM", "Reverse Engineering", "Wireshark", "MITRE ATT&CK", "Linux"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Analyze nation-state cyber intrusions, identify zero-day vulnerabilities, and deploy threat countermeasures across the Falcon platform.",
+    "responsibilities": [
+      "Perform deep forensic analysis on malware samples and memory dumps.",
+      "Develop automated detection heuristics mapped to the MITRE ATT&CK matrix.",
+      "Deliver executive briefing dossiers detailing adversary tactics, techniques, and procedures (TTPs)."
+    ],
+    "requirements": [
+      "Hands-on experience in SOC operations, incident response, or penetration testing.",
+      "Proficient in Python or PowerShell for malware analysis and data parsing.",
+      "Relevant certifications (OSCP, CISSP, CEH) highly preferred."
+    ],
+    "logo": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Data Engineering Intern - Streaming Telemetry",
+    "company": "Netflix",
+    "role": "Data Engineer",
+    "domain": "Data Engineering",
+    "location": "Los Gatos, CA",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$50 - $60 / hr",
+    "deadline": "2026-11-10T00:00:00.000Z",
+    "requiredSkills": ["Python", "SQL", "Apache Spark", "Kafka", "AWS S3", "Docker"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Process real-time video playback telemetry from 260+ million subscribers to optimize adaptive bitrate streaming algorithms.",
+    "responsibilities": [
+      "Construct high-throughput Spark streaming jobs aggregating billions of device pings daily.",
+      "Build automated data quality gates alerting on schema drifts and missing metadata.",
+      "Create dimensional data marts supporting algorithm recommendation teams."
+    ],
+    "requirements": [
+      "Enrolled in a STEM undergraduate or graduate degree program.",
+      "Demonstrated proficiency in Python, SQL, and data transformation concepts.",
+      "Curiosity about distributed data stores and large-scale media distribution."
+    ],
+    "logo": "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Staff Backend Architect - Real-Time Communications",
+    "company": "Discord",
+    "role": "Backend Engineer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA (Hybrid)",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$220k – $270k + Equity",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["Rust", "Elixir", "Distributed Systems", "WebRTC", "Cassandra", "Kubernetes"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Scale voice, video, and text infrastructure that connects 150+ million monthly active gamers and community members.",
+    "responsibilities": [
+      "Re-architect high-frequency voice routing nodes in Rust for minimal jitter.",
+      "Optimize distributed state synchronization between millions of simultaneous WebSocket connections.",
+      "Lead technical design reviews and mentor senior engineering staff."
+    ],
+    "requirements": [
+      "7+ years experience designing ultra-low latency distributed real-time systems.",
+      "Deep mastery of Rust or Elixir/Erlang concurrency models.",
+      "Extensive experience with distributed databases like ScyllaDB or Cassandra."
+    ],
+    "logo": "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Engineer - Developer Tooling",
+    "company": "Vercel",
+    "role": "Full-Stack Developer",
+    "domain": "Software Engineering",
+    "location": "Remote (Worldwide)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$140k – $175k · ₹30 – 40 LPA",
+    "deadline": "2026-11-20T00:00:00.000Z",
+    "requiredSkills": ["Next.js", "React", "TypeScript", "Node.js", "Edge Functions", "Tailwind CSS"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Build the deployment and observability interfaces that make the web faster for millions of developers using Next.js.",
+    "responsibilities": [
+      "Develop real-time deployment status dashboards and serverless execution analytics.",
+      "Collaborate with the Next.js core team to pioneer cutting-edge React Server Components patterns.",
+      "Optimize build pipelines and edge worker cold-start latencies."
+    ],
+    "requirements": [
+      "Deep mastery of Next.js, React, and TypeScript.",
+      "Passion for world-class developer experiences and pixel-perfect design.",
+      "Experience with edge compute runtimes, serverless architectures, and modern web protocols."
+    ],
+    "logo": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Autonomous Driving Perception Software Engineer",
+    "company": "Tesla",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "Palo Alto, CA",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$160k – $220k + Stock",
+    "deadline": "2026-12-31T00:00:00.000Z",
+    "requiredSkills": ["C++", "Python", "PyTorch", "Computer Vision", "CUDA", "TensorRT"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Train and deploy deep neural networks that run on Tesla Autopilot vehicles to navigate real-world city streets in real-time.",
+    "responsibilities": [
+      "Train vision foundation models extracting 3D geometry and occupancy from 8 multi-camera video streams.",
+      "Quantize and optimize neural network weights to execute within a 10ms budget on Tesla FSD hardware.",
+      "Debug difficult edge cases using vehicle fleet telemetry."
+    ],
+    "requirements": [
+      "Solid foundation in computer vision, 3D geometry, and deep learning.",
+      "Proficient in C++ and Python with hands-on experience optimizing GPU inference.",
+      "Track record of deploying neural networks to resource-constrained hardware."
+    ],
+    "logo": "https://images.unsplash.com/photo-1536700503339-1e4b06520771?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cloud Infrastructure & Kubernetes Engineer",
+    "company": "Apple",
+    "role": "DevOps / SRE",
+    "domain": "Cloud & DevOps",
+    "location": "Cupertino, CA & Hyderabad, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$150k – $185k · ₹26 – 34 LPA",
+    "deadline": "2026-11-30T00:00:00.000Z",
+    "requiredSkills": ["Kubernetes", "Docker", "Go", "Python", "Linux", "Terraform"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Operate the mission-critical cloud platform hosting iCloud, Apple Music, and App Store services for a billion devices.",
+    "responsibilities": [
+      "Automate cluster provisioning and multi-region failover across global Apple data centers.",
+      "Build custom Kubernetes controllers and CRDs in Go to manage complex stateful workloads.",
+      "Conduct capacity planning, disaster recovery simulations, and security hardening audits."
+    ],
+    "requirements": [
+      "Extensive experience running production Kubernetes clusters at scale.",
+      "Strong coding proficiency in Go or Python.",
+      "In-depth knowledge of Linux system administration, cgroups, and eBPF observability."
+    ],
+    "logo": "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Mobile App Engineering Intern (iOS)",
+    "company": "Uber",
+    "role": "Mobile App Developer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA & Bangalore, India",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$50 - $60 / hr · ₹1,00,000 / mo",
+    "deadline": "2026-11-15T00:00:00.000Z",
+    "requiredSkills": ["Swift", "iOS", "Xcode", "REST APIs", "MapKit", "CoreLocation"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build rider and driver mobile experiences that orchestrate millions of real-time rides and deliveries every single day.",
+    "responsibilities": [
+      "Develop native iOS UI components with smooth navigation transitions and dynamic route rendering.",
+      "Optimize battery consumption and location polling accuracy during active trips.",
+      "Write unit tests with comprehensive code coverage using XCTest."
+    ],
+    "requirements": [
+      "Pursuing a degree in Computer Science, Computer Engineering, or related technical field.",
+      "Proficient in Swift with understanding of iOS app architecture (MVVM, RIBs).",
+      "Knowledge of client-server networking, REST APIs, and multi-threading."
+    ],
+    "logo": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Security Operations & Pen Testing Specialist",
+    "company": "Palo Alto Networks",
+    "role": "Security Analyst",
+    "domain": "Cybersecurity",
+    "location": "Santa Clara, CA & Bangalore, India",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$130k – $165k · ₹24 – 32 LPA",
+    "deadline": "2026-12-05T00:00:00.000Z",
+    "requiredSkills": ["Network Security", "Penetration Testing", "Burp Suite", "Python", "Firewalls", "Linux"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Assess vulnerabilities across enterprise networks and build next-generation automated intrusion prevention signatures.",
+    "responsibilities": [
+      "Execute automated and manual penetration tests against web services and cloud environments.",
+      "Draft remediation roadmaps for zero-day CVE findings.",
+      "Design threat correlation models for cloud-delivered security services."
+    ],
+    "requirements": [
+      "Practical experience with penetration testing frameworks and vulnerability scanners.",
+      "Familiarity with network protocols (TCP, IP, DNS, TLS) and packet inspection.",
+      "Certifications like OSCP, CEH, or CompTIA Security+ preferred."
+    ],
+    "logo": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Senior Data Architect - Real-Time Analytics",
+    "company": "Palantir",
+    "role": "Data Engineer",
+    "domain": "Data Engineering",
+    "location": "Denver, CO & Washington, DC",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$180k – $240k + Equity",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["Python", "Spark", "Java", "PostgreSQL", "Data Pipelines", "Kubernetes"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Deploy Palantir Foundry data platforms that unify mission-critical operational data for defense and healthcare organizations.",
+    "responsibilities": [
+      "Architect petabyte-scale data lakes with semantic ontologies and row-level access controls.",
+      "Optimize data pipelines running across heterogeneous cloud and air-gapped environments.",
+      "Work closely with customer executives to translate complex mission requirements into data pipelines."
+    ],
+    "requirements": [
+      "5+ years of enterprise data engineering and distributed architecture experience.",
+      "Expertise in Spark, Hadoop, Presto, and relational database systems.",
+      "US citizenship or security clearance eligibility may be required for certain projects."
+    ],
+    "logo": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Front-End Developer - Interactive Web Tools",
+    "company": "Figma",
+    "role": "Frontend Developer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$150k – $185k",
+    "deadline": "2026-11-25T00:00:00.000Z",
+    "requiredSkills": ["TypeScript", "React", "WebGL", "WebAssembly", "State Management", "Canvas"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Push the limits of the browser by crafting high-performance vector rendering and collaborative whiteboard experiences.",
+    "responsibilities": [
+      "Optimize 60fps canvas rendering pipelines handling complex nested artboards.",
+      "Build multiplayer collaboration algorithms based on operational transformation and CRDTs.",
+      "Deliver intuitive, polished UI widgets that designers and engineers love."
+    ],
+    "requirements": [
+      "Exceptional command of TypeScript, modern JavaScript, and web graphics (Canvas/WebGL).",
+      "Experience writing high-performance code with consideration for memory and garbage collection.",
+      "Strong intuition for user interaction design and visual fidelity."
+    ],
+    "logo": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Crypto Protocol & Smart Contract Engineer",
+    "company": "Coinbase",
+    "role": "Backend Engineer",
+    "domain": "FinTech",
+    "location": "Remote (US & Global)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$155k – $195k + Crypto Incentive",
+    "deadline": "2026-12-10T00:00:00.000Z",
+    "requiredSkills": ["Go", "Solidity", "Blockchain", "Cryptography", "REST APIs", "Docker"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build the secure digital asset custody and institutional exchange platforms trusted by 100+ million customers.",
+    "responsibilities": [
+      "Develop secure node connectors and transaction signing services for leading Layer-1 and Layer-2 blockchains.",
+      "Perform formal verification on smart contracts and wallet authorization flows.",
+      "Build high-throughput order settlement and accounting ledger pipelines in Go."
+    ],
+    "requirements": [
+      "Solid proficiency in Go, Rust, or C++ in production environments.",
+      "Good understanding of cryptographic primitives (ECDSA, Ed25519, hashing algorithms).",
+      "Demonstrated interest in decentralized finance and blockchain protocols."
+    ],
+    "logo": "https://images.unsplash.com/photo-1622979135225-d2ba269bc1df?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Engineer - Member Experience",
+    "company": "CRED",
+    "role": "Full-Stack Developer",
+    "domain": "FinTech",
+    "location": "Bangalore, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "₹32 – 48 LPA + ESOPs",
+    "deadline": "2026-11-30T00:00:00.000Z",
+    "requiredSkills": ["React Native", "Node.js", "TypeScript", "PostgreSQL", "Redis", "Kafka"],
+    "mncTier": "Unicorn",
+    "desc": "Build award-winning financial lifestyle apps that reward India's top creditworthy individuals with silky-smooth micro-animations.",
+    "responsibilities": [
+      "Engineer buttery-smooth 60fps mobile interfaces with gesture physics and sensory design.",
+      "Develop resilient backend microservices processing billions in credit card payments.",
+      "Collaborate closely with product design to experiment with novel visual interactions."
+    ],
+    "requirements": [
+      "Strong expertise in React Native, TypeScript, and high-performance Node.js services.",
+      "Relentless attention to detail, motion physics, and user experience craftsmanship.",
+      "Experience with relational data modelling, caching, and queue systems."
+    ],
+    "logo": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "API Platform Engineer - Developer Ecosystem",
+    "company": "Postman",
+    "role": "Backend Engineer",
+    "domain": "Software Engineering",
+    "location": "Bangalore, India & San Francisco, CA (Remote)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$135k – $165k · ₹28 – 38 LPA",
+    "deadline": "2026-12-05T00:00:00.000Z",
+    "requiredSkills": ["Node.js", "TypeScript", "REST APIs", "GraphQL", "PostgreSQL", "Docker"],
+    "mncTier": "Unicorn",
+    "desc": "Build the API collaboration platform used by 30+ million developers and 500,000 organizations worldwide.",
+    "responsibilities": [
+      "Scale real-time API collection collaboration servers and automated test runners.",
+      "Design open standards for API schemas (OpenAPI, AsyncAPI, GraphQL).",
+      "Improve response latencies and reliability across global serverless regions."
+    ],
+    "requirements": [
+      "Strong background building high-throughput backend services in Node.js and TypeScript.",
+      "Deep understanding of HTTP protocols, websockets, and API architectures.",
+      "Passionate about developer productivity and open-source ecosystems."
+    ],
+    "logo": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Quantitative Trading Software Engineer",
+    "company": "Zerodha",
+    "role": "Backend Engineer",
+    "domain": "FinTech",
+    "location": "Bangalore, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "₹25 – 40 LPA",
+    "deadline": "2026-11-20T00:00:00.000Z",
+    "requiredSkills": ["Go", "Python", "PostgreSQL", "Redis", "Kafka", "Linux"],
+    "mncTier": "Unicorn",
+    "desc": "Power Kite, India's largest retail brokerage executing over 15 million trades daily with minimal overhead and zero debt.",
+    "responsibilities": [
+      "Maintain and optimize Kite Connect APIs handling millions of requests per minute with sub-millisecond latencies.",
+      "Develop fault-tolerant order routing and position calculation microservices in Go.",
+      "Build robust audit logging and compliance telemetry ensuring zero discrepancies."
+    ],
+    "requirements": [
+      "Deep programming proficiency in Go or Python with focus on simplicity and performance.",
+      "Experience optimizing PostgreSQL queries on multi-terabyte tables.",
+      "Enthusiasm for low-overhead, self-hosted, open-source architectures."
+    ],
+    "logo": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Machine Learning Research Intern",
+    "company": "Google",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "Bangalore, India & Zurich, Switzerland",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$55 / hr · ₹1,10,000 / mo",
+    "deadline": "2026-11-30T00:00:00.000Z",
+    "requiredSkills": ["Python", "TensorFlow", "JAX", "Machine Learning", "Mathematics"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Conduct groundbreaking research alongside Google DeepMind scientists in reinforcement learning, robotics, or natural language understanding.",
+    "responsibilities": [
+      "Formulate novel algorithmic hypotheses and prototype experimental models in JAX.",
+      "Analyze training curves, loss dynamics, and model representations.",
+      "Publish discoveries to top-tier conferences (NeurIPS, ICML, CVPR)."
+    ],
+    "requirements": [
+      "Enrolled in a PhD or MS degree in Computer Science, Machine Learning, or related quantitative field.",
+      "First-author research publication or impressive GitHub open-source machine learning projects.",
+      "Strong mathematical grounding in linear algebra, calculus, and probability."
+    ],
+    "logo": "https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cloud Infrastructure Engineer",
+    "company": "Netflix",
+    "role": "Cloud & DevOps Engineer",
+    "domain": "Cloud & DevOps",
+    "location": "Los Gatos, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Senior",
+    "salary": "$190k – $250k",
+    "deadline": "2026-12-18T00:00:00.000Z",
+    "requiredSkills": ["AWS", "Spinnaker", "Java", "Python", "Kubernetes", "Linux"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build the continuous deployment platform and chaos engineering automation that powers Netflix's global streaming service.",
+    "responsibilities": [
+      "Develop automated canary deployment algorithms verifying service health under live traffic.",
+      "Conduct automated Chaos Monkey experiments inducing instance failures to verify resiliency.",
+      "Design self-healing cloud infrastructure spanning multi-region AWS footprints."
+    ],
+    "requirements": [
+      "Extensive experience operating large scale multi-region AWS cloud architectures.",
+      "Strong programming skills in Java, Python, or Go.",
+      "Passion for high freedom and high responsibility engineering culture."
+    ],
+    "logo": "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Backend Engineering Intern - Database Platforms",
+    "company": "MongoDB",
+    "role": "Software Engineer",
+    "domain": "Software Engineering",
+    "location": "New York, NY & Dublin, Ireland",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$48 - $58 / hr",
+    "deadline": "2026-11-22T00:00:00.000Z",
+    "requiredSkills": ["C++", "Python", "MongoDB", "Data Structures", "Distributed Systems"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Work on the core MongoDB server engine, developing new storage primitives, query optimization algorithms, or Atlas cloud automation.",
+    "responsibilities": [
+      "Implement features and performance enhancements in the core C++ mongod codebase.",
+      "Write automated unit and integration tests running across massive distributed test matrices.",
+      "Benchmark throughput and latency under heavy concurrency workloads."
+    ],
+    "requirements": [
+      "Pursuing a degree in Computer Science, Software Engineering, or related discipline.",
+      "Proficient in C++ or modern object-oriented languages.",
+      "Solid knowledge of database internals, concurrency, and operating systems."
+    ],
+    "logo": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "DevOps & Infrastructure Engineer",
+    "company": "GitHub",
+    "role": "Cloud & DevOps Engineer",
+    "domain": "Cloud & DevOps",
+    "location": "Remote (Worldwide)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$140k – $170k · ₹28 – 38 LPA",
+    "deadline": "2026-12-10T00:00:00.000Z",
+    "requiredSkills": ["Ruby", "Go", "Kubernetes", "Linux", "Terraform", "CI/CD"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Keep GitHub.com fast, secure, and available for 100+ million developers storing code across the globe.",
+    "responsibilities": [
+      "Automate zero-downtime database failovers and schema migrations for billions of git repositories.",
+      "Scale GitHub Actions compute runners handling millions of automated workflows daily.",
+      "Build real-time health dashboards with proactive alert routing."
+    ],
+    "requirements": [
+      "Experience operating large-scale web services on Kubernetes and public clouds.",
+      "Proficiency with Go, Ruby, or Python.",
+      "Strong foundation in networking, Linux systems, and infrastructure as code."
+    ],
+    "logo": "https://images.unsplash.com/photo-1618401471353-b98aedd04e11?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cybersecurity Vulnerability Researcher",
+    "company": "Google",
+    "role": "Security Analyst",
+    "domain": "Cybersecurity",
+    "location": "Mountain View, CA & Zurich, Switzerland",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$180k – $230k",
+    "deadline": "2026-12-25T00:00:00.000Z",
+    "requiredSkills": ["C", "C++", "Reverse Engineering", "Fuzzing", "Linux Kernel", "Exploit Analysis"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Join Google Project Zero to find zero-day vulnerabilities in high-profile operating systems, browsers, and hardware firmware.",
+    "responsibilities": [
+      "Develop innovative fuzzing engines discovering novel memory corruption bugs.",
+      "Analyze structural root causes of modern exploits and propose architectural mitigations.",
+      "Publish comprehensive technical vulnerability write-ups for the global security community."
+    ],
+    "requirements": [
+      "Demonstrated track record of finding and analyzing critical zero-day vulnerabilities (CVE credits).",
+      "Expertise in assembly, C/C++, reverse engineering tools (Ghidra, IDA Pro), and kernel debugging.",
+      "Commitment to ethical disclosure principles."
+    ],
+    "logo": "https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Machine Learning Engineer - Personalization",
+    "company": "Spotify",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "Stockholm, Sweden & New York, NY (Remote Option)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$145k – $180k",
+    "deadline": "2026-12-08T00:00:00.000Z",
+    "requiredSkills": ["Python", "PyTorch", "Kubeflow", "GCP", "SQL", "Recommender Systems"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Develop the algorithmic models powering Discover Weekly and Daily Mix for 600+ million music listeners.",
+    "responsibilities": [
+      "Train two-tower neural collaborative filtering models on hundreds of billions of user stream interactions.",
+      "Conduct online A/B tests evaluating musical diversity, session retention, and user satisfaction.",
+      "Build real-time feature stores serving embeddings with sub-15ms response times."
+    ],
+    "requirements": [
+      "Mastery of Python, modern ML frameworks, and distributed data processing.",
+      "Experience designing and evaluating recommendation systems at scale.",
+      "Solid understanding of statistical hypothesis testing and offline/online evaluation metrics."
+    ],
+    "logo": "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Software Engineer - Collaboration Tools",
+    "company": "Atlassian",
+    "role": "Full-Stack Developer",
+    "domain": "Software Engineering",
+    "location": "Sydney, Australia & Bangalore, India (Remote)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$130k – $160k · ₹26 – 35 LPA",
+    "deadline": "2026-11-28T00:00:00.000Z",
+    "requiredSkills": ["React", "TypeScript", "Node.js", "Java", "AWS", "REST APIs"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build the team collaboration tools (Jira, Confluence) that power software engineering workflows across the Fortune 500.",
+    "responsibilities": [
+      "Develop modular React UI components integrated with the Atlaskit design system.",
+      "Build resilient REST and GraphQL microservices deployed on AWS serverless runtimes.",
+      "Drive continuous delivery improvements and automated test suites."
+    ],
+    "requirements": [
+      "3+ years building modern full-stack web applications with React and TypeScript.",
+      "Familiarity with server-side architecture in Node.js or Java.",
+      "Strong communication skills and enthusiasm for asynchronous remote team collaboration."
+    ],
+    "logo": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Data Platform Engineer - High Throughput Pipelines",
+    "company": "Uber",
+    "role": "Data Engineer",
+    "domain": "Data Engineering",
+    "location": "San Francisco, CA & Hyderabad, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$145k – $180k · ₹28 – 38 LPA",
+    "deadline": "2026-12-12T00:00:00.000Z",
+    "requiredSkills": ["Java", "Scala", "Kafka", "Flink", "Hadoop", "Distributed Systems"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build the real-time event streaming platform that handles trillions of daily GPS events for dynamic marketplace pricing.",
+    "responsibilities": [
+      "Develop stateful stream processing pipelines in Apache Flink with exactly-once guarantees.",
+      "Scale Kafka clusters across multiple physical data centers with seamless data replication.",
+      "Implement data lineage and automated schema governance across all event streams."
+    ],
+    "requirements": [
+      "Strong background in distributed systems and JVM languages (Java, Scala).",
+      "Hands-on experience with Apache Kafka, Flink, or Spark Streaming.",
+      "Knowledge of distributed storage formats like Apache Hudi or Iceberg."
+    ],
+    "logo": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Security Engineering Intern - Cloud Defense",
+    "company": "Microsoft",
+    "role": "Security Analyst",
+    "domain": "Cybersecurity",
+    "location": "Hyderabad, India & Redmond, WA",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$42 - $50 / hr · ₹80,000 / mo",
+    "deadline": "2026-11-20T00:00:00.000Z",
+    "requiredSkills": ["Python", "PowerShell", "Azure", "Security", "Networking"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Partner with Microsoft Defender engineers to build threat detection automation and audit cloud tenant permissions.",
+    "responsibilities": [
+      "Write automated detection rules identifying suspicious login anomalies and credential spraying.",
+      "Develop security compliance scripts testing Azure resources against CIS benchmarks.",
+      "Create interactive security visualization dashboards for enterprise administrators."
+    ],
+    "requirements": [
+      "Enrolled in an undergraduate or graduate degree in Computer Science, Cybersecurity, or related field.",
+      "Basic understanding of operating system internals, authentication protocols (OAuth, SAML), and networks.",
+      "Familiarity with scripting in Python or PowerShell."
+    ],
+    "logo": "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Backend Software Engineer - Real-Time Core",
+    "company": "Supabase",
+    "role": "Backend Engineer",
+    "domain": "Software Engineering",
+    "location": "Remote (Worldwide)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$135k – $170k",
+    "deadline": "2026-12-05T00:00:00.000Z",
+    "requiredSkills": ["Elixir", "PostgreSQL", "Go", "Docker", "WebSockets", "Distributed Systems"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Build the open-source Firebase alternative powering hundreds of thousands of developers with real-time PostgreSQL replication.",
+    "responsibilities": [
+      "Develop high-concurrency WebSocket broadcast servers in Elixir/Phoenix.",
+      "Optimize logical replication listeners decoding Postgres write-ahead logs.",
+      "Contribute to open-source developer tooling and client libraries."
+    ],
+    "requirements": [
+      "Strong background in functional programming (Elixir, Erlang) or modern Go.",
+      "Deep understanding of PostgreSQL internals, replication, and query optimization.",
+      "Active participant in open-source development and developer communities."
+    ],
+    "logo": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Machine Learning Engineer - Speech Recognition",
+    "company": "Apple",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "Cupertino, CA & Cambridge, UK",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$155k – $190k",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["Python", "C++", "PyTorch", "Audio Processing", "Deep Learning", "CoreML"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Advance on-device automatic speech recognition and acoustic modeling for Siri running privately across billions of Apple devices.",
+    "responsibilities": [
+      "Train conformer and transformer acoustic models on multilingual audio datasets.",
+      "Quantize neural network architectures to run in real time on the Apple Neural Engine (ANE).",
+      "Develop beam search and language model rescoring algorithms minimizing word error rate."
+    ],
+    "requirements": [
+      "MS or PhD in Computer Science, Electrical Engineering, or related field with focus on speech or audio.",
+      "Proficient in Python and C++ with deep knowledge of PyTorch.",
+      "Understanding of digital signal processing, acoustic features (Mel spectrograms), and neural network compression."
+    ],
+    "logo": "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Frontend Engineer - Creative Tools",
+    "company": "Canva",
+    "role": "Frontend Developer",
+    "domain": "Software Engineering",
+    "location": "Sydney, Australia & Austin, TX (Remote)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$130k – $165k · ₹25 – 35 LPA",
+    "deadline": "2026-12-01T00:00:00.000Z",
+    "requiredSkills": ["TypeScript", "React", "Canvas", "WebGL", "CSS", "Performance"],
+    "mncTier": "Unicorn",
+    "desc": "Empower the world to design by building intuitive visual layout and animation editing interfaces used by 170+ million creators.",
+    "responsibilities": [
+      "Build drag-and-drop design canvas interactions with zero frame drops.",
+      "Develop accessible and responsive UI components using modern design systems.",
+      "Optimize memory usage for complex multi-page vector presentations."
+    ],
+    "requirements": [
+      "Proficient in TypeScript, React, and browser rendering engines.",
+      "Solid knowledge of web animations, HTML5 Canvas, and user input gestures.",
+      "Empathy for visual design, typography, and user accessibility."
+    ],
+    "logo": "https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cloud Solutions & Infrastructure Architect",
+    "company": "Cisco",
+    "role": "Cloud & DevOps Engineer",
+    "domain": "Cloud & DevOps",
+    "location": "San Jose, CA & Bangalore, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$165k – $200k · ₹28 – 38 LPA",
+    "deadline": "2026-12-20T00:00:00.000Z",
+    "requiredSkills": ["Kubernetes", "Linux", "Networking", "Terraform", "Python", "Go"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Design enterprise hybrid cloud networking fabrics and container mesh architectures connecting global distributed offices.",
+    "responsibilities": [
+      "Architect software-defined WAN and multi-cloud networking solutions.",
+      "Automate infrastructure deployments across hybrid private and public clouds using Terraform.",
+      "Conduct security audits and enforce network segmentation policies."
+    ],
+    "requirements": [
+      "Extensive experience with enterprise network design (BGP, OSPF, VPNs, SD-WAN).",
+      "Hands-on expertise with Kubernetes, Istio service mesh, and container networking.",
+      "Strong scripting and automation capabilities in Python or Go."
+    ],
+    "logo": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Mobile App Developer - Consumer Experience",
+    "company": "Swiggy",
+    "role": "Mobile App Developer",
+    "domain": "Software Engineering",
+    "location": "Bangalore, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "₹26 – 36 LPA + ESOPs",
+    "deadline": "2026-11-25T00:00:00.000Z",
+    "requiredSkills": ["React Native", "Flutter", "TypeScript", "REST APIs", "Mobile Performance"],
+    "mncTier": "Unicorn",
+    "desc": "Build the lightning-fast hyperlocal food and grocery delivery mobile apps serving millions of Indian households daily.",
+    "responsibilities": [
+      "Develop high-speed checkout flows and live delivery GPS tracking interfaces.",
+      "Optimize app bundle size and cold-start launch times across budget Android devices.",
+      "Collaborate with backend engineers to minimize network round-trips over 4G/5G connections."
+    ],
+    "requirements": [
+      "Proven experience shipping high-scale React Native or Flutter applications.",
+      "Solid understanding of client-side state caching, background sync, and push notifications.",
+      "Passion for hyper-responsive mobile user experiences."
+    ],
+    "logo": "https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Data Scientist - Algorithmic Pricing & Marketplace",
+    "company": "Airbnb",
+    "role": "Data Scientist",
+    "domain": "Data Engineering",
+    "location": "San Francisco, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$150k – $185k",
+    "deadline": "2026-12-10T00:00:00.000Z",
+    "requiredSkills": ["Python", "SQL", "R", "Machine Learning", "Econometrics", "Causal Inference"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Develop economic supply-demand models and dynamic pricing recommendation algorithms for millions of global hosts.",
+    "responsibilities": [
+      "Build causal inference models measuring the elasticity of guest booking demand across seasonal trends.",
+      "Design smart pricing recommendation algorithms that maximize host revenue.",
+      "Present actionable experimental findings to product leadership and marketplace directors."
+    ],
+    "requirements": [
+      "Master’s or PhD in Statistics, Economics, Computer Science, or related quantitative field.",
+      "Deep expertise in statistical modeling, causal inference, and machine learning.",
+      "Proficient in Python (pandas, statsmodels, scikit-learn) and complex SQL queries."
+    ],
+    "logo": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Software Engineering Intern - Web Platforms",
+    "company": "Meta",
+    "role": "Frontend Developer",
+    "domain": "Software Engineering",
+    "location": "Menlo Park, CA & London, UK",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$52 - $62 / hr · ₹1,00,000 / mo",
+    "deadline": "2026-11-15T00:00:00.000Z",
+    "requiredSkills": ["React", "JavaScript", "HTML5", "CSS3", "Git"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Build feature rich web interfaces for Facebook, Instagram Web, or Threads alongside industry-leading frontend architects.",
+    "responsibilities": [
+      "Implement accessible and modular React UI components for social feed interactions.",
+      "Work with performance engineers to optimize bundle footprints and time to interactive (TTI).",
+      "Participate in code reviews, bug bashes, and team hackathons."
+    ],
+    "requirements": [
+      "Enrolled in a Bachelor's or Master's program in Computer Science or related engineering field.",
+      "Strong grounding in JavaScript (ES6+), React, and responsive web design.",
+      "Demonstrated passion for building beautiful, responsive consumer web interfaces."
+    ],
+    "logo": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Staff AI Safety & Red-Teaming Engineer",
+    "company": "Scale AI",
+    "role": "AI / ML Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "San Francisco, CA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Senior",
+    "salary": "$200k – $260k + Equity",
+    "deadline": "2026-12-28T00:00:00.000Z",
+    "requiredSkills": ["Python", "LLMs", "Red Teaming", "PyTorch", "Prompt Engineering", "Cybersecurity"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Pioneer rigorous automated adversarial evaluation suites testing frontier generative AI models for enterprise and national defense partners.",
+    "responsibilities": [
+      "Design synthetic prompt injection and jailbreak attack datasets for automated evaluation.",
+      "Build benchmarking harnesses scoring models across toxicity, truthfulness, and cybersecurity risk.",
+      "Collaborate with leading foundation model labs to publish safety standards."
+    ],
+    "requirements": [
+      "Extensive experience working with large language models and prompt evaluation frameworks.",
+      "Strong software engineering fundamentals in Python and cloud microservices.",
+      "Background in cybersecurity, adversarial machine learning, or software penetration testing."
+    ],
+    "logo": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cloud Platform & SRE Intern",
+    "company": "Databricks",
+    "role": "DevOps / SRE",
+    "domain": "Cloud & DevOps",
+    "location": "San Francisco, CA & Bangalore, India",
+    "type": "Internship",
+    "remote": false,
+    "experienceLevel": "Intern",
+    "salary": "$45 - $55 / hr · ₹90,000 / mo",
+    "deadline": "2026-11-25T00:00:00.000Z",
+    "requiredSkills": ["Linux", "Python", "Kubernetes", "AWS", "Terraform"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Build automated infrastructure provisioning tools and monitor petabyte-scale Apache Spark clusters in the cloud.",
+    "responsibilities": [
+      "Develop telemetry collection scripts tracking CPU, memory, and disk health across compute nodes.",
+      "Automate cluster recreation and canary health verification in staging environments.",
+      "Partner with senior SREs to investigate production performance bottlenecks."
+    ],
+    "requirements": [
+      "Currently pursuing a degree in Computer Science, Computer Engineering, or related technical field.",
+      "Familiarity with Linux operating systems, shell scripting, and basic cloud concepts.",
+      "Eager to learn modern infrastructure automation and observability tools."
+    ],
+    "logo": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Software Engineer - Productivity Suite",
+    "company": "Notion",
+    "role": "Full-Stack Developer",
+    "domain": "Software Engineering",
+    "location": "San Francisco, CA & New York, NY",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "$155k – $190k + Equity",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["React", "TypeScript", "Node.js", "PostgreSQL", "State Management", "Performance"],
+    "mncTier": "Unicorn",
+    "desc": "Craft the all-in-one connected workspace that millions of knowledge workers and organizations use to organize notes, projects, and wikis.",
+    "responsibilities": [
+      "Develop complex block-based rich text and database editor components in React.",
+      "Optimize SQLite client-side caching to support instant offline loading and real-time syncing.",
+      "Scale PostgreSQL database queries processing billions of block transactions daily."
+    ],
+    "requirements": [
+      "Expert knowledge of TypeScript, React, and browser rendering mechanics.",
+      "Strong understanding of backend data modeling, transactions, and distributed caching.",
+      "High aesthetic standard for user interface craftsmanship and typing feel."
+    ],
+    "logo": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Mobile App Developer (Flutter & Native iOS/Android)",
+    "company": "Zomato",
+    "role": "Mobile App Developer",
+    "domain": "Software Engineering",
+    "location": "Gurgaon, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Mid-Level",
+    "salary": "₹24 – 34 LPA + ESOPs",
+    "deadline": "2026-11-20T00:00:00.000Z",
+    "requiredSkills": ["Flutter", "Dart", "REST APIs", "State Management", "Mobile Architecture"],
+    "mncTier": "Unicorn",
+    "desc": "Create engaging mobile food discovery and live order tracking experiences that delight tens of millions of foodies across 500+ cities.",
+    "responsibilities": [
+      "Build custom widget architectures and responsive animations in Flutter.",
+      "Integrate low-latency WebSocket live rider tracking with map overlays.",
+      "Profile and eliminate UI jank, memory leaks, and excessive battery usage."
+    ],
+    "requirements": [
+      "Solid track record of shipping production mobile applications with Flutter/Dart.",
+      "Familiarity with state management libraries (Bloc, Riverpod, or Provider).",
+      "Understanding of native iOS and Android build systems and App Store guidelines."
+    ],
+    "logo": "https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Enterprise Cloud Solutions Architect",
+    "company": "Salesforce",
+    "role": "Cloud & DevOps Engineer",
+    "domain": "Cloud & DevOps",
+    "location": "San Francisco, CA & Hyderabad, India",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Senior",
+    "salary": "$160k – $205k · ₹28 – 38 LPA",
+    "deadline": "2026-12-10T00:00:00.000Z",
+    "requiredSkills": ["AWS", "Java", "Kubernetes", "Microservices", "REST APIs", "Docker"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Lead architecture strategies that scale Salesforce Customer 360 multi-tenant infrastructure across global public cloud providers.",
+    "responsibilities": [
+      "Design high-availability cloud migration blueprints for Fortune 100 enterprise clients.",
+      "Implement multi-region active-active disaster recovery architectures.",
+      "Mentor enterprise engineering teams on modern cloud-native best practices."
+    ],
+    "requirements": [
+      "7+ years enterprise software architecture and cloud infrastructure experience.",
+      "Deep understanding of multi-tenant database designs, identity federation, and cloud security.",
+      "Excellent executive communication and technical leadership skills."
+    ],
+    "logo": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "GPU Computing & CUDA Software Engineer",
+    "company": "NVIDIA",
+    "role": "Systems Engineer",
+    "domain": "AI & Machine Learning",
+    "location": "Santa Clara, CA & Pune, India",
+    "type": "Full-Time",
+    "remote": false,
+    "experienceLevel": "Senior",
+    "salary": "$175k – $230k · ₹35 – 48 LPA",
+    "deadline": "2026-12-31T00:00:00.000Z",
+    "requiredSkills": ["C++", "CUDA", "GPU Architecture", "Linux", "Deep Learning", "Parallel Computing"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Develop the fundamental CUDA software libraries and parallel algorithms that power the world's most advanced AI supercomputers.",
+    "responsibilities": [
+      "Write handcrafted CUDA kernels optimizing matrix multiplications (GEMM) for Hopper and Blackwell GPU architectures.",
+      "Optimize memory transfers across NVLink and NVSwitch interconnects.",
+      "Collaborate directly with researchers to accelerate PyTorch and TensorRT operations."
+    ],
+    "requirements": [
+      "Strong background in parallel computer architecture, memory hierarchies, and hardware acceleration.",
+      "Expertise in modern C++ (C++17/20) and CUDA programming.",
+      "Deep understanding of numerical algorithms, floating-point precision, and tensor algebra."
+    ],
+    "logo": "https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Full-Stack Engineer - Issue Tracker & Workflow",
+    "company": "Linear",
+    "role": "Full-Stack Developer",
+    "domain": "Software Engineering",
+    "location": "Remote (Worldwide)",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Mid-Level",
+    "salary": "$145k – $180k + Equity",
+    "deadline": "2026-11-30T00:00:00.000Z",
+    "requiredSkills": ["TypeScript", "React", "Node.js", "GraphQL", "PostgreSQL", "Sync Engines"],
+    "mncTier": "High-Growth Startup",
+    "desc": "Build the magical, lightning-fast software development tool designed for modern high-performance teams.",
+    "responsibilities": [
+      "Engineer client-side real-time synchronization pipelines with instant optimistic UI updates.",
+      "Develop keyboard-first navigation patterns with extensive shortcut support.",
+      "Design clean, performant GraphQL schemas and PostgreSQL queries."
+    ],
+    "requirements": [
+      "Passionate about building software with exceptional speed, responsiveness, and taste.",
+      "Expert knowledge of TypeScript, React, and client-side database caching.",
+      "Experience with offline-first architectures and collaborative editing."
+    ],
+    "logo": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=80"
+  },
+  {
+    "title": "Cybersecurity Penetration Tester & Red Teamer",
+    "company": "Mandiant",
+    "role": "Security Analyst",
+    "domain": "Cybersecurity",
+    "location": "Reston, VA & Remote",
+    "type": "Full-Time",
+    "remote": true,
+    "experienceLevel": "Senior",
+    "salary": "$145k – $180k",
+    "deadline": "2026-12-15T00:00:00.000Z",
+    "requiredSkills": ["Penetration Testing", "Python", "Active Directory", "Network Security", "Reverse Engineering"],
+    "mncTier": "Tier-1 MNC",
+    "desc": "Conduct adversary simulations mimicking sophisticated nation-state threat groups to harden critical infrastructure.",
+    "responsibilities": [
+      "Execute full-scope red-team operations across enterprise network environments.",
+      "Develop custom command-and-control (C2) evasion techniques and exploit payloads.",
+      "Collaborate with client blue teams to debrief tactics and improve detection telemetry."
+    ],
+    "requirements": [
+      "5+ years professional penetration testing or red-team experience.",
+      "Deep understanding of Windows/Active Directory internals, Kerberos, and cloud IAM.",
+      "Recognized industry certifications (OSCE, OSCP, GXPN)."
+    ],
+    "logo": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=80"
+  }
+]

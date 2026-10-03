@@ -9,7 +9,7 @@
  */
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowLeft } from 'lucide-react';
-import { NexoraIcon } from '../components/brand/NexoraLogo';
+import { NexoraIcon } from '../components/common/NexoraLogo';
 
 export default function AuthLayout({
   children,

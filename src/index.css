@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-card: var(--bg-card);
+  --color-main: var(--text-main);
+  --color-muted: var(--text-muted);
+  --color-border: var(--border-color);
+  --color-input: var(--input-bg);
+}
+
+.bg-input { background-color: var(--input-bg); }
+.bg-card { background-color: var(--bg-card); }
+.text-main { color: var(--text-main); }
+.text-muted { color: var(--text-muted); }
+.border-border { border-color: var(--border-color); }
+
 
 :root {
   /* LIGHT MODE (Elevated Slate Canvas & Pure White Luxury Cards) */
@@ -26,6 +40,8 @@
   /* Crisp Slate 200 */
   --border-subtle: #cbd5e1;
   /* Slate 300 */
+  --input-bg: #f8fafc;
+  /* Crisp Light Slate Background */
   --success: #10b981;
   --warning: #f59e0b;
 
@@ -39,6 +55,15 @@
   --minimal-zinc: #475569;
   --minimal-card: #ffffff;
   --minimal-card-hover: #f8fafc;
+
+  /* ── Card-bg alias (used throughout pages) ── */
+  --card-bg: var(--bg-card);
+  --card-hover: var(--minimal-card-hover);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-glow-primary: rgba(79, 70, 229, 0.18);
+  --card-radius: 16px;
+  --card-padding: 1.25rem;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -113,6 +138,15 @@ html.dark {
   --minimal-zinc: #a1a1aa;
   --minimal-card: #121215;
   --minimal-card-hover: #16161a;
+
+  /* ── Card-bg alias (dark mode) ── */
+  --card-bg: var(--bg-card);
+  --card-hover: var(--minimal-card-hover);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-highlight: rgba(255, 255, 255, 0.10);
+  --glass-glow-primary: rgba(99, 102, 241, 0.20);
+  --card-radius: 16px;
+  --card-padding: 1.25rem;
 
   /* SKEUOMORPHIC DARK TOKENS (Matte Anodized Titanium) */
   --skeuo-highlight: rgba(255, 255, 255, 0.12);
@@ -212,13 +246,25 @@ html.dark .skeuo-card {
 
 .glass-panel.interactive:hover,
 .skeuo-card.interactive:hover {
-  transform: translateY(-4px) translateZ(0);
+  transform: translateY(-3px) translateZ(0);
   box-shadow:
     inset 0 1px 0 var(--skeuo-highlight),
     inset 0 -1px 0 var(--skeuo-shadow-rim),
-    0 18px 40px -4px var(--skeuo-shadow-deep),
-    0 0 20px var(--primary-glow);
+    0 20px 48px -6px var(--skeuo-shadow-deep),
+    0 0 0 1px rgba(99, 102, 241, 0.25),
+    0 0 24px var(--glass-glow-primary);
   border-color: rgba(99, 102, 241, 0.45);
+  border-top-color: rgba(99, 102, 241, 0.6);
+}
+
+html.dark .glass-panel.interactive:hover,
+html.dark .skeuo-card.interactive:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 24px 52px -8px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(99, 102, 241, 0.3),
+    0 0 32px rgba(99, 102, 241, 0.18);
 }
 
 .glass-panel.interactive:active,
@@ -228,6 +274,179 @@ html.dark .skeuo-card {
     inset 0 2px 4px rgba(0, 0, 0, 0.25),
     0 4px 12px rgba(0, 0, 0, 0.15);
   transition-duration: 0.06s;
+}
+
+/* ─── Elite Card — Unified Luxury Glass Card ─────────────── */
+.elite-card {
+  background: var(--skeuo-surface-card);
+  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-bottom: 1px solid var(--skeuo-shadow-rim);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 1px 0 var(--skeuo-highlight-subtle),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 8px 24px -4px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+  cursor: pointer;
+  will-change: transform, box-shadow;
+}
+
+html.dark .elite-card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 16px 36px -6px rgba(0, 0, 0, 0.65);
+}
+
+.elite-card:hover {
+  transform: translateY(-3px) translateZ(0);
+  border-color: rgba(99, 102, 241, 0.45);
+  border-top-color: rgba(99, 102, 241, 0.6);
+  box-shadow:
+    inset 0 1px 0 var(--skeuo-highlight),
+    0 16px 40px -6px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(99, 102, 241, 0.2),
+    0 0 28px rgba(99, 102, 241, 0.14);
+}
+
+html.dark .elite-card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 24px 52px -8px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(99, 102, 241, 0.3),
+    0 0 32px rgba(99, 102, 241, 0.18);
+}
+
+.elite-card:active {
+  transform: translateY(1px) scale(0.99);
+  transition-duration: 0.05s;
+}
+
+/* Top shimmer line inside .elite-card on hover (add as first child) */
+.elite-card-shimmer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.7) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  pointer-events: none;
+}
+
+.elite-card:hover .elite-card-shimmer {
+  opacity: 1;
+}
+
+/* ─── Elite Frame — Section Container Panel ──────────────── */
+.elite-frame {
+  background: var(--skeuo-surface-card);
+  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--skeuo-highlight);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 1px 0 var(--skeuo-highlight-subtle),
+    0 4px 16px -2px rgba(0, 0, 0, 0.06),
+    0 12px 32px -6px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .elite-frame {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 8px 24px -4px rgba(0, 0, 0, 0.5),
+    0 20px 48px -8px rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 640px) {
+  .elite-frame { padding: 1.75rem; }
+}
+
+@media (min-width: 1024px) {
+  .elite-frame { padding: 2rem; }
+}
+
+/* ─── Elite Responsive Grid Systems ────────────────────────── */
+.elite-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 560px) {
+  .elite-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .elite-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.elite-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .elite-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .elite-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.elite-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .elite-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
 }
 
 /* Animations */
@@ -1111,4 +1330,55 @@ html.dark .skeleton-box {
   height: 22px;
   margin-bottom: 12px;
   border-radius: 6px;
+}
+
+/* ─── Nexora Spring Animations & Micro-Interactions ─────────────── */
+@keyframes spring-pop {
+  0% { transform: scale(0.96); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-spring-pop {
+  animation: spring-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.hover-elevate {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-elevate:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(99, 102, 241, 0.25);
+}
+
+/* Mobile viewport notch safe-areas */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+/* Mobile Touch Active Target Enhancement */
+@media (max-width: 640px) {
+  .interactive:active {
+    transform: scale(0.98);
+  }
+  
+  /* Prevent horizontal scroll bleed on mobile viewports */
+  body, html {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
 }

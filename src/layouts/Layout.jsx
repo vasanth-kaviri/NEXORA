@@ -2,12 +2,16 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, Compass, Bell, ArrowLeft, Rocket, 
   FolderKanban, Trophy, BookOpen, Bot, Settings, 
-  Sun, Moon, ChevronRight, Menu, X, Info
+  Sun, Moon, ChevronRight, Menu, X, Info, User,
+  Briefcase, Clock
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
-import { NexoraIcon } from '../components/brand/NexoraLogo';
+import { NexoraIcon } from '../components/common/NexoraLogo';
 import db from '../services/db';
+import apiClient from '../services/apiClient';
+import useSessionTimeout from '../hooks/useSessionTimeout';
+import ApplicationTrackerDrawer from '../components/ApplicationTrackerDrawer';
 import './Layout.css';
 
 export default function Layout() {
@@ -29,12 +33,29 @@ export default function Layout() {
     return user || { firstName: 'Explorer', dreamJob: 'Software Engineer', level: 1 };
   });
 
+  const [applicationCount, setApplicationCount] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_job_applications');
+      return saved ? JSON.parse(saved).length : 0;
+    } catch {
+      return 0;
+    }
+  });
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isTrackerDrawerOpen, setIsTrackerDrawerOpen] = useState(false);
 
   // Pages that shouldn't show global navigation shell (auth, onboarding, splash, chatbot standalone)
-  const authPaths = ['/', '/onboarding', '/login', '/signup', '/forgot-password', '/complete-profile'];
+  const authPaths = [
+    '/', '/onboarding', '/login', '/signup', 
+    '/forgot-password', '/complete-profile', 
+    '/verify-account', '/reset-password'
+  ];
   const isAuthPage = authPaths.includes(location.pathname);
   const isChatbot = location.pathname === '/chatbot';
+
+  // Checkpoint 3: Session Security - Inactivity Timeout & Cross-Tab Logout Listener
+  useSessionTimeout({ enabled: !isAuthPage });
 
   useEffect(() => {
     const refreshData = () => {
@@ -50,6 +71,38 @@ export default function Layout() {
     return () => {
       window.removeEventListener('notifications_updated', refreshData);
       window.removeEventListener('user_session_changed', refreshData);
+    };
+  }, []);
+
+  // Real-time Application Tracker Count Listener
+  useEffect(() => {
+    const fetchAppCount = async () => {
+      try {
+        const res = await apiClient.get('/api/v1/applications/user-timeline');
+        const count = res.data?.count ?? res.data?.applications?.length;
+        if (typeof count === 'number') {
+          setApplicationCount(count);
+          return;
+        }
+        const fallback = await apiClient.get('/api/v1/applications/my-count');
+        const fallbackCount = fallback.data?.count ?? fallback.data?.data?.count;
+        if (typeof fallbackCount === 'number') {
+          setApplicationCount(fallbackCount);
+        }
+      } catch {
+        // Ignored
+      }
+    };
+
+    fetchAppCount();
+
+    const handleAppUpdated = () => {
+      fetchAppCount();
+    };
+
+    window.addEventListener('applications_updated', handleAppUpdated);
+    return () => {
+      window.removeEventListener('applications_updated', handleAppUpdated);
     };
   }, []);
 
@@ -75,9 +128,11 @@ export default function Layout() {
     { label: 'Roadmap', path: '/roadmap', icon: Compass },
     { label: 'Explore', path: '/explore', icon: Rocket },
     { label: 'Alerts', path: '/notifications', icon: Bell, badge: unreadCount > 0 ? unreadCount : null },
+    { label: 'Profile', path: '/profile', icon: User },
   ];
 
   const secondaryNavItems = [
+    { label: 'Jobs & Tracker', path: '/jobs', icon: Briefcase, badge: applicationCount > 0 ? applicationCount : null },
     { label: 'Projects', path: '/projects', icon: FolderKanban },
     { label: 'Hackathons', path: '/hackathons', icon: Trophy },
     { label: 'Resources', path: '/resources', icon: BookOpen },
@@ -132,6 +187,7 @@ export default function Layout() {
                   onClick={() => navigate(item.path)}
                   className={`nexus-nav-btn ${isActive ? 'active' : ''}`}
                   title={item.label}
+                  aria-label={item.badge ? `${item.label} (${item.badge} unread)` : item.label}
                 >
                   <div className="nav-icon-box">
                     <Icon size={19} />
@@ -155,6 +211,7 @@ export default function Layout() {
                   onClick={() => navigate(item.path)}
                   className={`nexus-nav-btn ${isActive ? 'active' : ''}`}
                   title={item.label}
+                  aria-label={item.label}
                 >
                   <div className="nav-icon-box">
                     <Icon size={19} />
@@ -175,11 +232,11 @@ export default function Layout() {
             title="Open Profile"
           >
             <div className="user-avatar-hex">
-              {currentUser.firstName ? currentUser.firstName.charAt(0).toUpperCase() : 'U'}
+              {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : (currentUser.firstName ? currentUser.firstName.charAt(0).toUpperCase() : 'U')}
             </div>
             <div className="user-pill-meta">
-              <span className="user-pill-name">{currentUser.firstName} {currentUser.lastName || ''}</span>
-              <span className="user-pill-role text-muted">Lvl {currentUser.level || 5} · {currentUser.dreamJob?.split(' ')[0] || 'Tech'}</span>
+              <span className="user-pill-name">{currentUser.name || [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') || 'User'}</span>
+              <span className="user-pill-role text-muted">Lvl {currentUser.level || 1} · {(currentUser.targetRole || currentUser.dreamJob)?.split(' ')[0] || 'Tech'}</span>
             </div>
             <Settings size={16} className="text-muted user-pill-gear" onClick={(e) => { e.stopPropagation(); navigate('/settings'); }} />
           </div>
@@ -221,6 +278,20 @@ export default function Layout() {
           </div>
 
           <div className="topbar-right">
+            {/* Application Tracker Badge Counter */}
+            <button
+              onClick={() => setIsTrackerDrawerOpen(true)}
+              className="topbar-tracker-btn flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/25 transition-all cursor-pointer"
+              title="Open Application Tracker"
+              aria-label={`Application Tracker (${applicationCount})`}
+            >
+              <Clock size={14} className="text-indigo-400" />
+              <span className="hidden sm:inline">Application Tracker</span>
+              <span className="bg-indigo-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                {applicationCount}
+              </span>
+            </button>
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -246,9 +317,9 @@ export default function Layout() {
             <div 
               className="topbar-avatar interactive"
               onClick={() => navigate('/profile')}
-              title={`${currentUser.firstName} (${currentUser.dreamJob})`}
+              title={`${currentUser.name || currentUser.firstName || 'User'} (${currentUser.targetRole || currentUser.dreamJob || 'Engineering'})`}
             >
-              {currentUser.firstName ? currentUser.firstName.charAt(0).toUpperCase() : 'U'}
+              {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : (currentUser.firstName ? currentUser.firstName.charAt(0).toUpperCase() : 'U')}
             </div>
           </div>
         </header>
@@ -294,23 +365,31 @@ export default function Layout() {
       </div>
 
       {/* ── Mobile Floating Bottom Dock (< 768px) ── */}
-      <nav className="mobile-bottom-dock glass-panel md:hidden">
-        {mainNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`mobile-dock-item ${isActive ? 'active' : ''}`}
-            >
-              <Icon size={21} />
-              <span>{item.label}</span>
-              {item.badge && <span className="dock-badge-dot" />}
-            </button>
-          );
-        })}
-      </nav>
+      {!isChatbot && (
+        <nav className="mobile-bottom-dock glass-panel md:hidden">
+          {mainNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`mobile-dock-item ${isActive ? 'active' : ''}`}
+              >
+                <Icon size={21} />
+                <span>{item.label}</span>
+                {item.badge && <span className="dock-badge-dot" />}
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
+      {/* ── Two-Way Application Tracker Glassmorphic Drawer ── */}
+      <ApplicationTrackerDrawer 
+        isOpen={isTrackerDrawerOpen} 
+        onClose={() => setIsTrackerDrawerOpen(false)} 
+      />
     </div>
   );
 }

@@ -1,32 +1,39 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+// getDatabase decommissioned - RTDB replaced with MongoDB REST endpoints
 import { getAuth } from 'firebase/auth';
 
 /**
- * Firebase Realtime Database Client Configuration
- * Supports environment variables with graceful fallback defaults.
+ * Firebase Client Configuration
+ * Falls back gracefully when credentials are missing/invalid (local mock mode).
  */
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDemoNEXORAPlatformKey2026",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "nexora-career.firebaseapp.com",
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://nexora-career-default-rtdb.firebaseio.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "nexora-career",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "nexora-career.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "104857600000",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:104857600000:web:nexora990f1"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Singleton App Initialization
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-const rtdb = getDatabase(app);
-const auth = getAuth(app);
-
-export const isFirebaseConfigured = () => {
-  return Boolean(
-    import.meta.env.VITE_FIREBASE_API_KEY &&
-    import.meta.env.VITE_FIREBASE_DATABASE_URL
+export const isFirebaseConfigured = () =>
+  Boolean(
+    firebaseConfig.apiKey &&
+    !String(firebaseConfig.apiKey).toLowerCase().includes('demo')
   );
-};
+
+// Safe singleton - never crashes the app on bad/missing credentials
+let app = null;
+const rtdb = null; // RTDB decommissioned
+let auth = null;
+
+try {
+  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  // RTDB removed to eliminate '@firebase/database: FIREBASE WARNING'
+  auth = getAuth(app);
+} catch (err) {
+  console.warn('[NEXORA] Firebase init failed - running in local mock mode:', err && err.message);
+}
 
 export { app, rtdb, auth, firebaseConfig };
 export default rtdb;

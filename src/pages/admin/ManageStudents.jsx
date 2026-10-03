@@ -26,8 +26,40 @@ export default function ManageStudents() {
     s.path.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editPath, setEditPath] = useState('');
+
   const handleDelete = (id) => {
+    db.deleteStudent(id);
     setStudents(prev => prev.filter(s => s.id !== id));
+  };
+
+  const openEditModal = (student) => {
+    setEditingStudent(student);
+    setEditName(student.name);
+    setEditPath(student.path);
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editingStudent) return;
+    const all = db.getUsers();
+    const updatedUsers = all.map(u => {
+      if ((u.id && u.id === editingStudent.id) || u.email === editingStudent.email) {
+        const parts = editName.trim().split(' ');
+        return {
+          ...u,
+          firstName: parts[0] || u.firstName,
+          lastName: parts.slice(1).join(' ') || u.lastName,
+          dreamJob: editPath
+        };
+      }
+      return u;
+    });
+    db.saveUsers(updatedUsers);
+    setStudents(prev => prev.map(s => s.id === editingStudent.id ? { ...s, name: editName, path: editPath } : s));
+    setEditingStudent(null);
   };
 
   return (
@@ -92,12 +124,17 @@ export default function ManageStudents() {
                     </div>
                   </td>
                   <td style={{ padding: '16px', textAlign: 'right' }}>
-                    <button style={{ padding: '8px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                    <button 
+                      onClick={() => openEditModal(student)}
+                      style={{ padding: '8px', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      title="Edit Student"
+                    >
                       <Edit2 size={18} />
                     </button>
                     <button 
                       onClick={() => handleDelete(student.id)}
                       style={{ padding: '8px', color: 'var(--secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      title="Delete Student"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -108,6 +145,49 @@ export default function ManageStudents() {
           </table>
         )}
       </div>
+
+      {/* Edit Student Modal */}
+      {editingStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-md animate-fade-in" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}>
+          <div className="glass-panel w-full max-w-md p-lg flex flex-col gap-md" style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>Edit Student Record</h3>
+            <form onSubmit={handleSaveEdit} className="flex flex-col gap-md">
+              <div className="input-group mb-0">
+                <label className="input-label text-xs font-semibold">Student Name</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  required 
+                />
+              </div>
+              <div className="input-group mb-0">
+                <label className="input-label text-xs font-semibold">Career Track</label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  value={editPath}
+                  onChange={(e) => setEditPath(e.target.value)}
+                  required 
+                />
+              </div>
+              <div className="flex justify-end gap-sm mt-sm">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setEditingStudent(null)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

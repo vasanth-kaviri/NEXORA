@@ -2,12 +2,25 @@ import { useState } from 'react';
 import { Search, Plus, Trash2, X, Sparkles } from 'lucide-react';
 
 export default function ManageResources() {
-  const [resources, setResources] = useState([
-    { id: 'res_1', title: 'Modern React Architecture & Concurrency', type: 'Course', source: 'Frontend Masters', category: 'Frontend', accessCount: 1420 },
-    { id: 'res_2', title: 'PostgreSQL Deep Dive: Query Planning & B-Trees', type: 'Article', source: 'Postgres Guide', category: 'Database', accessCount: 980 },
-    { id: 'res_3', title: 'Distributed Systems & Docker Containerization', type: 'Course', source: 'Coursera', category: 'DevOps', accessCount: 1150 },
-    { id: 'res_4', title: 'PyTorch Deep Learning & Transformer Implementation', type: 'Course', source: 'DeepLearning.AI', category: 'AI/ML', accessCount: 890 }
-  ]);
+  const [resources, setResources] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nexora_admin_resources');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [
+      { id: 'res_1', title: 'Modern React Architecture & Concurrency', type: 'Course', source: 'Frontend Masters', category: 'Frontend', accessCount: 1420 },
+      { id: 'res_2', title: 'PostgreSQL Deep Dive: Query Planning & B-Trees', type: 'Article', source: 'Postgres Guide', category: 'Database', accessCount: 980 },
+      { id: 'res_3', title: 'Distributed Systems & Docker Containerization', type: 'Course', source: 'Coursera', category: 'DevOps', accessCount: 1150 },
+      { id: 'res_4', title: 'PyTorch Deep Learning & Transformer Implementation', type: 'Course', source: 'DeepLearning.AI', category: 'AI/ML', accessCount: 890 }
+    ];
+  });
+
+  const saveResources = (updated) => {
+    setResources(updated);
+    try {
+      localStorage.setItem('nexora_admin_resources', JSON.stringify(updated));
+    } catch {}
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -35,7 +48,7 @@ export default function ManageResources() {
       accessCount: 0
     };
 
-    setResources([newRes, ...resources]);
+    saveResources([newRes, ...resources]);
     setShowAddModal(false);
     setNewTitle('');
     setNewSource('');
@@ -43,7 +56,7 @@ export default function ManageResources() {
   };
 
   const handleDelete = (id) => {
-    setResources(resources.filter(r => r.id !== id));
+    saveResources(resources.filter(r => r.id !== id));
     triggerToast('Resource deleted.');
   };
 
