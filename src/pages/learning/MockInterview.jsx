@@ -7,6 +7,7 @@ import {
   MessageSquare, Layers, Monitor, Calendar, AlertTriangle
 } from 'lucide-react';
 import db from '../../services/db';
+import interviewService from '../../services/interviewService';
 
 export default function MockInterview() {
   const navigate = useNavigate();
@@ -541,7 +542,24 @@ export default function MockInterview() {
       xp: (currentUser.xp || 1200) + 150
     });
 
-    triggerToast('Interview Finalized: Hardware Released & +150 XP Awarded!');
+    // Persist session to MongoDB Atlas via interviewService
+    interviewService.completeInterview({
+      role: selectedRole,
+      overallScore: calculatedScore,
+      verdict: generatedScorecard.verdict,
+      alertCount,
+      scorecard: generatedScorecard,
+      answers: Object.entries(userAnswers).map(([qId, ans]) => ({
+        questionId: qId,
+        question: questionBanks[selectedRole]?.find(q => String(q.id) === String(qId))?.q || 'Interview Question',
+        company: questionBanks[selectedRole]?.find(q => String(q.id) === String(qId))?.company,
+        type: questionBanks[selectedRole]?.find(q => String(q.id) === String(qId))?.type,
+        answerContent: ans,
+        feedback: perQuestionFeedback[qId],
+      })),
+    });
+
+    triggerToast('Interview Finalized: Hardware Released & Saved to Atlas (+150 XP)!');
   };
 
   const formatTime = (secs) => {
